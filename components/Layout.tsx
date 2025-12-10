@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
-import { UserRole, AuthState, Notification } from '../types';
+import { UserRole, AuthState, Notification, COMPANY_SECTORS, CompanySector } from '../types';
 import { supabase } from '../services/supabase';
 
 interface LayoutProps {
@@ -19,7 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  const [editForm, setEditForm] = useState({ full_name: auth.user?.full_name || '', phone: '', city: auth.user?.city || '' });
+  const [editForm, setEditForm] = useState({ full_name: auth.user?.full_name || '', phone: '', city: auth.user?.city || '', company_sector: (auth.user?.company_sector as CompanySector) || '' });
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -28,13 +28,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
       fetchNotifications();
-      
-      // Refresh notifications every 10 seconds
-      const interval = setInterval(() => {
-        fetchNotifications();
-      }, 10000);
-      
-      return () => clearInterval(interval);
+
+      // Realtime subscription to notifications for this user (Supabase v2)
+      const channel = supabase.channel('public:VoyNotifications')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'VoyNotifications', filter: `user_id=eq.${auth.user.id}` }, (payload) => {
+          console.log('Realtime notification payload:', payload);
+          // refresh list when there's a change for this user's notifications
+          fetchNotifications();
+        })
+        .subscribe();
+
+      return () => {
+        try { supabase.removeChannel(channel); } catch (e) { /* ignore */ }
+      };
     }
   }, [auth.user?.id]);
 
@@ -94,12 +100,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
     e.preventDefault();
     if (!auth.user?.id) return;
 
+    // Require sector for company users
+    if (auth.user?.role === UserRole.COMPANY && !editForm.company_sector) {
+      alert('Selecciona el sector principal de la empresa');
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('VoyUsers')
         .update({
           full_name: editForm.full_name,
-          city: editForm.city
+          city: editForm.city,
+          company_sector: editForm.company_sector || null
         })
         .eq('id', auth.user.id);
 
@@ -238,6 +251,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
                         <div className="p-4 border-b border-gray-100">
                           <p className="font-bold text-slate-900 text-sm">{auth.user.full_name}</p>
                           <p className="text-xs text-gray-500">{auth.user.email}</p>
+                          {auth.user?.role === UserRole.COMPANY && auth.user.company_sector && (
+                            <p className="text-xs text-gray-400 mt-1">{COMPANY_SECTORS.find(s => s.id === auth.user!.company_sector)?.short || auth.user.company_sector}</p>
+                          )}
                         </div>
                         <button 
                           onClick={() => {
@@ -419,6 +435,23 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
                   placeholder="Madrid"
                 />
               </div>
+
+              {/* Company sector selector for company users */}
+              {auth.user?.role === UserRole.COMPANY && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Sector principal de la empresa</label>
+                  <select
+                    value={editForm.company_sector}
+                    onChange={(e) => setEditForm({...editForm, company_sector: e.target.value as CompanySector})}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="">Selecciona un sector</option>
+                    {COMPANY_SECTORS.map(s => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <button 

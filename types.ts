@@ -56,6 +56,7 @@ export interface User {
   email: string;
   city?: string;
   district?: string;
+  company_sector?: CompanySector;  // nuevo
 }
 
 export interface Job {
@@ -74,6 +75,7 @@ export interface Job {
   creator_user_id: string;
   created_at: string;
   
+    sector?: CompanySector | null;          //  nuevo
   // Expanded properties
   creator?: {
     full_name: string;
@@ -129,3 +131,43 @@ export const DAYS_OF_WEEK = [
   { id: 6, label: 'S', name: 'Sábado' },
   { id: 0, label: 'D', name: 'Domingo' },
 ];
+
+export type CompanySector =
+  | 'HOSTELERIA_RESTAURACION'
+  | 'COMERCIO_RETAIL'
+  | 'LOGISTICA_ALMACEN'
+  | 'MENSAJERIA_REPARTO'
+  | 'EVENTOS_PROMOCION'
+  | 'CONSTRUCCION_OBRA'
+  | 'LIMPIEZA_MANTENIMIENTO'
+  | 'ATENCION_PERSONAS'
+  | 'SERVICIOS_TECNOLOGICOS'
+  | 'SEGURIDAD_VIGILANCIA'
+  | 'HOTELES_TURISMO'
+  | 'AGRICULTURA_TEMPORAL'
+  | 'INDUSTRIA_FABRICAS'
+  | 'MARKETING_PUBLICIDAD'
+  | 'TRANSPORTE_MOVILIDAD';
+
+export const COMPANY_SECTORS: {
+  id: CompanySector;
+  label: string;
+  short: string;
+}[] = [
+  { id: 'HOSTELERIA_RESTAURACION', label: 'Hostelería y Restauración', short: 'Hostelería' },
+  { id: 'COMERCIO_RETAIL', label: 'Comercio y Retail', short: 'Comercio' },
+  { id: 'LOGISTICA_ALMACEN', label: 'Logística y Almacén', short: 'Logística' },
+  { id: 'MENSAJERIA_REPARTO', label: 'Mensajería y Reparto', short: 'Reparto' },
+  { id: 'EVENTOS_PROMOCION', label: 'Eventos y Promoción', short: 'Eventos' },
+  { id: 'CONSTRUCCION_OBRA', label: 'Construcción y Obra', short: 'Construcción' },
+  { id: 'LIMPIEZA_MANTENIMIENTO', label: 'Limpieza y Mantenimiento', short: 'Limpieza' },
+  { id: 'ATENCION_PERSONAS', label: 'Atención a Personas', short: 'Personas' },
+  { id: 'SERVICIOS_TECNOLOGICOS', label: 'Servicios Tecnológicos', short: 'Tecnología' },
+  { id: 'SEGURIDAD_VIGILANCIA', label: 'Seguridad y Vigilancia', short: 'Seguridad' },
+  { id: 'HOTELES_TURISMO', label: 'Hoteles y Turismo', short: 'Turismo' },
+  { id: 'AGRICULTURA_TEMPORAL', label: 'Agricultura y Temporales', short: 'Agricultura' },
+  { id: 'INDUSTRIA_FABRICAS', label: 'Industria y Fábricas', short: 'Industria' },
+  { id: 'MARKETING_PUBLICIDAD', label: 'Marketing y Publicidad', short: 'Marketing' },
+  { id: 'TRANSPORTE_MOVILIDAD', label: 'Transporte y Movilidad', short: 'Transporte' },
+];
+
