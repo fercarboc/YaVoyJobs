@@ -1,0 +1,8 @@
+{
+  "name": "WebYaVoy",
+  "description": "Plataforma de micro-trabajos y ayuda vecinal para conectar a quienes necesitan ayuda con quienes pueden ofrecerla.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
