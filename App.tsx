@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-ro
 import { Layout } from './components/Layout';
 import { SubscriptionPanel } from './components/SubscriptionPanel';
 import { SubscriptionPaymentModal } from './components/SubscriptionPaymentModal';
+import { FinancialPanel } from './components/FinancialPanel';
 import { AuthState, UserRole, User, Job, JobStatus, PeriodType, ContractType, DAYS_OF_WEEK } from './types';
 import { Icons } from './components/Icons';
 import { optimizeJobDescription, suggestJobPrice } from './services/geminiService';
@@ -1137,12 +1138,48 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
       }
     };
 
-    const handleSubscriptionPaymentSuccess = () => {
+    const handleSubscriptionPaymentSuccess = async () => {
       setSubscriptionPaymentModalOpen(false);
       setSubscriptionClientSecret(null);
       setSubscriptionPlanInfo(null);
+      
+      // Activar la última suscripción pendiente automáticamente
+      try {
+        const { data: pendingSubs } = await supabase
+          .from('VoyCompanySubscriptions')
+          .select('*')
+          .eq('company_user_id', user.id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (pendingSubs && pendingSubs.length > 0) {
+          const sub = pendingSubs[0];
+          const durationDays = sub.subscription_type === 'annual' ? 365 : 
+                               sub.subscription_type === 'semester' ? 180 : 30;
+          
+          const startDate = new Date();
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + durationDays);
+
+          await supabase
+            .from('VoyCompanySubscriptions')
+            .update({
+              status: 'active',
+              start_date: startDate.toISOString(),
+              end_date: endDate.toISOString()
+            })
+            .eq('id', sub.id);
+        }
+      } catch (error) {
+        console.error('Error activating subscription:', error);
+      }
+
       onToast({ message: '¡Suscripción activada con éxito!', type: 'success' });
       setShowSubscriptions(false);
+      
+      // Recargar la página para mostrar el bono activo
+      setTimeout(() => window.location.reload(), 1500);
     };
 
     const handleAcceptApplicant = async (applicationId: string, jobId: string, helperUserId: string) => {
@@ -1291,9 +1328,9 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold text-slate-800">Mis Anuncios</h1>
+                <h1 className="text-2xl font-bold text-slate-800">Mi Panel</h1>
                 <div className="flex gap-3">
                     {user.role === 'COMPANY' && (
                         <button
@@ -1314,24 +1351,29 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                 </div>
             </div>
 
-            {/* Stats Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <span className="text-gray-500 text-xs uppercase font-bold">Activos</span>
-                    <p className="text-2xl font-bold text-brand-600">{jobs.filter(j => j.status === 'OPEN').length}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <span className="text-gray-500 text-xs uppercase font-bold">Completados</span>
-                    <p className="text-2xl font-bold text-emerald-600">{jobs.filter(j => j.status === 'COMPLETED').length}</p>
-                </div>
-            </div>
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Jobs List (2/3) */}
+                <div className="lg:col-span-2 space-y-6">
+                    <h2 className="text-xl font-bold text-slate-800">Mis Anuncios</h2>
+                    
+                    {/* Stats Summary */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <span className="text-gray-500 text-xs uppercase font-bold">Activos</span>
+                            <p className="text-2xl font-bold text-brand-600">{jobs.filter(j => j.status === 'OPEN').length}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <span className="text-gray-500 text-xs uppercase font-bold">Completados</span>
+                            <p className="text-2xl font-bold text-emerald-600">{jobs.filter(j => j.status === 'COMPLETED').length}</p>
+                        </div>
+                    </div>
 
-            {/* List */}
-            {loading ? (
-              <div className="text-center py-12">Cargando...</div>
-            ) : (
-              <div className="space-y-4">
-                  {jobs.map(job => (
+                    {/* Jobs List */}
+                    {loading ? (
+                      <div className="text-center py-12">Cargando...</div>
+                    ) : (
+                      <div className="space-y-4">{jobs.map(job => (
                       <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
                           <div className="p-6">
                               <div className="flex flex-col md:flex-row justify-between items-start">
@@ -1470,6 +1512,17 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                   )}
               </div>
             )}
+                </div>
+
+                {/* Right Column - Financial Panel (1/3) */}
+                {(user.role === 'COMPANY' || user.role === 'PARTICULAR') && (
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-4">
+                            <FinancialPanel userId={user.id} userRole={user.role as 'COMPANY' | 'PARTICULAR'} />
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* Advanced Modal */}
             {isModalOpen && (

@@ -104,14 +104,23 @@ export async function createSubscriptionPayment(
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Error creando payment intent');
+      const errorText = await response.text();
+      console.error('Error response:', response.status, errorText);
+      let errorMessage = 'Error creando payment intent';
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.error || errorMessage;
+      } catch (e) {
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    console.log('Payment response:', data);
     return {
       clientSecret: data.clientSecret,
-      paymentIntentId: data.paymentIntentId
+      paymentIntentId: data.paymentIntentId || data.stripe_payment_intent_id || ''
     };
   } catch (err) {
     console.error('Error in createSubscriptionPayment:', err);
