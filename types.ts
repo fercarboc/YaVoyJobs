@@ -56,7 +56,7 @@ export interface User {
   email: string;
   city?: string;
   district?: string;
-  company_sector?: CompanySector;  // nuevo
+  company_sector?: CompanySector | null;  // nuevo
 }
 
 export interface Job {

@@ -5,7 +5,8 @@ import {
   LayoutDashboard, Sparkles, Download,
   PawPrint, Hammer, Lightbulb, MessageCircle,
   Navigation, UserCheck, Search, Edit3,
-  Quote, Users, Trash, ChevronDown, FileText
+  Quote, Users, Trash, ChevronDown, FileText,
+  Check, Info, Gift
 } from 'lucide-react';
 
 export const Icons = {
@@ -15,5 +16,6 @@ export const Icons = {
   LayoutDashboard, Sparkles, Download,
   PawPrint, Hammer, Lightbulb, MessageCircle,
   Navigation, UserCheck, Search, Edit3,
-  Quote, Users, Trash, ChevronDown, FileText
+  Quote, Users, Trash, ChevronDown, FileText,
+  Check, Info, Gift
 };

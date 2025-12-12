@@ -2,11 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { AuthState, UserRole, User, Job, JobStatus, PeriodType, ContractType, DAYS_OF_WEEK, COMPANY_SECTORS, CompanySector } from './types';
+import { SubscriptionPanel } from './components/SubscriptionPanel';
+import { SubscriptionPaymentModal } from './components/SubscriptionPaymentModal';
+import { AuthState, UserRole, User, Job, JobStatus, PeriodType, ContractType, DAYS_OF_WEEK } from './types';
 import { Icons } from './components/Icons';
 import { optimizeJobDescription, suggestJobPrice } from './services/geminiService';
 import { supabase } from './services/supabase';
 import { LegalNotice, PrivacyPolicy, CookiesPolicy, TermsOfUse } from './components/LegalPages';
+import { SubscriptionType } from './services/subscriptionService';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
@@ -19,52 +22,6 @@ const INITIAL_AUTH: AuthState = { isAuthenticated: false, user: null, loading: t
 // 1. LANDING PAGE
 const Landing = () => {
   const navigate = useNavigate();
-  const [neighEmail, setNeighEmail] = useState('');
-  const [neighCP, setNeighCP] = useState('');
-  const [neighLoading, setNeighLoading] = useState(false);
-  const [neighSent, setNeighSent] = useState(false);
-
-  const handleNeighborhoodRequest = async () => {
-    if (!neighEmail || !neighCP) {
-      alert('Introduce tu email y código postal.');
-      return;
-    }
-    setNeighLoading(true);
-    try {
-      const { data: admins, error: adminErr } = await supabase
-        .from('VoyUsers')
-        .select('id, full_name')
-        .eq('role', 'ADMIN');
-
-      if (adminErr) throw adminErr;
-
-      if (admins && admins.length > 0) {
-        const notifications = admins.map((a: any) => ({
-          user_id: a.id,
-          title: 'Solicitud: YaVoy en nuevo barrio',
-          message: `Solicitud de lanzamiento: email ${neighEmail} · C.P. ${neighCP}`,
-          type: 'SYSTEM',
-          is_read: false
-        }));
-
-        const { error: notifErr } = await supabase
-          .from('VoyNotifications')
-          .insert(notifications);
-
-        if (notifErr) throw notifErr;
-      }
-
-      setNeighSent(true);
-      alert('Gracias — avisaremos cuando lleguemos a tu barrio');
-      setNeighEmail('');
-      setNeighCP('');
-    } catch (err) {
-      console.error('Error sending neighborhood request', err);
-      alert('Error enviando solicitud. Intenta de nuevo.');
-    } finally {
-      setNeighLoading(false);
-    }
-  };
 
   return (
     <div className="w-full font-sans">
@@ -558,27 +515,9 @@ const Landing = () => {
                     <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/10 max-w-xl mx-auto md:mx-0">
                        <h3 className="font-bold text-lg mb-4">¿Quieres YaVoy en tu barrio?</h3>
                        <div className="flex flex-col sm:flex-row gap-2">
-                         <input
-                           type="email"
-                           placeholder="Tu email"
-                           value={neighEmail}
-                           onChange={(e) => setNeighEmail(e.target.value)}
-                           className="flex-grow px-4 py-3 rounded-lg text-slate-900 bg-white outline-none focus:ring-2 focus:ring-brand-500"
-                         />
-                         <input
-                           type="text"
-                           placeholder="Tu C.P."
-                           value={neighCP}
-                           onChange={(e) => setNeighCP(e.target.value)}
-                           className="w-full sm:w-24 px-4 py-3 rounded-lg text-slate-900 bg-white outline-none focus:ring-2 focus:ring-brand-500"
-                         />
-                         <button
-                           onClick={handleNeighborhoodRequest}
-                           disabled={neighLoading || neighSent}
-                           className={`px-6 py-3 rounded-lg font-bold transition text-white ${neighLoading || neighSent ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-500 hover:bg-brand-600'}`}
-                         >
-                           {neighLoading ? 'Enviando...' : neighSent ? 'Enviado' : 'Avisadme'}
-                         </button>
+                         <input type="email" placeholder="Tu email" className="flex-grow px-4 py-3 rounded-lg text-slate-900 bg-white outline-none focus:ring-2 focus:ring-brand-500" />
+                         <input type="text" placeholder="Tu C.P." className="w-full sm:w-24 px-4 py-3 rounded-lg text-slate-900 bg-white outline-none focus:ring-2 focus:ring-brand-500" />
+                         <button className="bg-brand-500 px-6 py-3 rounded-lg font-bold hover:bg-brand-600 transition text-white">Avisadme</button>
                        </div>
                     </div>
                 </div>
@@ -757,7 +696,7 @@ const Login = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
       if (data.user) {
         const { data: profileData, error: profileError } = await supabase
           .from('VoyUsers')
-          .select('id, auth_user_id, full_name, role, email, city, district, company_sector')
+          .select('*')
           .eq('auth_user_id', data.user.id)
           .single();
         
@@ -839,13 +778,10 @@ const Register = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    cif: '',
-    companySector: ''
+    cif: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [emailConfirmationPending, setEmailConfirmationPending] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -854,12 +790,6 @@ const Register = () => {
     
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
-      return;
-    }
-
-    // If company, require sector
-    if (activeTab === 'COMPANY' && !formData.companySector) {
-      setError('Selecciona el sector principal de la empresa');
       return;
     }
 
@@ -882,16 +812,15 @@ const Register = () => {
               full_name: formData.name,
               email: formData.email,
               role: activeTab,
-              phone: formData.phone,
-              company_sector: formData.companySector || null
+              phone: formData.phone
             }
           ]);
 
         if (profileError) throw profileError;
         
-        // Show email confirmation message
-        setRegisteredEmail(formData.email);
-        setEmailConfirmationPending(true);
+        // If Company, also insert into VoyCompanies (skipped for brevity/mock in this step, handled by BE logic typically)
+        
+        navigate('/');
       }
     } catch (err: any) {
       setError(err.message || 'Error al registrarse');
@@ -902,11 +831,6 @@ const Register = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleConfirmEmailClose = () => {
-    setEmailConfirmationPending(false);
-    navigate('/login');
   };
 
   return (
@@ -996,22 +920,6 @@ const Register = () => {
                  </div>
               )}
 
-              {activeTab === 'COMPANY' && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Sector principal de la empresa</label>
-                  <select
-                    value={formData.companySector}
-                    onChange={(e) => setFormData({ ...formData, companySector: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  >
-                    <option value="">Selecciona un sector</option>
-                    {COMPANY_SECTORS.map(s => (
-                      <option key={s.id} value={s.id}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               <div className="md:col-span-2 mt-4">
                 <button type="submit" disabled={loading} className="w-full bg-brand-500 text-white py-4 rounded-lg font-bold hover:bg-brand-600 transition shadow-lg disabled:opacity-50">
                   {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
@@ -1021,37 +929,6 @@ const Register = () => {
           </div>
         </div>
       </div>
-
-      {/* Email Confirmation Modal */}
-      {emailConfirmationPending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <Icons.Mail size={32} className="text-blue-600" />
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Confirma tu Email</h2>
-            <p className="text-slate-600 mb-6">
-              Hemos enviado un enlace de confirmación a:
-              <br />
-              <span className="font-bold text-brand-600">{registeredEmail}</span>
-            </p>
-            <div className="bg-blue-50 p-4 rounded-lg mb-6 text-sm text-slate-700 text-left space-y-2">
-              <p>📧 <span className="font-medium">Revisa tu bandeja de entrada</span> (y spam si es necesario)</p>
-              <p>🔗 Haz clic en el enlace de confirmación</p>
-              <p>✅ Después podrás iniciar sesión con tu email y contraseña</p>
-            </div>
-            <button
-              onClick={handleConfirmEmailClose}
-              className="w-full bg-brand-500 text-white py-3 rounded-lg font-bold hover:bg-brand-600 transition shadow-lg"
-            >
-              Entendido, ir a Login
-            </button>
-            <p className="text-xs text-slate-500 mt-4">¿No recibiste el email? Revisa spam o intenta registrarte de nuevo.</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -1150,12 +1027,20 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
     const [applicants, setApplicants] = useState<Record<string, any[]>>({});
     const [editingJobId, setEditingJobId] = useState<string | null>(null);
     
+    // Subscription state
+    const [showSubscriptions, setShowSubscriptions] = useState(false);
+    const [subscriptionPaymentModalOpen, setSubscriptionPaymentModalOpen] = useState(false);
+    const [subscriptionClientSecret, setSubscriptionClientSecret] = useState<string | null>(null);
+    const [subscriptionPlanInfo, setSubscriptionPlanInfo] = useState<{
+      name: string;
+      amount: number;
+    } | null>(null);
+    
     // New Job Form State
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('OTROS');
-    const [jobSector, setJobSector] = useState<CompanySector | ''>(user.company_sector || '');
     const [isOptimizing, setIsOptimizing] = useState(false);
 
     // Advanced Options State
@@ -1200,8 +1085,6 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
       }
     };
 
-    // (removed) suggested helpers effect — belongs to WorkerDashboard
-
     const fetchApplicants = async (jobId: string) => {
       try {
         const { data, error } = await supabase
@@ -1235,6 +1118,31 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
         alert('Error al eliminar el anuncio');
         console.error(err);
       }
+    };
+
+    const handlePurchaseSubscription = async (subscriptionType: SubscriptionType) => {
+      try {
+        const { createSubscription, createSubscriptionPayment, SUBSCRIPTION_PLANS } = await import('./services/subscriptionService');
+        
+        const subscription = await createSubscription(user.id, subscriptionType);
+        const plan = SUBSCRIPTION_PLANS[subscriptionType];
+        const { clientSecret } = await createSubscriptionPayment(subscription.id, plan.price, user.id);
+        
+        setSubscriptionClientSecret(clientSecret);
+        setSubscriptionPlanInfo({ name: plan.name, amount: plan.price });
+        setSubscriptionPaymentModalOpen(true);
+      } catch (err) {
+        console.error('Error purchasing subscription:', err);
+        onToast({ message: 'Error al procesar la compra', type: 'error' });
+      }
+    };
+
+    const handleSubscriptionPaymentSuccess = () => {
+      setSubscriptionPaymentModalOpen(false);
+      setSubscriptionClientSecret(null);
+      setSubscriptionPlanInfo(null);
+      onToast({ message: '¡Suscripción activada con éxito!', type: 'success' });
+      setShowSubscriptions(false);
     };
 
     const handleAcceptApplicant = async (applicationId: string, jobId: string, helperUserId: string) => {
@@ -1311,12 +1219,6 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
         setIsOptimizing(false);
     };
 
-    // Returns true if the given job already has an accepted candidate
-    const hasAcceptedCandidate = (jobId: string): boolean => {
-      const jobApplicants = applicants[jobId] || [];
-      return jobApplicants.some((app: any) => app.status === 'ACCEPTED');
-    };
-
     const toggleDay = (dayId: number) => {
         if (selectedDays.includes(dayId)) {
             setSelectedDays(selectedDays.filter(d => d !== dayId));
@@ -1341,9 +1243,6 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
             status: 'OPEN',
             city: user.city || 'Madrid'
           };
-          if (user.role === UserRole.COMPANY) {
-            (jobData as any).sector = jobSector || user.company_sector || null;
-          }
 
           const { data: createdJob, error: jobError } = await supabase
             .from('VoyJobs')
@@ -1395,13 +1294,24 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
         <div className="max-w-6xl mx-auto px-4 py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold text-slate-800">Mis Anuncios</h1>
-                <button 
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-brand-500 text-white px-5 py-2.5 rounded-full font-bold shadow-lg hover:bg-brand-600 flex items-center"
-                >
-                    <Icons.Sparkles size={18} className="mr-2" />
-                    Publicar Nuevo
-                </button>
+                <div className="flex gap-3">
+                    {user.role === 'COMPANY' && (
+                        <button
+                            onClick={() => setShowSubscriptions(true)}
+                            className="bg-purple-600 text-white px-5 py-2.5 rounded-full font-bold shadow-lg hover:bg-purple-700 flex items-center"
+                        >
+                            <Icons.Gift size={18} className="mr-2" />
+                            Bonos
+                        </button>
+                    )}
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-brand-500 text-white px-5 py-2.5 rounded-full font-bold shadow-lg hover:bg-brand-600 flex items-center"
+                    >
+                        <Icons.Sparkles size={18} className="mr-2" />
+                        Publicar Nuevo
+                    </button>
+                </div>
             </div>
 
             {/* Stats Summary */}
@@ -1421,8 +1331,8 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
               <div className="text-center py-12">Cargando...</div>
             ) : (
               <div className="space-y-4">
-                    {jobs.map(job => (
-                      <div key={job.id} className={`${hasAcceptedCandidate(job.id) ? 'bg-gray-100 border border-gray-200 rounded-xl overflow-hidden transition opacity-70' : 'bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition'}`}>
+                  {jobs.map(job => (
+                      <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
                           <div className="p-6">
                               <div className="flex flex-col md:flex-row justify-between items-start">
                                   <div className="flex-grow">
@@ -1451,40 +1361,41 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                                                <span className="text-xl font-bold text-slate-800">{job.price_fixed || job.price_hourly}€</span>
                                           )}
                                           
-                                            <span className={`block px-3 py-1 rounded-full text-xs font-bold mt-2 ${hasAcceptedCandidate(job.id) ? 'bg-rose-100 text-rose-700' : job.status === 'OPEN' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
-                                              {hasAcceptedCandidate(job.id) ? '✓ Candidato Aceptado' : (job.status === 'OPEN' ? 'Buscando...' : job.status)}
-                                            </span>
+                                          <span className={`block px-3 py-1 rounded-full text-xs font-bold mt-2 ${job.status === 'OPEN' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                                              {job.status === 'OPEN' ? 'Buscando...' : job.status}
+                                          </span>
                                       </div>
 
                                       {/* Candidatos Counter */}
-                                        <button
-                                          onClick={() => !hasAcceptedCandidate(job.id) && setExpandedJobId(expandedJobId === job.id ? null : job.id)}
-                                          disabled={hasAcceptedCandidate(job.id)}
-                                          className={`flex items-center space-x-2 mb-3 px-3 py-2 rounded-lg transition ${hasAcceptedCandidate(job.id) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}>
+                                      <button
+                                          onClick={() => setExpandedJobId(expandedJobId === job.id ? null : job.id)}
+                                          className="flex items-center space-x-2 mb-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                      >
                                           <Icons.Users size={18} />
                                           <span className="font-bold text-sm">{applicants[job.id]?.length || 0} candidatos</span>
-                                        </button>
+                                      </button>
                                   </div>
                               </div>
 
                               {/* Action Buttons */}
                               <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                                      <button
-                                        onClick={() => { setEditingJobId(job.id); setIsModalOpen(true); }}
-                                        disabled={hasAcceptedCandidate(job.id)}
-                                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition text-sm ${hasAcceptedCandidate(job.id) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                                      >
-                                        <Icons.Edit3 size={16} />
-                                        Editar
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteJob(job.id)}
-                                        disabled={hasAcceptedCandidate(job.id)}
-                                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition text-sm ${hasAcceptedCandidate(job.id) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
-                                      >
-                                        <Icons.Trash size={16} />
-                                        Eliminar
-                                      </button>
+                                  <button
+                                      onClick={() => {
+                                          setEditingJobId(job.id);
+                                          setIsModalOpen(true);
+                                      }}
+                                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium hover:bg-blue-100 transition text-sm"
+                                  >
+                                      <Icons.Edit3 size={16} />
+                                      Editar
+                                  </button>
+                                  <button
+                                      onClick={() => handleDeleteJob(job.id)}
+                                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition text-sm"
+                                  >
+                                      <Icons.Trash size={16} />
+                                      Eliminar
+                                  </button>
                               </div>
 
                               {/* Expandable Applicants List */}
@@ -1604,17 +1515,6 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                                             <option value="DIGITAL">Tecnología</option>
                                         </select>
                                     </div>
-                                    {user.role === UserRole.COMPANY && (
-                                      <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Sector (empresa)</label>
-                                        <select value={jobSector} onChange={e => setJobSector(e.target.value as CompanySector)} className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none">
-                                          <option value="">Usar sector de perfil ({user.company_sector || 'sin sector'})</option>
-                                          {COMPANY_SECTORS.map(s => (
-                                            <option key={s.id} value={s.id}>{s.label}</option>
-                                          ))}
-                                        </select>
-                                      </div>
-                                    )}
                                 </div>
                             </div>
 
@@ -1721,6 +1621,33 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                     </div>
                 </div>
             )}
+
+            {/* Subscription Panel Modal */}
+            {showSubscriptions && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                    <div className="bg-white rounded-lg max-w-4xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto relative">
+                        <button
+                            onClick={() => setShowSubscriptions(false)}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                        >
+                            ✕
+                        </button>
+                        <SubscriptionPanel userId={user.id} onPurchase={handlePurchaseSubscription} />
+                    </div>
+                </div>
+            )}
+
+            {/* Subscription Payment Modal */}
+            {subscriptionPaymentModalOpen && subscriptionClientSecret && subscriptionPlanInfo && (
+                <SubscriptionPaymentModal
+                    isOpen={subscriptionPaymentModalOpen}
+                    onClose={() => setSubscriptionPaymentModalOpen(false)}
+                    onSuccess={handleSubscriptionPaymentSuccess}
+                    clientSecret={subscriptionClientSecret}
+                    planName={subscriptionPlanInfo.name}
+                    amount={subscriptionPlanInfo.amount}
+                />
+            )}
         </div>
     );
 };
@@ -1747,77 +1674,11 @@ const WorkerDashboard = ({ user }: { user: User }) => {
       fetchMyApplications();
     }, [user.id]);
 
-    // Realtime subscriptions: listen for application changes to update UI immediately
-    useEffect(() => {
-      if (!user.id) return;
-
-      const channel = supabase.channel('public:VoyJobApplications')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'VoyJobApplications' }, (payload) => {
-          console.log('Realtime job application payload:', payload);
-          try {
-            const newApp = (payload as any).new;
-            const oldApp = (payload as any).old;
-
-            // If this change concerns the current helper, refresh their applications and appliedJobs
-            if (newApp?.helper_user_id === user.id || oldApp?.helper_user_id === user.id) {
-              fetchMyApplications();
-              fetchAppliedJobs();
-            }
-
-            // If an application's status changed to ACCEPTED (or was accepted), refresh jobs to update UI (grey-out)
-            if (newApp?.status === 'ACCEPTED' || oldApp?.status === 'ACCEPTED') {
-              fetchJobs();
-            }
-          } catch (e) {
-            console.error('Realtime payload handling error', e);
-          }
-        })
-        .subscribe();
-
-      return () => {
-        try { supabase.removeChannel(channel); } catch (e) { /* ignore cleanup errors */ }
-      };
-    }, [user.id]);
-
-    const [sectorFilter, setSectorFilter] = useState<CompanySector | ''>('');
-    const [suggestedHelpers, setSuggestedHelpers] = useState<any[]>([]);
-
-    const fetchSuggestedHelpers = async (sector: CompanySector | '') => {
-      if (!sector) {
-        setSuggestedHelpers([]);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('VoyJobApplications')
-          .select('helper:VoyUsers(id, full_name, email, phone), job:VoyJobs(id, title, creator:VoyUsers(company_sector))')
-          .order('created_at', { ascending: false })
-          .limit(200);
-
-        if (error) throw error;
-
-        const helpersMap: Record<string, any> = {};
-        (data || []).forEach((app: any) => {
-          const jobSector = app.job?.creator?.company_sector;
-          const helper = app.helper;
-          if (jobSector === sector && helper) {
-            helpersMap[helper.id] = helper;
-          }
-        });
-
-        setSuggestedHelpers(Object.values(helpersMap));
-      } catch (err) {
-        console.error('Error fetching suggested helpers', err);
-        setSuggestedHelpers([]);
-      }
-    };
-
     const fetchJobs = async () => {
       try {
         const { data, error } = await supabase
           .from('VoyJobs')
-          .select('*, creator:VoyUsers(full_name, company_sector), schedule:VoyWorkSchedules(*), contract:VoyWorkContracts(*)')
+          .select('*, creator:VoyUsers(full_name), schedule:VoyWorkSchedules(*), contract:VoyWorkContracts(*)')
           .eq('status', 'OPEN')
           .order('created_at', { ascending: false });
 
@@ -1904,11 +1765,7 @@ const WorkerDashboard = ({ user }: { user: User }) => {
       }
     };
 
-    const filtered = (filter === 'all' ? availableJobs : availableJobs.filter(j => j.category === filter))
-      .filter(j => {
-        if (!sectorFilter) return true;
-        return j.creator?.company_sector === sectorFilter;
-      });
+    const filtered = filter === 'all' ? availableJobs : availableJobs.filter(j => j.category === filter);
 
     const getDayLabel = (dayIndex: number) => DAYS_OF_WEEK.find(d => d.id === dayIndex)?.label || '?';
 
@@ -1973,90 +1830,6 @@ const WorkerDashboard = ({ user }: { user: User }) => {
                   ))}
                 </div>
 
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <label className="text-sm text-gray-600">Filtrar por sector:</label>
-                    <select
-                      value={sectorFilter}
-                      onChange={(e) => setSectorFilter(e.target.value as CompanySector)}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
-                    >
-                      <option value="">Todos</option>
-                      {COMPANY_SECTORS.map(s => (
-                        <option key={s.id} value={s.id}>{s.label}</option>
-                      ))}
-                    </select>
-
-                    {/* Quick chips for common sectors */}
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => setSectorFilter('HOSTELERIA_RESTAURACION')} className={`px-3 py-1 rounded-full text-sm ${sectorFilter === 'HOSTELERIA_RESTAURACION' ? 'bg-slate-900 text-white' : 'bg-white border border-gray-200 text-slate-700'}`}>Hostelería</button>
-                      <button onClick={() => setSectorFilter('LOGISTICA_ALMACEN')} className={`px-3 py-1 rounded-full text-sm ${sectorFilter === 'LOGISTICA_ALMACEN' ? 'bg-slate-900 text-white' : 'bg-white border border-gray-200 text-slate-700'}`}>Logística</button>
-                      <button onClick={() => setSectorFilter('COMERCIO_RETAIL')} className={`px-3 py-1 rounded-full text-sm ${sectorFilter === 'COMERCIO_RETAIL' ? 'bg-slate-900 text-white' : 'bg-white border border-gray-200 text-slate-700'}`}>Comercio</button>
-                      <button onClick={() => setSectorFilter('')} className="px-2 py-1 rounded-full text-sm bg-white border border-gray-200 text-slate-500">Limpiar</button>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Suggested Helpers Panel */}
-                {sectorFilter && suggestedHelpers.length > 0 && (
-                  <div className="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-xl border border-emerald-200">
-                    <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center">
-                      <Icons.Users size={16} className="mr-2 text-emerald-600" />
-                      Ayudantes Sugeridos en {COMPANY_SECTORS.find(s => s.id === sectorFilter)?.short || sectorFilter}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {suggestedHelpers.map(helper => (
-                        <div key={helper.id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                              <span className="text-emerald-700 font-bold text-sm">{(helper.full_name || 'U').charAt(0)}</span>
-                            </div>
-                            <div className="flex-grow min-w-0">
-                              <p className="font-semibold text-sm text-slate-900 truncate">{helper.full_name}</p>
-                              <p className="text-xs text-gray-500">Ayudante</p>
-                            </div>
-                          </div>
-                          <div className="space-y-1 mb-3 text-xs text-gray-600">
-                            {helper.email && (
-                              <div className="flex items-center gap-2 truncate">
-                                <Icons.Mail size={12} className="text-gray-400 flex-shrink-0" />
-                                <span className="truncate">{helper.email}</span>
-                              </div>
-                            )}
-                            {helper.phone && (
-                              <div className="flex items-center gap-2">
-                                <Icons.Phone size={12} className="text-gray-400 flex-shrink-0" />
-                                <span>{helper.phone}</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                if (helper.email) {
-                                  window.location.href = `mailto:${helper.email}`;
-                                }
-                              }}
-                              disabled={!helper.email}
-                              className="flex-1 px-2 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded hover:bg-blue-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                            >
-                              <Icons.Mail size={12} />
-                              Contactar
-                            </button>
-                            <button
-                              className="flex-1 px-2 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200 transition flex items-center justify-center gap-1"
-                            >
-                              <Icons.ExternalLink size={12} />
-                              Perfil
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {loading ? (
                   <div className="text-center">Cargando ofertas...</div>
                 ) : (
@@ -2079,12 +1852,7 @@ const WorkerDashboard = ({ user }: { user: User }) => {
                                           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
                                               {(job.creator?.full_name || 'U').charAt(0)}
                                           </div>
-                                          <div className="flex items-center space-x-2">
-                                            <span className="text-sm font-medium text-gray-700 truncate max-w-[100px]">{job.creator?.full_name || 'Usuario'}</span>
-                                            {job.creator?.company_sector && (
-                                              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-slate-700">{COMPANY_SECTORS.find(s => s.id === job.creator!.company_sector)?.short || job.creator!.company_sector}</span>
-                                            )}
-                                          </div>
+                                          <span className="text-sm font-medium text-gray-700 truncate max-w-[100px]">{job.creator?.full_name || 'Usuario'}</span>
                                       </div>
                                   </div>
                                   
@@ -2176,12 +1944,12 @@ const WorkerDashboard = ({ user }: { user: User }) => {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-grow">
                           <h3 className="text-lg font-bold text-slate-900">{app.job?.title}</h3>
-                          <div className="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                          <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
                             <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
                               {(app.job?.creator?.full_name || 'U').charAt(0)}
                             </div>
                             {app.job?.creator?.full_name || 'Usuario desconocido'}
-                          </div>
+                          </p>
                         </div>
                         <div>
                           {getStatusBadge(app.status)}
@@ -2367,10 +2135,10 @@ export const App: React.FC = () => {
     const fetchProfile = async (authUserId: string, email: string) => {
         try {
             const { data, error } = await supabase
-              .from('VoyUsers')
-              .select('id, auth_user_id, full_name, role, email, city, district, company_sector')
-              .eq('auth_user_id', authUserId)
-              .single();
+                .from('VoyUsers')
+                .select('*')
+                .eq('auth_user_id', authUserId)
+                .single();
             
             if (data) {
                 setAuth({
@@ -2381,10 +2149,8 @@ export const App: React.FC = () => {
                         auth_user_id: data.auth_user_id,
                         full_name: data.full_name,
                         email: data.email,
-                    role: data.role as UserRole,
-                    city: data.city,
-                    district: data.district,
-                    company_sector: data.company_sector
+                        role: data.role as UserRole,
+                        city: data.city
                     }
                 });
             } else {
@@ -2400,8 +2166,6 @@ export const App: React.FC = () => {
         await supabase.auth.signOut();
         setAuth({ isAuthenticated: false, user: null, loading: false });
     };
-
-    
 
     return (
         <HashRouter>
