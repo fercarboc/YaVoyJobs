@@ -48,6 +48,10 @@ export const FinancialPanel: React.FC<FinancialPanelProps> = ({ userId, userRole
 
   const loadPayments = async () => {
     try {
+      // Temporary: skip payments loading if table doesn't exist yet
+      setPayments([]);
+      setTotalCommissions(0);
+      /*
       const { data, error } = await supabase
         .from('VoyPayments')
         .select('*')
@@ -67,6 +71,7 @@ export const FinancialPanel: React.FC<FinancialPanelProps> = ({ userId, userRole
         .reduce((sum, p) => sum + p.commission, 0);
       
       setTotalCommissions(total);
+      */
     } catch (error) {
       console.error('Error loading payments:', error);
     } finally {

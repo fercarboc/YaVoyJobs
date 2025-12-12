@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { DashboardModal } from './components/DashboardModal';
 import { SubscriptionPanel } from './components/SubscriptionPanel';
 import { SubscriptionPaymentModal } from './components/SubscriptionPaymentModal';
 import { FinancialPanel } from './components/FinancialPanel';
-import { AuthState, UserRole, User, Job, JobStatus, PeriodType, ContractType, DAYS_OF_WEEK } from './types';
+import { AdminDashboard } from './components/AdminDashboard';
+import { AuthState, UserRole, User, Job, JobStatus, PeriodType, ContractType, DAYS_OF_WEEK, CompanySector } from './types';
 import { Icons } from './components/Icons';
 import { optimizeJobDescription, suggestJobPrice } from './services/geminiService';
 import { supabase } from './services/supabase';
@@ -19,6 +21,236 @@ import {
 const INITIAL_AUTH: AuthState = { isAuthenticated: false, user: null, loading: true };
 
 // --- COMPONENTS ---
+
+// Sectors Page
+const SectorsPage = () => {
+  const [sectors, setSectors] = useState<any[]>([]);
+  const [selectedSector, setSelectedSector] = useState<any | null>(null);
+  const [microTasks, setMicroTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSectors();
+  }, []);
+
+  useEffect(() => {
+    if (selectedSector) {
+      loadMicroTasks(selectedSector.id);
+    }
+  }, [selectedSector]);
+
+  const loadSectors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('VoySectors')
+        .select('*')
+        .order('is_primary', { ascending: false })
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      setSectors(data || []);
+      if (data && data.length > 0) {
+        setSelectedSector(data[0]); // Select first sector by default
+      }
+    } catch (err) {
+      console.error('Error loading sectors:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMicroTasks = async (sectorId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('VoyMicroTasks')
+        .select('*')
+        .eq('sector_id', sectorId)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      setMicroTasks(data || []);
+    } catch (err) {
+      console.error('Error loading microtasks:', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500 mx-auto mb-4"></div>
+          <p className="text-slate-600">Cargando sectores...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const primarySectors = sectors.filter(s => s.is_primary);
+  const secondarySectors = sectors.filter(s => !s.is_primary);
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-slate-900 mb-4">
+            Sectores de Servicios
+          </h1>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            Descubre todos los servicios disponibles en YaVoy. Desde tecnología hasta cuidado de mayores, 
+            encuentra ayuda profesional en tu zona.
+          </p>
+        </div>
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Sectors List */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Primary Sectors */}
+            <div>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">
+                Sectores Principales
+              </h2>
+              <div className="space-y-2">
+                {primarySectors.map(sector => (
+                  <button
+                    key={sector.id}
+                    onClick={() => setSelectedSector(sector)}
+                    className={`w-full text-left p-4 rounded-xl transition flex items-center gap-3 ${
+                      selectedSector?.id === sector.id
+                        ? 'bg-brand-500 text-white shadow-lg'
+                        : 'bg-white hover:bg-brand-50 text-slate-900 border border-gray-200'
+                    }`}
+                  >
+                    <span className="text-2xl">{sector.emoji}</span>
+                    <div className="flex-1">
+                      <p className={`font-semibold text-sm ${
+                        selectedSector?.id === sector.id ? 'text-white' : 'text-slate-900'
+                      }`}>
+                        {sector.name}
+                      </p>
+                    </div>
+                    {selectedSector?.id === sector.id && (
+                      <Icons.ArrowRight size={20} className="text-white" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Secondary Sectors */}
+            {secondarySectors.length > 0 && (
+              <div>
+                <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">
+                  Otros Servicios
+                </h2>
+                <div className="space-y-2">
+                  {secondarySectors.map(sector => (
+                    <button
+                      key={sector.id}
+                      onClick={() => setSelectedSector(sector)}
+                      className={`w-full text-left p-4 rounded-xl transition flex items-center gap-3 ${
+                        selectedSector?.id === sector.id
+                          ? 'bg-brand-500 text-white shadow-lg'
+                          : 'bg-white hover:bg-brand-50 text-slate-900 border border-gray-200'
+                      }`}
+                    >
+                      <span className="text-2xl">{sector.emoji}</span>
+                      <div className="flex-1">
+                        <p className={`font-semibold text-sm ${
+                          selectedSector?.id === sector.id ? 'text-white' : 'text-slate-900'
+                        }`}>
+                          {sector.name}
+                        </p>
+                      </div>
+                      {selectedSector?.id === sector.id && (
+                        <Icons.ArrowRight size={20} className="text-white" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Sector Details */}
+          <div className="lg:col-span-2">
+            {selectedSector && (
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-brand-500 to-brand-600 p-8 text-white">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-6xl">{selectedSector.emoji}</span>
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2">{selectedSector.name}</h2>
+                      <p className="text-brand-100">{selectedSector.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-8">
+                  <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <Icons.CheckCircle size={24} className="text-brand-500" />
+                    Servicios que puedes solicitar
+                  </h3>
+
+                  {microTasks.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {microTasks.map(task => (
+                        <div
+                          key={task.id}
+                          className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-50 transition group"
+                        >
+                          <div className="bg-brand-500 rounded-full p-2 group-hover:scale-110 transition">
+                            <Icons.Check size={16} className="text-white" />
+                          </div>
+                          <p className="text-slate-700 font-medium">{task.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-center py-8">
+                      No hay servicios específicos definidos para este sector.
+                    </p>
+                  )}
+
+                  {/* CTA */}
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-xl p-6">
+                      <h4 className="font-bold text-slate-900 mb-2">
+                        ¿Necesitas alguno de estos servicios?
+                      </h4>
+                      <p className="text-slate-600 mb-4">
+                        Regístrate gratis y publica tu solicitud. Trabajadores cualificados en tu zona 
+                        te contactarán en minutos.
+                      </p>
+                      <div className="flex gap-3">
+                        <a
+                          href="#/register"
+                          className="bg-brand-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-600 transition inline-flex items-center gap-2"
+                        >
+                          <Icons.User size={18} />
+                          Registrarse Gratis
+                        </a>
+                        <a
+                          href="#/"
+                          className="bg-white text-brand-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-50 transition border border-brand-200"
+                        >
+                          Ver Cómo Funciona
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // 1. LANDING PAGE
 const Landing = () => {
@@ -290,6 +522,70 @@ const Landing = () => {
             </div>
           </div>
         </div>
+
+        {/* Value Proposition for Particulares */}
+        <div className="max-w-4xl mx-auto px-4 mt-16">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="bg-blue-500 rounded-full p-3 flex-shrink-0">
+                <Icons.Euro size={28} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Menos que 2 cafés al mes</h3>
+                <p className="text-slate-600 text-lg">Por solo <strong className="text-blue-600">3€</strong> por tarea + la cantidad que decidas pagar</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <h4 className="font-semibold text-slate-900 mb-3">Ejemplo: Ayuda con la compra</h4>
+                <div className="space-y-2 text-sm text-slate-700">
+                  <div className="flex justify-between">
+                    <span>Comisión plataforma:</span>
+                    <strong className="text-blue-600">3€</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Recompensa para el ayudante:</span>
+                    <strong>10€</strong>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold text-base">
+                    <span>Total:</span>
+                    <span className="text-blue-600">13€</span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 mt-3">✓ Tu padre recibe ayuda, tú pagas menos que una cena</p>
+              </div>
+
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <h4 className="font-semibold text-slate-900 mb-3">Ventajas</h4>
+                <ul className="space-y-2 text-sm text-slate-700">
+                  <li className="flex items-start">
+                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>Vecinos de confianza cerca de casa</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>Tú decides cuánto pagar por la ayuda</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>Tranquilidad para ti y para los tuyos</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>Sin suscripciones ni compromisos</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <button onClick={() => navigate('/register')} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg transition">
+                Empezar ahora - Solo 3€ por tarea
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* NEW: COMPANIES ZONE */}
@@ -364,6 +660,70 @@ const Landing = () => {
                       <span className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center mr-2 font-bold">G</span> Gestoría
                    </div>
                 </div>
+            </div>
+
+            {/* Bonos Section */}
+            <div className="mt-16 bg-gradient-to-br from-purple-900/50 to-purple-800/30 border border-purple-500/30 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="bg-purple-500 rounded-full p-3">
+                  <Icons.Gift size={24} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold">Bonos de Contratación</h3>
+                  <p className="text-purple-200">Ahorra dinero con nuestros planes mensuales</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                  <div className="text-purple-200 text-sm mb-2">Mensual</div>
+                  <div className="text-3xl font-bold mb-4">15€<span className="text-lg text-purple-300">/mes</span></div>
+                  <p className="text-sm text-purple-100 mb-4">Contrataciones ilimitadas durante 30 días</p>
+                  <div className="text-xs text-purple-200">✓ 0€ por contratación</div>
+                </div>
+
+                <div className="bg-purple-500/30 rounded-xl p-6 border-2 border-purple-400 relative">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-400 text-purple-900 text-xs font-bold px-3 py-1 rounded-full">
+                    RECOMENDADO
+                  </div>
+                  <div className="text-purple-200 text-sm mb-2">Semestral</div>
+                  <div className="text-3xl font-bold mb-4">75€<span className="text-lg text-purple-300">/6 meses</span></div>
+                  <p className="text-sm text-purple-100 mb-4">Contrataciones ilimitadas durante 180 días</p>
+                  <div className="text-xs text-green-300">✓ Ahorras 15€ (12.5€/mes)</div>
+                </div>
+
+                <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                  <div className="text-purple-200 text-sm mb-2">Anual</div>
+                  <div className="text-3xl font-bold mb-4">120€<span className="text-lg text-purple-300">/año</span></div>
+                  <p className="text-sm text-purple-100 mb-4">Contrataciones ilimitadas durante 365 días</p>
+                  <div className="text-xs text-green-300">✓ Ahorras 60€ (10€/mes)</div>
+                </div>
+              </div>
+
+              <div className="bg-white/5 rounded-xl p-6">
+                <h4 className="font-semibold mb-3 flex items-center">
+                  <Icons.Info size={18} className="mr-2 text-purple-300" />
+                  ¿Por qué un bono?
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4 text-sm text-purple-100">
+                  <div>
+                    <p className="mb-2"><strong className="text-white">Sin bono:</strong></p>
+                    <ul className="space-y-1 text-purple-200">
+                      <li>• 1 contratación = 15€ de comisión</li>
+                      <li>• 2 contrataciones = 30€</li>
+                      <li>• 5 contrataciones = 75€</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="mb-2"><strong className="text-white">Con bono mensual (15€):</strong></p>
+                    <ul className="space-y-1 text-green-300">
+                      <li>✓ Contrataciones ilimitadas sin comisión</li>
+                      <li>✓ Rentable desde la 2ª contratación</li>
+                      <li>✓ Ideal si contratas regularmente</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
          </div>
       </section>
@@ -779,11 +1139,32 @@ const Register = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    cif: ''
+    cif: '',
+    sector: '' as CompanySector | ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sectors, setSectors] = useState<any[]>([]);
+  const [showAllSectors, setShowAllSectors] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadSectors();
+  }, []);
+
+  const loadSectors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('VoySectors')
+        .select('*')
+        .order('is_primary', { ascending: false });
+      
+      if (error) throw error;
+      setSectors(data || []);
+    } catch (err) {
+      console.error('Error loading sectors:', err);
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -791,6 +1172,11 @@ const Register = () => {
     
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (activeTab === 'COMPANY' && !formData.sector) {
+      setError('Selecciona el sector principal de tu empresa');
       return;
     }
 
@@ -813,7 +1199,8 @@ const Register = () => {
               full_name: formData.name,
               email: formData.email,
               role: activeTab,
-              phone: formData.phone
+              phone: formData.phone,
+              company_sector: activeTab === 'COMPANY' ? formData.sector : null
             }
           ]);
 
@@ -915,10 +1302,63 @@ const Register = () => {
               </div>
 
               {activeTab === 'COMPANY' && (
+                <>
                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-1">CIF / NIF</label>
                     <input name="cif" onChange={handleChange} type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" />
                  </div>
+                 
+                 <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Sector Principal de tu Empresa <span className="text-red-500">*</span>
+                    </label>
+                    <p className="text-xs text-slate-500 mb-3">
+                      Elige el sector donde publicarás la mayoría de tus ofertas. Podrás publicar en otros sectores cuando lo necesites.
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {sectors.filter(s => showAllSectors || s.is_primary).map(sector => (
+                        <label
+                          key={sector.id}
+                          className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition ${
+                            formData.sector === sector.id
+                              ? 'border-brand-500 bg-brand-50'
+                              : 'border-gray-200 hover:border-brand-300 bg-white'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="sector"
+                            value={sector.id}
+                            checked={formData.sector === sector.id}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{sector.emoji}</span>
+                            <div>
+                              <div className="font-semibold text-sm text-slate-900">{sector.name}</div>
+                              <div className="text-xs text-slate-500 mt-0.5">{sector.description.split(',')[0]}</div>
+                            </div>
+                          </div>
+                          {formData.sector === sector.id && (
+                            <Icons.CheckCircle size={20} className="absolute top-2 right-2 text-brand-600" />
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                    
+                    {!showAllSectors && (
+                      <button
+                        type="button"
+                        className="mt-3 text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
+                        onClick={() => setShowAllSectors(true)}
+                      >
+                        <Icons.Plus size={16} />
+                        Ver más sectores
+                      </button>
+                    )}
+                 </div>
+                </>
               )}
 
               <div className="md:col-span-2 mt-4">
@@ -936,87 +1376,83 @@ const Register = () => {
 
 // 4. DASHBOARDS
 
-// --- ADMIN ---
-const AdminDashboard = () => {
-    // Mock data for Admin demo
-    const data = [
-      { name: 'Lun', jobs: 40 },
-      { name: 'Mar', jobs: 30 },
-      { name: 'Mie', jobs: 20 },
-      { name: 'Jue', jobs: 27 },
-      { name: 'Vie', jobs: 18 },
-      { name: 'Sab', jobs: 23 },
-      { name: 'Dom', jobs: 34 },
-    ];
-    
-    const pieData = [
-        { name: 'Particulares', value: 400 },
-        { name: 'Empresas', value: 300 },
-        { name: 'Trabajadores', value: 300 },
-    ];
-    const COLORS = ['#3b82f6', '#8b5cf6', '#10b981'];
+// CompanySectorCard component
+const CompanySectorCard = ({ userId, companySector }: { userId: string; companySector?: string | null }) => {
+  const [sector, setSector] = useState<any>(null);
 
-    return (
-        <div className="max-w-7xl mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-8 flex items-center">
-                <Icons.LayoutDashboard className="mr-3" /> Panel de Administración
-            </h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-slate-500 text-sm uppercase font-bold">Total Usuarios</h3>
-                    <p className="text-4xl font-bold text-slate-900 mt-2">1,240</p>
-                    <span className="text-emerald-500 text-sm font-medium flex items-center mt-1"><Icons.ArrowRight size={14} className="transform -rotate-45 mr-1"/> +12% esta semana</span>
-                </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-slate-500 text-sm uppercase font-bold">Trabajos Activos</h3>
-                    <p className="text-4xl font-bold text-brand-600 mt-2">86</p>
-                </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-slate-500 text-sm uppercase font-bold">Volumen Transaccionado</h3>
-                    <p className="text-4xl font-bold text-slate-900 mt-2">14.5k €</p>
-                </div>
-            </div>
+  useEffect(() => {
+    if (companySector) {
+      loadSector();
+    }
+  }, [companySector]);
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-96">
-                    <h3 className="font-bold text-slate-800 mb-4">Actividad Semanal</h3>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                            <YAxis axisLine={false} tickLine={false} />
-                            <ReTooltip cursor={{fill: '#e0f2fe'}} />
-                            <Bar dataKey="jobs" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-96 flex flex-col items-center">
-                    <h3 className="font-bold text-slate-800 mb-4 self-start">Distribución de Usuarios</h3>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={pieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={80}
-                                outerRadius={110}
-                                fill="#8884d8"
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {pieData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Legend verticalAlign="bottom" height={36}/>
-                            <ReTooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
+  const loadSector = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('VoySectors')
+        .select('*')
+        .eq('id', companySector)
+        .single();
+      
+      if (error) throw error;
+      setSector(data);
+    } catch (err) {
+      console.error('Error loading sector:', err);
+    }
+  };
+
+  if (!sector) return null;
+
+  return (
+    <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl p-6 text-white">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-4xl">{sector.emoji || '🏢'}</span>
+        <div>
+          <h3 className="font-bold text-lg">Sector Principal</h3>
+          <p className="text-brand-100 text-sm">{sector.name}</p>
         </div>
-    );
+      </div>
+      <p className="text-sm text-brand-50">{sector.description}</p>
+    </div>
+  );
+};
+
+// CompanySectorBanner component
+const CompanySectorBanner = ({ companySector }: { companySector: string }) => {
+  const [sector, setSector] = useState<any>(null);
+
+  useEffect(() => {
+    if (companySector) {
+      loadSector();
+    }
+  }, [companySector]);
+
+  const loadSector = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('VoySectors')
+        .select('*')
+        .eq('id', companySector)
+        .single();
+      
+      if (error) throw error;
+      setSector(data);
+    } catch (err) {
+      console.error('Error loading sector:', err);
+    }
+  };
+
+  if (!sector) return <h2 className="text-xl font-bold text-slate-800">Mis Anuncios</h2>;
+
+  return (
+    <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-xl p-4 text-white flex items-center gap-4">
+      <span className="text-3xl">{sector.emoji || '🏢'}</span>
+      <div>
+        <p className="text-xs text-brand-100 uppercase font-semibold">Sector Principal</p>
+        <h2 className="text-xl font-bold">{sector.name}</h2>
+      </div>
+    </div>
+  );
 };
 
 // --- CLIENT (Job Poster) ---
@@ -1027,6 +1463,9 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
     const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
     const [applicants, setApplicants] = useState<Record<string, any[]>>({});
     const [editingJobId, setEditingJobId] = useState<string | null>(null);
+    
+    // Active view state
+    const [activeView, setActiveView] = useState<'panel' | 'anuncios' | 'economia'>('anuncios');
     
     // Subscription state
     const [showSubscriptions, setShowSubscriptions] = useState(false);
@@ -1329,8 +1768,159 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold text-slate-800">Mi Panel</h1>
+            {/* Navigation Tabs */}
+            <div className="mb-8">
+                <nav className="flex gap-2 border-b border-gray-200">
+                    <button
+                        onClick={() => setActiveView('panel')}
+                        className={`px-6 py-3 font-medium transition flex items-center gap-2 border-b-2 ${
+                            activeView === 'panel' 
+                                ? 'border-brand-500 text-brand-600' 
+                                : 'border-transparent text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                        <Icons.User size={18} />
+                        Mi Perfil
+                    </button>
+                    <button
+                        onClick={() => setActiveView('anuncios')}
+                        className={`px-6 py-3 font-medium transition flex items-center gap-2 border-b-2 ${
+                            activeView === 'anuncios' 
+                                ? 'border-brand-500 text-brand-600' 
+                                : 'border-transparent text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                        <Icons.FileText size={18} />
+                        Mis Anuncios
+                    </button>
+                    <button
+                        onClick={() => setActiveView('economia')}
+                        className={`px-6 py-3 font-medium transition flex items-center gap-2 border-b-2 ${
+                            activeView === 'economia' 
+                                ? 'border-brand-500 text-brand-600' 
+                                : 'border-transparent text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                        <Icons.Euro size={18} />
+                        Economía
+                    </button>
+                </nav>
+            </div>
+
+            {/* Panel View - Profile & Settings */}
+            {activeView === 'panel' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Personal Info */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h2 className="text-xl font-bold text-slate-900 mb-6">Información Personal</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
+                                    <input 
+                                        type="text" 
+                                        defaultValue={user.full_name}
+                                        className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                                    <input 
+                                        type="email" 
+                                        defaultValue={user.email}
+                                        disabled
+                                        className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-slate-600 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                                    <input 
+                                        type="tel" 
+                                        defaultValue={user.phone || ''}
+                                        className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
+                                    <input 
+                                        type="text" 
+                                        defaultValue={user.city || ''}
+                                        className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+                                    />
+                                </div>
+                                <button className="bg-brand-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-600 transition">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Change Password */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h2 className="text-xl font-bold text-slate-900 mb-6">Cambiar Contraseña</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
+                                    <input 
+                                        type="password" 
+                                        className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Contraseña</label>
+                                    <input 
+                                        type="password" 
+                                        className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                                <button className="bg-slate-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-800 transition">
+                                    Actualizar Contraseña
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column - Activity */}
+                    <div className="space-y-6">
+                        {/* Sector Info for Companies */}
+                        <CompanySectorCard userId={user.id} companySector={user.company_sector} />
+                        
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h3 className="font-semibold text-slate-900 mb-4">Actividad Reciente</h3>
+                            <div className="space-y-3 text-sm">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
+                                    <div>
+                                        <p className="text-slate-700">Cuenta creada</p>
+                                        <p className="text-xs text-slate-400">{new Date(user.created_at).toLocaleDateString('es-ES')}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-brand-50 rounded-xl border border-brand-100 p-6">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="bg-brand-500 rounded-full p-2">
+                                    <Icons.Shield size={20} className="text-white" />
+                                </div>
+                                <h3 className="font-semibold text-brand-900">Cuenta {user.role}</h3>
+                            </div>
+                            <p className="text-sm text-brand-700">
+                                {user.role === 'COMPANY' && 'Acceso completo a publicación de ofertas y gestión de bonos'}
+                                {user.role === 'PARTICULAR' && 'Publica tareas y encuentra ayuda cerca de ti'}
+                                {user.role === 'WORKER' && 'Encuentra trabajos en tu zona'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Anuncios View - Existing Jobs List */}
+            {activeView === 'anuncios' && (
+                <div>
+                    <div className="flex justify-between items-center mb-8">
+                <h1 className="text-2xl font-bold text-slate-800">Mis Anuncios</h1>
                 <div className="flex gap-3">
                     {user.role === 'COMPANY' && (
                         <button
@@ -1355,7 +1945,11 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column - Jobs List (2/3) */}
                 <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-bold text-slate-800">Mis Anuncios</h2>
+                    {user.role === 'COMPANY' && user.company_sector ? (
+                        <CompanySectorBanner companySector={user.company_sector} />
+                    ) : (
+                        <h2 className="text-xl font-bold text-slate-800">Mis Anuncios</h2>
+                    )}
                     
                     {/* Stats Summary */}
                     <div className="grid grid-cols-2 gap-4">
@@ -1560,12 +2154,31 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
                                         <select value={category} onChange={e => setCategory(e.target.value)} className="w-full px-4 py-2 border rounded-lg bg-white text-slate-900 outline-none">
-                                            <option value="OTROS">Otros</option>
-                                            <option value="MAYORES">Mayores</option>
-                                            <option value="HOGAR">Hogar</option>
-                                            <option value="MASCOTAS">Mascotas</option>
-                                            <option value="RECADOS">Recados</option>
-                                            <option value="DIGITAL">Tecnología</option>
+                                            <option value="">Selecciona una categoría</option>
+                                            <optgroup label="Categorías Principales">
+                                                <option value="MAYORES">👴 Mayores y Dependencia</option>
+                                                <option value="HOGAR">🏠 Hogar y Mantenimiento</option>
+                                                <option value="MASCOTAS">🐾 Mascotas</option>
+                                                <option value="RECADOS">🛒 Compras y Recados</option>
+                                                <option value="DIGITAL">💻 Tecnología Digital</option>
+                                            </optgroup>
+                                            <optgroup label="Otras Categorías">
+                                                <option value="HOSTELERIA">🍽️ Hostelería y Eventos</option>
+                                                <option value="TRANSPORTE">🚗 Transporte y Reparto</option>
+                                                <option value="EDUCACION">📚 Educación y Formación</option>
+                                                <option value="COMERCIO">🏪 Comercio y Negocios</option>
+                                                <option value="SALUD">💊 Salud y Bienestar</option>
+                                                <option value="CREATIVIDAD">🎨 Creatividad y Arte</option>
+                                                <option value="ADMINISTRACION">📋 Administración y Oficina</option>
+                                                <option value="CONSTRUCCION">🔨 Construcción y Oficios</option>
+                                                <option value="AGRICULTURA">🌾 Agricultura y Campo</option>
+                                                <option value="TURISMO">✈️ Turismo y Alojamiento</option>
+                                                <option value="SEGURIDAD">🛡️ Seguridad y Control</option>
+                                                <option value="MARKETING">📢 Marketing de Calle</option>
+                                                <option value="TECNODOMESTICA">🔌 Tecnología Doméstica</option>
+                                                <option value="MODA">👗 Moda y Textil</option>
+                                                <option value="OTROS">📦 Otros Servicios</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>
@@ -1701,6 +2314,184 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                     amount={subscriptionPlanInfo.amount}
                 />
             )}
+                </div>
+            )}
+
+            {/* Economía View - Financial Dashboard */}
+            {activeView === 'economia' && (
+                <div className="space-y-6">
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <Icons.Briefcase size={24} className="opacity-80" />
+                                <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-bold">Total</div>
+                            </div>
+                            <div className="text-3xl font-bold mb-1">{jobs.length}</div>
+                            <div className="text-sm opacity-90">Anuncios Publicados</div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <Icons.Euro size={24} className="opacity-80" />
+                                <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-bold">Mes</div>
+                            </div>
+                            <div className="text-3xl font-bold mb-1">
+                                {jobs.filter(j => j.status === 'COMPLETED').length * 15}€
+                            </div>
+                            <div className="text-sm opacity-90">Ingresos Estimados</div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <Icons.Users size={24} className="opacity-80" />
+                                <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-bold">Total</div>
+                            </div>
+                            <div className="text-3xl font-bold mb-1">
+                                {jobs.reduce((sum, j) => sum + (j.applicant_count || 0), 0)}
+                            </div>
+                            <div className="text-sm opacity-90">Candidaturas Recibidas</div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <Icons.CheckCircle size={24} className="opacity-80" />
+                                <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-bold">Activas</div>
+                            </div>
+                            <div className="text-3xl font-bold mb-1">
+                                {jobs.filter(j => j.status === 'OPEN').length}
+                            </div>
+                            <div className="text-sm opacity-90">Ofertas Activas</div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Column - Detailed Transactions */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Financial Panel Component */}
+                            <FinancialPanel userId={user.id} userRole={user.role as 'COMPANY' | 'PARTICULAR'} />
+
+                            {/* Recent Jobs Activity */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <h2 className="text-xl font-bold text-slate-900 mb-6">Actividad de Anuncios</h2>
+                                <div className="space-y-4">
+                                    {jobs.slice(0, 5).map(job => (
+                                        <div key={job.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-slate-900">{job.title}</h3>
+                                                <p className="text-sm text-slate-500">
+                                                    {job.job_type === 'ONE_OFF' && `${job.price}€ precio fijo`}
+                                                    {job.job_type === 'HOURLY' && `${job.hourly_rate}€/h`}
+                                                    {job.job_type === 'CONTRACT' && `Contrato indefinido`}
+                                                </p>
+                                            </div>
+                                            <div className="text-right ml-4">
+                                                <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                                                    job.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+                                                    job.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' :
+                                                    'bg-gray-100 text-gray-700'
+                                                }`}>
+                                                    {job.status === 'ACTIVE' && 'Activa'}
+                                                    {job.status === 'COMPLETED' && 'Completada'}
+                                                    {job.status === 'CANCELLED' && 'Cancelada'}
+                                                </div>
+                                                {job.applicant_count ? (
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                        {job.applicant_count} candidaturas
+                                                    </p>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {jobs.length === 0 && (
+                                        <div className="text-center py-8 text-slate-400">
+                                            <Icons.FileText size={48} className="mx-auto mb-3 opacity-50" />
+                                            <p>No hay anuncios todavía</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column - Quick Stats & Charts */}
+                        <div className="space-y-6">
+                            {/* Jobs by Category */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <h3 className="font-semibold text-slate-900 mb-4">Anuncios por Categoría</h3>
+                                <div className="space-y-3">
+                                    {['OTROS', 'MAYORES', 'HOGAR', 'MASCOTAS', 'RECADOS', 'DIGITAL'].map(cat => {
+                                        const count = jobs.filter(j => j.category === cat).length;
+                                        const percentage = jobs.length > 0 ? (count / jobs.length) * 100 : 0;
+                                        return (
+                                            <div key={cat}>
+                                                <div className="flex justify-between text-sm mb-1">
+                                                    <span className="text-slate-600 capitalize">{cat.toLowerCase()}</span>
+                                                    <span className="font-bold text-slate-900">{count}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div 
+                                                        className="bg-brand-500 h-2 rounded-full transition-all"
+                                                        style={{ width: `${percentage}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Jobs by Status */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <h3 className="font-semibold text-slate-900 mb-4">Estado de Anuncios</h3>
+                                <div className="space-y-3">
+                                    {['ACTIVE', 'COMPLETED', 'CANCELLED'].map(status => {
+                                        const count = jobs.filter(j => j.status === status).length;
+                                        return (
+                                            <div key={status} className="flex justify-between items-center">
+                                                <span className="text-sm text-slate-600">
+                                                    {status === 'ACTIVE' && 'Activas'}
+                                                    {status === 'COMPLETED' && 'Completadas'}
+                                                    {status === 'CANCELLED' && 'Canceladas'}
+                                                </span>
+                                                <span className={`text-2xl font-bold ${
+                                                    status === 'ACTIVE' ? 'text-green-600' :
+                                                    status === 'COMPLETED' ? 'text-blue-600' :
+                                                    'text-gray-600'
+                                                }`}>
+                                                    {count}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl p-6 text-white">
+                                <h3 className="font-semibold mb-3">Acciones Rápidas</h3>
+                                <div className="space-y-2">
+                                    <button 
+                                        onClick={() => setActiveView('anuncios')}
+                                        className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium transition flex items-center justify-center gap-2"
+                                    >
+                                        <Icons.Plus size={16} />
+                                        Publicar Anuncio
+                                    </button>
+                                    {user.role === 'COMPANY' && (
+                                        <button 
+                                            onClick={() => setShowSubscriptions(true)}
+                                            className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium transition flex items-center justify-center gap-2"
+                                        >
+                                            <Icons.Gift size={16} />
+                                            Ver Bonos
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -1714,21 +2505,39 @@ const WorkerDashboard = ({ user }: { user: User }) => {
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'available' | 'my-applications'>('available');
+    const [activeTab, setActiveTab] = useState<'available' | 'my-applications' | 'economics'>('available');
     const [applyFormData, setApplyFormData] = useState({
       message: '',
       proposedPrice: '',
       proposedHourlyRate: ''
+    });
+    const [economicStats, setEconomicStats] = useState({
+      totalHired: 0,
+      totalEarned: 0,
+      pendingEarnings: 0,
+      activeOpportunities: 0
     });
 
     useEffect(() => {
       fetchJobs();
       fetchAppliedJobs();
       fetchMyApplications();
+      fetchEconomicStats();
     }, [user.id]);
 
     const fetchJobs = async () => {
       try {
+        // Primero obtenemos los IDs de trabajos que ya tienen candidaturas aceptadas
+        const { data: acceptedApplications, error: acceptedError } = await supabase
+          .from('VoyJobApplications')
+          .select('job_id')
+          .eq('status', 'ACCEPTED');
+
+        if (acceptedError) throw acceptedError;
+
+        const acceptedJobIds = (acceptedApplications || []).map(app => app.job_id);
+
+        // Luego obtenemos todos los trabajos OPEN
         const { data, error } = await supabase
           .from('VoyJobs')
           .select('*, creator:VoyUsers(full_name), schedule:VoyWorkSchedules(*), contract:VoyWorkContracts(*)')
@@ -1736,7 +2545,11 @@ const WorkerDashboard = ({ user }: { user: User }) => {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setAvailableJobs(data as unknown as Job[] || []);
+
+        // Filtramos los trabajos para excluir los que ya tienen candidaturas aceptadas
+        const availableJobsFiltered = (data || []).filter(job => !acceptedJobIds.includes(job.id));
+        
+        setAvailableJobs(availableJobsFiltered as unknown as Job[] || []);
       } catch (err) {
         console.error("Error fetching jobs", err);
       } finally {
@@ -1770,6 +2583,79 @@ const WorkerDashboard = ({ user }: { user: User }) => {
         setMyApplications(data || []);
       } catch (err) {
         console.error("Error fetching my applications", err);
+      }
+    };
+
+    const fetchEconomicStats = async () => {
+      try {
+        // Obtener aplicaciones aceptadas (contrataciones)
+        const { data: acceptedApps, error: acceptedError } = await supabase
+          .from('VoyJobApplications')
+          .select('*, job:VoyJobs(price_fixed, price_hourly, job_type)')
+          .eq('helper_user_id', user.id)
+          .eq('status', 'ACCEPTED');
+        
+        if (acceptedError) throw acceptedError;
+
+        // Calcular ingresos obtenidos (trabajos aceptados)
+        const totalEarned = (acceptedApps || []).reduce((sum, app) => {
+          if (app.job?.job_type === 'ONE_OFF' && app.job.price_fixed) {
+            return sum + app.job.price_fixed;
+          }
+          if (app.job?.job_type === 'HOURLY' && app.job.price_hourly) {
+            // Estimación: 20 horas por trabajo por hora
+            return sum + (app.job.price_hourly * 20);
+          }
+          return sum;
+        }, 0);
+
+        // Obtener aplicaciones pendientes
+        const { data: pendingApps, error: pendingError } = await supabase
+          .from('VoyJobApplications')
+          .select('*, job:VoyJobs(price_fixed, price_hourly, job_type)')
+          .eq('helper_user_id', user.id)
+          .eq('status', 'PENDING');
+        
+        if (pendingError) throw pendingError;
+
+        // Calcular posibles ingresos de candidaturas pendientes
+        const pendingEarnings = (pendingApps || []).reduce((sum, app) => {
+          if (app.job?.job_type === 'ONE_OFF' && app.job.price_fixed) {
+            return sum + app.job.price_fixed;
+          }
+          if (app.job?.job_type === 'HOURLY' && app.job.price_hourly) {
+            return sum + (app.job.price_hourly * 20);
+          }
+          return sum;
+        }, 0);
+
+        // Calcular oportunidades activas disponibles
+        const { data: activeJobs, error: activeError } = await supabase
+          .from('VoyJobs')
+          .select('price_fixed, price_hourly, job_type')
+          .eq('status', 'OPEN');
+        
+        if (activeError) throw activeError;
+
+        const activeOpportunities = (activeJobs || []).reduce((sum, job) => {
+          if (job.job_type === 'ONE_OFF' && job.price_fixed) {
+            return sum + job.price_fixed;
+          }
+          if (job.job_type === 'HOURLY' && job.price_hourly) {
+            return sum + (job.price_hourly * 20);
+          }
+          return sum;
+        }, 0);
+
+        setEconomicStats({
+          totalHired: acceptedApps?.length || 0,
+          totalEarned: Math.round(totalEarned),
+          pendingEarnings: Math.round(pendingEarnings),
+          activeOpportunities: Math.round(activeOpportunities)
+        });
+
+      } catch (err) {
+        console.error("Error fetching economic stats", err);
       }
     };
 
@@ -1866,21 +2752,62 @@ const WorkerDashboard = ({ user }: { user: User }) => {
                   </span>
                 )}
               </button>
+              <button 
+                onClick={() => setActiveTab('economics')}
+                className={`px-4 py-3 font-medium transition border-b-2 flex items-center gap-2 ${
+                  activeTab === 'economics' 
+                    ? 'border-brand-500 text-brand-600' 
+                    : 'border-transparent text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                <Icons.DollarSign size={18} />
+                Datos Económicos
+              </button>
             </div>
 
             {/* Available Jobs Tab */}
             {activeTab === 'available' && (
               <>
-                <div className="flex overflow-x-auto space-x-2 pb-4 mb-4 scrollbar-hide">
-                  {['all', 'MAYORES', 'HOGAR', 'MASCOTAS', 'RECADOS', 'DIGITAL'].map(cat => (
-                      <button 
-                          key={cat}
-                          onClick={() => setFilter(cat)}
-                          className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${filter === cat ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-gray-50'}`}
-                      >
-                          {cat === 'all' ? 'Todos' : cat}
-                      </button>
+                <div className="flex flex-wrap gap-2 pb-4 mb-4">
+                  {/* Categorías principales */}
+                  <button 
+                    onClick={() => setFilter('all')}
+                    className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${filter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-gray-50'}`}
+                  >
+                    Todos
+                  </button>
+                  {['MAYORES', 'HOGAR', 'MASCOTAS', 'RECADOS', 'DIGITAL'].map(cat => (
+                    <button 
+                      key={cat}
+                      onClick={() => setFilter(cat)}
+                      className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${filter === cat ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-gray-50'}`}
+                    >
+                      {cat}
+                    </button>
                   ))}
+                  
+                  {/* Desplegable con más categorías */}
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="px-4 py-2 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600 hover:bg-gray-50 transition outline-none cursor-pointer"
+                  >
+                    <option value="">Más categorías...</option>
+                    <option value="HOSTELERIA">Hostelería y Eventos</option>
+                    <option value="TRANSPORTE">Transporte y Reparto</option>
+                    <option value="EDUCACION">Educación y Formación</option>
+                    <option value="COMERCIO">Comercio y Negocios</option>
+                    <option value="SALUD">Salud y Bienestar</option>
+                    <option value="CREATIVIDAD">Creatividad y Arte</option>
+                    <option value="ADMINISTRACION">Administración</option>
+                    <option value="CONSTRUCCION">Construcción y Oficios</option>
+                    <option value="AGRICULTURA">Agricultura</option>
+                    <option value="TURISMO">Turismo y Alojamiento</option>
+                    <option value="SEGURIDAD">Seguridad</option>
+                    <option value="MARKETING">Marketing</option>
+                    <option value="MODA">Moda y Textil</option>
+                    <option value="OTROS">Otros Servicios</option>
+                  </select>
                 </div>
 
                 {loading ? (
@@ -1985,80 +2912,206 @@ const WorkerDashboard = ({ user }: { user: User }) => {
 
             {/* My Applications Tab */}
             {activeTab === 'my-applications' && (
-              <div className="space-y-4">
+              <div>
                 {myApplications.length === 0 ? (
                   <div className="text-center py-12 text-gray-400">
                     <Icons.FileText size={48} className="mx-auto mb-4 opacity-50" />
                     <p>No has enviado ninguna candidatura aún</p>
                   </div>
                 ) : (
-                  myApplications.map(app => (
-                    <div key={app.id} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-brand-300 transition">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-grow">
-                          <h3 className="text-lg font-bold text-slate-900">{app.job?.title}</h3>
-                          <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
-                              {(app.job?.creator?.full_name || 'U').charAt(0)}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {myApplications.map(app => {
+                      // Determinar color de la cabecera según el estado
+                      const getHeaderColor = () => {
+                        if (app.status === 'ACCEPTED') return 'bg-emerald-500';
+                        if (app.status === 'REJECTED') return 'bg-gray-400';
+                        return 'bg-orange-500'; // PENDING
+                      };
+
+                      return (
+                        <div key={app.id} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition overflow-hidden">
+                          {/* Cabecera con color según estado */}
+                          <div className={`${getHeaderColor()} px-4 py-3 text-white`}>
+                            <h3 className="font-bold text-sm line-clamp-1">{app.job?.title}</h3>
+                          </div>
+
+                          {/* Contenido del card */}
+                          <div className="p-4">
+                            {/* Creador y estado */}
+                            <div className="flex justify-between items-center mb-3">
+                              <div className="text-xs text-gray-600 flex items-center gap-1">
+                                <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-[10px] font-bold">
+                                  {(app.job?.creator?.full_name || 'U').charAt(0)}
+                                </div>
+                                <span className="truncate max-w-[120px]">{app.job?.creator?.full_name || 'Usuario'}</span>
+                              </div>
+                              {getStatusBadge(app.status)}
                             </div>
-                            {app.job?.creator?.full_name || 'Usuario desconocido'}
-                          </p>
-                        </div>
-                        <div>
-                          {getStatusBadge(app.status)}
-                        </div>
-                      </div>
 
-                      {/* Application Details */}
-                      <div className="space-y-3 text-sm text-gray-600 mb-4">
-                        {app.message && (
-                          <div>
-                            <p className="font-medium text-gray-700 mb-1">Tu mensaje:</p>
-                            <p className="text-gray-600 italic">"{app.message}"</p>
-                          </div>
-                        )}
-                        {app.proposed_price && (
-                          <p><span className="font-medium text-gray-700">Precio propuesto:</span> {app.proposed_price}€</p>
-                        )}
-                        {app.proposed_hourly_rate && (
-                          <p><span className="font-medium text-gray-700">Tarifa propuesta:</span> {app.proposed_hourly_rate}€/h</p>
-                        )}
-                        <p className="text-gray-500 text-xs">
-                          Candidatura enviada el {new Date(app.created_at).toLocaleDateString('es-ES')} a las {new Date(app.created_at).toLocaleTimeString('es-ES')}
-                        </p>
-                      </div>
+                            {/* Application Details */}
+                            <div className="space-y-2 text-xs text-gray-600 mb-3">
+                              {app.message && (
+                                <div>
+                                  <p className="font-medium text-gray-700 mb-0.5">Tu mensaje:</p>
+                                  <p className="text-gray-600 italic line-clamp-2">"{app.message}"</p>
+                                </div>
+                              )}
+                              {app.proposed_price && (
+                                <p><span className="font-medium text-gray-700">Precio:</span> {app.proposed_price}€</p>
+                              )}
+                              {app.proposed_hourly_rate && (
+                                <p><span className="font-medium text-gray-700">Tarifa:</span> {app.proposed_hourly_rate}€/h</p>
+                              )}
+                            </div>
 
-                      {/* Job Details Preview */}
-                      {app.job && (
-                        <div className="bg-gray-50 p-3 rounded-lg text-xs text-gray-600 mb-4">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><span className="font-medium">Ubicación:</span> {app.job.city || 'Madrid'}</div>
-                            {app.job.price_fixed && <div><span className="font-medium">Presupuesto:</span> {app.job.price_fixed}€</div>}
-                            {app.job.price_hourly && <div><span className="font-medium">Tarifa:</span> {app.job.price_hourly}€/h</div>}
-                            {app.job.contract && app.job.contract[0]?.monthly_salary && <div><span className="font-medium">Salario:</span> {app.job.contract[0].monthly_salary}€/mes</div>}
+                            {/* Job Details Preview */}
+                            {app.job && (
+                              <div className="bg-gray-50 p-2 rounded-lg text-[10px] text-gray-600 mb-3">
+                                <div className="space-y-1">
+                                  <div><span className="font-medium">Ubicación:</span> {app.job.city || 'Madrid'}</div>
+                                  {app.job.price_fixed && <div><span className="font-medium">Presupuesto:</span> {app.job.price_fixed}€</div>}
+                                  {app.job.price_hourly && <div><span className="font-medium">Tarifa:</span> {app.job.price_hourly}€/h</div>}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Fecha */}
+                            <p className="text-gray-400 text-[10px]">
+                              {new Date(app.created_at).toLocaleDateString('es-ES')}
+                            </p>
                           </div>
                         </div>
-                      )}
-
-                      {/* Status Message */}
-                      {app.status === 'ACCEPTED' && (
-                        <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-sm text-emerald-700">
-                          ¡Felicidades! Tu candidatura ha sido aceptada. El empleador debería contactarte pronto.
-                        </div>
-                      )}
-                      {app.status === 'REJECTED' && (
-                        <div className="bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
-                          Tu candidatura ha sido rechazada. ¡Pero no te desanimes! Sigue buscando otras oportunidades.
-                        </div>
-                      )}
-                      {app.status === 'PENDING' && (
-                        <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-sm text-yellow-700">
-                          Tu candidatura está en revisión. El empleador la está considerando.
-                        </div>
-                      )}
-                    </div>
-                  ))
+                      );
+                    })}
+                  </div>
                 )}
+              </div>
+            )}
+
+            {/* Economics Tab */}
+            {activeTab === 'economics' && (
+              <div className="space-y-6">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Total Hired */}
+                  <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <Icons.CheckCircle size={32} className="opacity-80" />
+                      <span className="text-emerald-100 text-sm font-medium">Total</span>
+                    </div>
+                    <div className="text-4xl font-black mb-1">{economicStats.totalHired}</div>
+                    <div className="text-emerald-100 text-sm">Veces Contratado</div>
+                  </div>
+
+                  {/* Total Earned */}
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <Icons.DollarSign size={32} className="opacity-80" />
+                      <span className="text-blue-100 text-sm font-medium">Ganado</span>
+                    </div>
+                    <div className="text-4xl font-black mb-1">{economicStats.totalEarned}€</div>
+                    <div className="text-blue-100 text-sm">Ingresos Obtenidos</div>
+                  </div>
+
+                  {/* Pending Earnings */}
+                  <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <Icons.Clock size={32} className="opacity-80" />
+                      <span className="text-amber-100 text-sm font-medium">Pendiente</span>
+                    </div>
+                    <div className="text-4xl font-black mb-1">{economicStats.pendingEarnings}€</div>
+                    <div className="text-amber-100 text-sm">Candidaturas Pendientes</div>
+                  </div>
+
+                  {/* Active Opportunities */}
+                  <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <Icons.TrendingUp size={32} className="opacity-80" />
+                      <span className="text-purple-100 text-sm font-medium">Disponible</span>
+                    </div>
+                    <div className="text-4xl font-black mb-1">{economicStats.activeOpportunities}€</div>
+                    <div className="text-purple-100 text-sm">En Ofertas Activas</div>
+                  </div>
+                </div>
+
+                {/* Detailed Analysis */}
+                <div className="bg-white rounded-xl p-6 border border-gray-200">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <Icons.BarChart size={24} className="text-brand-500" />
+                    Análisis Económico
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {/* Success Rate */}
+                    <div className="border-l-4 border-emerald-500 pl-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Tasa de Éxito</span>
+                        <span className="text-lg font-bold text-emerald-600">
+                          {myApplications.length > 0 
+                            ? Math.round((economicStats.totalHired / myApplications.length) * 100) 
+                            : 0}%
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {economicStats.totalHired} contrataciones de {myApplications.length} candidaturas enviadas
+                      </p>
+                    </div>
+
+                    {/* Average Earning per Job */}
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Ingreso Promedio por Trabajo</span>
+                        <span className="text-lg font-bold text-blue-600">
+                          {economicStats.totalHired > 0 
+                            ? Math.round(economicStats.totalEarned / economicStats.totalHired) 
+                            : 0}€
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Basado en {economicStats.totalHired} trabajos completados
+                      </p>
+                    </div>
+
+                    {/* Potential Growth */}
+                    <div className="border-l-4 border-purple-500 pl-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Potencial de Crecimiento</span>
+                        <span className="text-lg font-bold text-purple-600">
+                          {economicStats.pendingEarnings + economicStats.activeOpportunities}€
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Oportunidades pendientes + ofertas activas disponibles
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tips Section */}
+                <div className="bg-gradient-to-br from-brand-50 to-blue-50 rounded-xl p-6 border border-brand-200">
+                  <h3 className="text-lg font-bold text-brand-900 mb-3 flex items-center gap-2">
+                    <Icons.Lightbulb size={20} className="text-brand-600" />
+                    Consejos para Aumentar tus Ingresos
+                  </h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <Icons.CheckCircle size={16} className="text-brand-500 mt-0.5 shrink-0" />
+                      <span>Completa tu perfil al 100% para destacar entre otros candidatos</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icons.CheckCircle size={16} className="text-brand-500 mt-0.5 shrink-0" />
+                      <span>Responde rápidamente a las ofertas - los primeros en aplicar tienen más posibilidades</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icons.CheckCircle size={16} className="text-brand-500 mt-0.5 shrink-0" />
+                      <span>Personaliza tu mensaje en cada candidatura para mostrar interés genuino</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icons.CheckCircle size={16} className="text-brand-500 mt-0.5 shrink-0" />
+                      <span>Mantén una buena valoración completando trabajos con calidad y puntualidad</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             )}
 
@@ -2162,6 +3215,7 @@ const ProtectedRoute = ({ children, auth, roles }: { children: React.ReactElemen
 export const App: React.FC = () => {
     const [auth, setAuth] = useState<AuthState>(INITIAL_AUTH);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [showDashboard, setShowDashboard] = useState(false);
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -2177,8 +3231,10 @@ export const App: React.FC = () => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session) {
                 fetchProfile(session.user.id, session.user.email!);
+                setShowDashboard(true); // Auto-open dashboard after login
             } else {
                 setAuth({ isAuthenticated: false, user: null, loading: false });
+                setShowDashboard(false);
             }
         });
 
@@ -2218,15 +3274,23 @@ export const App: React.FC = () => {
     const handleLogout = async () => {
         await supabase.auth.signOut();
         setAuth({ isAuthenticated: false, user: null, loading: false });
+        setShowDashboard(false);
+    };
+
+    const handleOpenDashboard = () => {
+        if (auth.isAuthenticated) {
+            setShowDashboard(true);
+        }
     };
 
     return (
         <HashRouter>
-            <Layout auth={auth} onLogout={handleLogout}>
+            <Layout auth={auth} onLogout={handleLogout} onOpenDashboard={handleOpenDashboard}>
                 <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/sectores" element={<SectorsPage />} />
                     <Route path="/download" element={<DownloadPage />} />
-                    <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
+                    <Route path="/login" element={<Login onLoginSuccess={() => setShowDashboard(true)} />} />
                     <Route path="/register" element={<Register />} />
                     
                     <Route path="/aviso-legal" element={<LegalNotice />} />
@@ -2234,26 +3298,26 @@ export const App: React.FC = () => {
                     <Route path="/cookies" element={<CookiesPolicy />} />
                     <Route path="/terminos" element={<TermsOfUse />} />
                     
-                    <Route path="/admin" element={
-                        <ProtectedRoute auth={auth} roles={[UserRole.ADMIN]}>
-                            <AdminDashboard />
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/client" element={
-                        <ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY]}>
-                            {auth.user ? <ClientDashboard user={auth.user} onToast={setToast} /> : <div></div>}
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/worker" element={
-                        <ProtectedRoute auth={auth} roles={[UserRole.HELPER]}>
-                            {auth.user ? <WorkerDashboard user={auth.user} /> : <div></div>}
-                        </ProtectedRoute>
-                    } />
-                    
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
+
+                {/* Dashboard Modal */}
+                {auth.isAuthenticated && auth.user && (
+                    <DashboardModal
+                        isOpen={showDashboard}
+                        onClose={() => setShowDashboard(false)}
+                        user={auth.user}
+                        dashboardContent={
+                            auth.user.role === UserRole.ADMIN ? (
+                                <AdminDashboard />
+                            ) : auth.user.role === UserRole.HELPER ? (
+                                <WorkerDashboard user={auth.user} />
+                            ) : (
+                                <ClientDashboard user={auth.user} onToast={setToast} />
+                            )
+                        }
+                    />
+                )}
 
                 {/* Toast Notification */}
                 {toast && (

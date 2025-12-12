@@ -6,6 +6,28 @@ export enum UserRole {
   ADMIN = 'ADMIN'
 }
 
+export type CompanySector = 
+  | 'tecnologia-digital'
+  | 'hogar-mantenimiento'
+  | 'mascotas'
+  | 'compras-recados'
+  | 'hosteleria-eventos'
+  | 'transporte-reparto'
+  | 'mayores-dependencia'
+  | 'educacion-formacion'
+  | 'comercio-negocios'
+  | 'salud-bienestar'
+  | 'creatividad-arte'
+  | 'administracion-oficina'
+  | 'construccion-oficios'
+  | 'agricultura-campo'
+  | 'turismo-alojamiento'
+  | 'seguridad-control'
+  | 'marketing-calle'
+  | 'tecnologia-domestica'
+  | 'moda-textil'
+  | 'otros-servicios';
+
 export enum JobStatus {
   OPEN = 'OPEN',
   ASSIGNED = 'ASSIGNED',

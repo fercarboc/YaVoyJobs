@@ -6,7 +6,7 @@ import {
   PawPrint, Hammer, Lightbulb, MessageCircle,
   Navigation, UserCheck, Search, Edit3,
   Quote, Users, Trash, ChevronDown, FileText,
-  Check, Info, Gift
+  Check, Info, Gift, Plus, DollarSign, BarChart, TrendingUp
 } from 'lucide-react';
 
 export const Icons = {
@@ -17,5 +17,5 @@ export const Icons = {
   PawPrint, Hammer, Lightbulb, MessageCircle,
   Navigation, UserCheck, Search, Edit3,
   Quote, Users, Trash, ChevronDown, FileText,
-  Check, Info, Gift
+  Check, Info, Gift, Plus, DollarSign, BarChart, TrendingUp
 };

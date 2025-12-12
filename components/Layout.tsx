@@ -8,9 +8,10 @@ interface LayoutProps {
   children: React.ReactNode;
   auth: AuthState;
   onLogout: () => void;
+  onOpenDashboard?: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpenDashboard }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -139,35 +140,36 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <nav className={`sticky top-0 z-50 transition-colors duration-300 ${isLanding && !isMenuOpen ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-white shadow-md'}`}>
+      <nav className="sticky top-0 z-50 bg-blue-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => navigate('/')}>
-              <img src="/YaVoy.ico" alt="YaVoy Logo" className="h-10 w-10 mr-2 object-contain" />
-              <span className="font-bold text-2xl text-slate-800 tracking-tight">YaVoy</span>
+              <img src="/yavoy.png" alt="YaVoy Logo" className="h-12 w-auto mr-2 object-contain" />
+              <span className="font-bold text-2xl text-white tracking-tight">YaVoy</span>
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden lg:flex space-x-6 items-center">
-              <button onClick={() => handleScrollTo('como-funciona')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Cómo funciona</button>
-              <button onClick={() => handleScrollTo('servicios')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Soy Particular</button>
-              <button onClick={() => handleScrollTo('opiniones')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Opiniones</button>
-              <button onClick={() => handleScrollTo('empresas')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Soy Empresa</button>
-              <button onClick={() => handleScrollTo('donde')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Dónde Ayudamos</button>
-              <button onClick={() => handleScrollTo('contacto')} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Contacto</button>
+              <button onClick={() => handleScrollTo('como-funciona')} className="text-white hover:text-blue-100 font-medium transition text-sm">Cómo funciona</button>
+              <Link to="/sectores" className="text-white hover:text-blue-100 font-medium transition text-sm">Sectores</Link>
+              <button onClick={() => handleScrollTo('servicios')} className="text-white hover:text-blue-100 font-medium transition text-sm">Soy Particular</button>
+              <button onClick={() => handleScrollTo('opiniones')} className="text-white hover:text-blue-100 font-medium transition text-sm">Opiniones</button>
+              <button onClick={() => handleScrollTo('empresas')} className="text-white hover:text-blue-100 font-medium transition text-sm">Soy Empresa</button>
+              <button onClick={() => handleScrollTo('donde')} className="text-white hover:text-blue-100 font-medium transition text-sm">Dónde Ayudamos</button>
+              <button onClick={() => handleScrollTo('contacto')} className="text-white hover:text-blue-100 font-medium transition text-sm">Contacto</button>
               
-              <div className="h-6 w-px bg-slate-200 mx-2"></div>
+              <div className="h-6 w-px bg-white/30 mx-2"></div>
 
               {auth.isAuthenticated ? (
                 <>
-                  <Link to={getDashboardLink()} className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">
+                  <button onClick={onOpenDashboard} className="text-white hover:text-blue-100 font-medium transition text-sm">
                     Mi Panel
-                  </Link>
+                  </button>
                   <div className="relative">
                     <button 
                       onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                      className="text-slate-600 hover:text-brand-600 p-2 transition relative"
+                      className="text-white hover:text-blue-100 p-2 transition relative"
                     >
                       <Icons.MessageCircle size={20} />
                       {unreadCount > 0 && (
@@ -223,13 +225,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
                   <div className="relative">
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="flex items-center space-x-2 pl-2 border-l border-gray-200 hover:bg-gray-50 rounded-lg px-2 py-1 transition"
+                      className="flex items-center space-x-2 pl-2 border-l border-white/30 hover:bg-white/10 rounded-lg px-2 py-1 transition"
                     >
-                      <div className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-sm">
                         {auth.user.full_name?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <span className="text-slate-700 font-medium text-sm">{auth.user.full_name}</span>
-                      <Icons.ChevronDown size={16} className={`text-slate-600 transition ${isProfileOpen ? 'rotate-180' : ''}`} />
+                      <span className="text-white font-medium text-sm">{auth.user.full_name}</span>
+                      <Icons.ChevronDown size={16} className={`text-white transition ${isProfileOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Profile Dropdown */}
@@ -275,8 +277,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="text-slate-600 hover:text-brand-600 font-medium transition text-sm">Entrar</Link>
-                  <Link to="/register" className="bg-brand-500 text-white px-5 py-2 rounded-full font-bold shadow-lg hover:bg-brand-600 hover:shadow-brand-500/30 transition transform hover:-translate-y-0.5 text-sm">
+                  <Link to="/login" className="text-white hover:text-blue-100 font-medium transition text-sm">Entrar</Link>
+                  <Link to="/register" className="bg-green-500 text-white px-5 py-2 rounded-full font-bold shadow-lg hover:bg-green-600 transition transform hover:-translate-y-0.5 text-sm">
                     Registrarse
                   </Link>
                 </>
@@ -285,7 +287,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
 
             {/* Mobile Menu Button */}
             <div className="lg:hidden flex items-center">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-slate-600 hover:text-brand-600 p-2">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white hover:text-blue-100 p-2">
                 {isMenuOpen ? <Icons.X size={24} /> : <Icons.Menu size={24} />}
               </button>
             </div>
@@ -297,6 +299,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
           <div className="lg:hidden bg-white border-t border-gray-100">
             <div className="px-4 pt-2 pb-6 space-y-1 shadow-lg h-screen overflow-y-auto">
               <button onClick={() => handleScrollTo('como-funciona')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Cómo funciona</button>
+              <Link to="/sectores" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Sectores</Link>
               <button onClick={() => handleScrollTo('servicios')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Soy Particular</button>
               <button onClick={() => handleScrollTo('opiniones')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Opiniones</button>
               <button onClick={() => handleScrollTo('empresas')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Soy Empresa</button>
@@ -317,7 +320,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
                       </div>
                     </div>
                   </div>
-                  <Link to={getDashboardLink()} onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Mi Panel</Link>
+                  <button onClick={() => { onOpenDashboard?.(); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Mi Panel</button>
                   <button 
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                     className="w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg flex justify-between items-center"
@@ -330,7 +333,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout }) => {
               ) : (
                 <>
                   <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Iniciar Sesión</Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-brand-600 font-bold bg-brand-50 rounded-lg">Registrarse</Link>
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-white font-bold bg-green-500 hover:bg-green-600 rounded-lg transition">Registrarse</Link>
                 </>
               )}
             </div>
