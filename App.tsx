@@ -34,10 +34,11 @@ const SectorsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedSector) {
+    if (selectedSector && selectedSector.id) {
       loadMicroTasks(selectedSector.id);
     }
-  }, [selectedSector]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSector?.id]);
 
   const loadSectors = async () => {
     try {
@@ -46,11 +47,11 @@ const SectorsPage = () => {
         .select('*')
         .order('is_primary', { ascending: false })
         .order('name', { ascending: true });
-      
       if (error) throw error;
       setSectors(data || []);
+      // Selecciona siempre el primer sector de la lista
       if (data && data.length > 0) {
-        setSelectedSector(data[0]); // Select first sector by default
+        setSelectedSector({ ...data[0] });
       }
     } catch (err) {
       console.error('Error loading sectors:', err);
@@ -85,8 +86,7 @@ const SectorsPage = () => {
     );
   }
 
-  const primarySectors = sectors.filter(s => s.is_primary);
-  const secondarySectors = sectors.filter(s => !s.is_primary);
+  const allSectors = sectors;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -102,155 +102,133 @@ const SectorsPage = () => {
           </p>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Sectors List */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Primary Sectors */}
-            <div>
-              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">
-                Sectores Principales
-              </h2>
-              <div className="space-y-2">
-                {primarySectors.map(sector => (
-                  <button
-                    key={sector.id}
-                    onClick={() => setSelectedSector(sector)}
-                    className={`w-full text-left p-4 rounded-xl transition flex items-center gap-3 ${
-                      selectedSector?.id === sector.id
-                        ? 'bg-brand-500 text-white shadow-lg'
-                        : 'bg-white hover:bg-brand-50 text-slate-900 border border-gray-200'
-                    }`}
-                  >
-                    <span className="text-2xl">{sector.emoji}</span>
-                    <div className="flex-1">
-                      <p className={`font-semibold text-sm ${
-                        selectedSector?.id === sector.id ? 'text-white' : 'text-slate-900'
-                      }`}>
-                        {sector.name}
-                      </p>
-                    </div>
-                    {selectedSector?.id === sector.id && (
-                      <Icons.ArrowRight size={20} className="text-white" />
-                    )}
-                  </button>
-                ))}
-              </div>
+       {/* Two Column Layout */}
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+  {/* Left Column - Sectors List (Card con scroll) */}
+  <div className="lg:col-span-1">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+        <h2 className="text-sm font-bold text-slate-600 uppercase tracking-wide">
+          Sectores
+        </h2>
+        <p className="text-xs text-slate-500 mt-1">
+          Selecciona un sector para ver ejemplos
+        </p>
+      </div>
+      {/* Scroll */}
+      <div className="p-3 overflow-y-auto max-h-[calc(100vh-210px)] space-y-2">
+        {allSectors.map(sector => (
+          <button
+            key={sector.id}
+            onClick={() => setSelectedSector({ ...sector })}
+            className={`w-full text-left p-4 rounded-xl transition flex items-center gap-3 ${
+              selectedSector?.id === sector.id
+                ? 'bg-brand-500 text-white shadow-lg'
+                : 'bg-white hover:bg-brand-50 text-slate-900 border border-gray-200'
+            }`}
+          >
+            <span className="text-2xl">{sector.emoji}</span>
+            <div className="flex-1">
+              <p className={`font-semibold text-sm ${
+                selectedSector?.id === sector.id ? 'text-white' : 'text-slate-900'
+              }`}>
+                {sector.name}
+              </p>
             </div>
-
-            {/* Secondary Sectors */}
-            {secondarySectors.length > 0 && (
-              <div>
-                <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">
-                  Otros Servicios
-                </h2>
-                <div className="space-y-2">
-                  {secondarySectors.map(sector => (
-                    <button
-                      key={sector.id}
-                      onClick={() => setSelectedSector(sector)}
-                      className={`w-full text-left p-4 rounded-xl transition flex items-center gap-3 ${
-                        selectedSector?.id === sector.id
-                          ? 'bg-brand-500 text-white shadow-lg'
-                          : 'bg-white hover:bg-brand-50 text-slate-900 border border-gray-200'
-                      }`}
-                    >
-                      <span className="text-2xl">{sector.emoji}</span>
-                      <div className="flex-1">
-                        <p className={`font-semibold text-sm ${
-                          selectedSector?.id === sector.id ? 'text-white' : 'text-slate-900'
-                        }`}>
-                          {sector.name}
-                        </p>
-                      </div>
-                      {selectedSector?.id === sector.id && (
-                        <Icons.ArrowRight size={20} className="text-white" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {selectedSector?.id === sector.id && (
+              <Icons.ArrowRight size={20} className="text-white" />
             )}
-          </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
 
-          {/* Right Column - Sector Details */}
-          <div className="lg:col-span-2">
-            {selectedSector && (
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-brand-500 to-brand-600 p-8 text-white">
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-6xl">{selectedSector.emoji}</span>
-                    <div>
-                      <h2 className="text-3xl font-bold mb-2">{selectedSector.name}</h2>
-                      <p className="text-brand-100">{selectedSector.description}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-8">
-                  <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <Icons.CheckCircle size={24} className="text-brand-500" />
-                    Servicios que puedes solicitar
-                  </h3>
-
-                  {microTasks.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {microTasks.map(task => (
-                        <div
-                          key={task.id}
-                          className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-50 transition group"
-                        >
-                          <div className="bg-brand-500 rounded-full p-2 group-hover:scale-110 transition">
-                            <Icons.Check size={16} className="text-white" />
-                          </div>
-                          <p className="text-slate-700 font-medium">{task.name}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-slate-500 text-center py-8">
-                      No hay servicios específicos definidos para este sector.
-                    </p>
-                  )}
-
-                  {/* CTA */}
-                  <div className="mt-8 pt-8 border-t border-gray-200">
-                    <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-xl p-6">
-                      <h4 className="font-bold text-slate-900 mb-2">
-                        ¿Necesitas alguno de estos servicios?
-                      </h4>
-                      <p className="text-slate-600 mb-4">
-                        Regístrate gratis y publica tu solicitud. Trabajadores cualificados en tu zona 
-                        te contactarán en minutos.
-                      </p>
-                      <div className="flex gap-3">
-                        <a
-                          href="#/register"
-                          className="bg-brand-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-600 transition inline-flex items-center gap-2"
-                        >
-                          <Icons.User size={18} />
-                          Registrarse Gratis
-                        </a>
-                        <a
-                          href="#/"
-                          className="bg-white text-brand-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-50 transition border border-brand-200"
-                        >
-                          Ver Cómo Funciona
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+  {/* Right Column - Sector Details (usa SIEMPRE microTasks del estado) */}
+  <div className="lg:col-span-2">
+    {selectedSector && (
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-brand-500 to-brand-600 p-6 text-white">
+          <div className="flex items-center gap-4">
+            <span className="text-5xl">{selectedSector.emoji}</span>
+            <div>
+              <h2 className="text-3xl font-bold mb-1">{selectedSector.name}</h2>
+              <p className="text-brand-100">{selectedSector.description}</p>
+            </div>
           </div>
         </div>
+
+        {/* Content con altura controlada */}
+        <div className="p-8 overflow-y-auto max-h-[calc(100vh-230px)]">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <Icons.CheckCircle size={24} className="text-brand-500" />
+            Servicios que puedes solicitar
+          </h3>
+
+          {/* microTasks salen del estado, no de selectedSector */}
+          {microTasks.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {microTasks.map(task => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-50 transition group"
+                >
+                  <div className="bg-brand-500 rounded-full p-2 group-hover:scale-110 transition">
+                    <Icons.Check size={16} className="text-white" />
+                  </div>
+                  <p className="text-slate-700 font-medium">{task.name}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500 text-center py-8">
+              No hay servicios definidos aún para este sector.
+            </p>
+          )}
+
+          {/* CTA */}
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-xl p-6">
+              <h4 className="font-bold text-slate-900 mb-2">
+                ¿Necesitas alguno de estos servicios?
+              </h4>
+              <p className="text-slate-600 mb-4">
+                Regístrate gratis y publica tu solicitud. Trabajadores cualificados en tu zona
+                te contactarán en minutos.
+              </p>
+              <div className="flex gap-3">
+                <a
+                  href="#/register"
+                  className="bg-brand-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-600 transition inline-flex items-center gap-2"
+                >
+                  <Icons.User size={18} />
+                  Registrarse Gratis
+                </a>
+                <a
+                  href="#/"
+                  className="bg-white text-brand-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-50 transition border border-brand-200"
+                >
+                  Ver Cómo Funciona
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );
 };
+
+
+
 
 // 1. LANDING PAGE
 const Landing = () => {
@@ -258,128 +236,273 @@ const Landing = () => {
 
   return (
     <div className="w-full font-sans">
-      {/* 1. HERO SECTION */}
-      <section className="relative bg-gradient-to-br from-brand-500 to-brand-700 text-white pt-16 pb-24 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 100 C 30 50 70 50 100 100 L 100 0 L 0 0 Z" fill="white" />
-            </svg>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 text-center md:text-left">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-brand-400 bg-opacity-30 border border-brand-300 text-sm font-semibold mb-2 backdrop-blur-sm">
-                👋 Hola vecinos de Madrid
-              </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-                ¿Necesitas ayuda <br/>cerca de casa? <span className="text-brand-200">YaVoy.</span>
-              </h1>
-              <div className="text-lg md:text-xl text-brand-50 max-w-lg mx-auto md:mx-0 leading-relaxed space-y-2">
-                <p>Microservicios en tu barrio: rápido, fácil y de confianza.</p>
-                <p className="font-semibold text-white bg-white/10 p-2 rounded-lg inline-block border border-white/20">
-                   💰 Tú decides el precio. <span className="font-normal opacity-90">Ofrece una recompensa justa por la ayuda que necesitas.</span>
-                </p>
-              </div>
-              
-              {/* Quick Categories */}
-              <div className="flex justify-center md:justify-start space-x-4 py-2">
-                <button onClick={() => {
-                  const el = document.getElementById('servicios');
-                  if(el) el.scrollIntoView({ behavior: 'smooth'});
-                }} className="flex flex-col items-center group">
-                  <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
-                    <Icons.PawPrint size={24} />
-                  </div>
-                  <span className="text-sm mt-2 font-medium opacity-90">Mascotas</span>
-                </button>
-                <button onClick={() => {
-                  const el = document.getElementById('servicios');
-                  if(el) el.scrollIntoView({ behavior: 'smooth'});
-                }} className="flex flex-col items-center group">
-                  <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
-                    <Icons.ShoppingCart size={24} />
-                  </div>
-                  <span className="text-sm mt-2 font-medium opacity-90">Recados</span>
-                </button>
-                <button onClick={() => {
-                  const el = document.getElementById('servicios');
-                  if(el) el.scrollIntoView({ behavior: 'smooth'});
-                }} className="flex flex-col items-center group">
-                  <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
-                    <Icons.Heart size={24} />
-                  </div>
-                  <span className="text-sm mt-2 font-medium opacity-90">Cuidados</span>
-                </button>
-              </div>
+     
+{/* 1. HERO SECTION */}
+<section className="relative bg-gradient-to-br from-brand-500 to-brand-700 text-white pt-12 pb-24 overflow-hidden">
+  {/* Background Pattern */}
+  <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+    <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path d="M0 100 C 30 50 70 50 100 100 L 100 0 L 0 0 Z" fill="white" />
+    </svg>
+  </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
-                <button onClick={() => navigate('/download')} className="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-slate-800 transition transform hover:-translate-y-1 flex items-center justify-center">
-                  <Icons.Download className="mr-2" size={20}/>
-                  Descargar App
-                </button>
-                <button onClick={() => navigate('/register')} className="bg-white text-brand-600 px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-brand-50 transition transform hover:-translate-y-1">
-                  Publicar una tarea
-                </button>
-              </div>
-            </div>
-            
-            {/* Cleaner App Visual */}
-            <div className="hidden md:block relative">
-               <div className="absolute -top-10 -right-10 w-64 h-64 bg-brand-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-               
-               <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl relative transform rotate-1 hover:rotate-0 transition duration-500">
-                 {/* App Interface Mockup */}
-                 <div className="bg-white rounded-2xl h-96 w-full overflow-hidden relative border border-slate-200 shadow-inner flex flex-col">
-                    {/* Mock Header */}
-                    <div className="bg-brand-500 p-4 flex justify-between items-center text-white">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><Icons.User size={16}/></div>
-                            <div className="h-2 w-24 bg-white/20 rounded"></div>
-                        </div>
-                        <Icons.Menu size={20} className="opacity-70"/>
-                    </div>
-                    {/* Mock Content */}
-                    <div className="p-4 space-y-3 bg-slate-50 flex-grow">
-                        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
-                            <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><Icons.ShoppingCart size={16}/></div>
-                            <div className="space-y-0.5 flex-grow">
-                                <div className="text-xs font-bold text-slate-800">Hacer la Compra</div>
-                                <div className="text-[10px] text-slate-500">y llevarla a Casa</div>
-                            </div>
-                            <div className="text-emerald-600 font-bold text-xs">15€</div>
-                        </div>
-                        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3 opacity-90">
-                            <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Icons.PawPrint size={16}/></div>
-                            <div className="space-y-0.5 flex-grow">
-                                <div className="text-xs font-bold text-slate-800">Pasear a Boby</div>
-                                <div className="text-[10px] text-slate-500">1 hora</div>
-                            </div>
-                            <div className="text-blue-600 font-bold text-xs">10€</div>
-                        </div>
-                         <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3 opacity-75">
-                            <div className="bg-amber-100 p-2 rounded-lg text-amber-600"><Icons.Hammer size={16}/></div>
-                            <div className="space-y-0.5 flex-grow">
-                                <div className="text-xs font-bold text-slate-800">Montar Estantería</div>
-                                <div className="text-[10px] text-slate-500">de Ikea</div>
-                            </div>
-                            <div className="text-amber-600 font-bold text-xs">25€</div>
-                        </div>
-                        
-                         {/* Floating "Accepted" Notification */}
-                        <div className="absolute bottom-6 right-6 left-6 bg-slate-900 text-white p-3 rounded-lg shadow-xl flex items-center space-x-3 animate-bounce" style={{animationDuration: '3s'}}>
-                             <div className="bg-green-500 rounded-full p-1"><Icons.CheckCircle size={12}/></div>
-                             <div className="text-xs font-medium">¡Juan aceptó tu tarea!</div>
-                        </div>
-                    </div>
-                 </div>
-               </div>
-            </div>
-          </div>
+ <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+    {/* ===== TITULARES FULL WIDTH ===== */}
+    <div className="text-center mb-12">
+      <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+        ¿Necesitas ayuda cerca de casa?
+      </h1>
+
+      <h2 className="mt-4 text-2xl md:text-3xl font-bold text-brand-100">
+        ¿Quieres trabajar en tu barrio?
+      </h2>
+    </div>
+
+    {/* ===== CONTENIDO A DOS COLUMNAS ===== */}
+   <div className="grid md:grid-cols-2 gap-12 md:items-start items-center">
+
+
+      {/* COLUMNA IZQUIERDA */}
+      <div className="space-y-6 text-center md:text-left">
+        <div className="text-lg md:text-xl text-brand-50 max-w-lg mx-auto md:mx-0 leading-relaxed space-y-2">
+          <p>Microservicios en tu barrio: rápido, fácil y de confianza.</p>
+
+          
         </div>
-      </section>
+
+
+   
+
+        {/* Quick Categories (3 + 4 NUEVOS) */}
+        <div className="flex flex-wrap justify-center md:justify-start gap-4 py-2">
+          {/* 3 existentes */}
+          <button
+            onClick={() => {
+              const el = document.getElementById("servicios");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex flex-col items-center group"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+              <Icons.PawPrint size={24} />
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Mascotas</span>
+          </button>
+
+          <button
+            onClick={() => {
+              const el = document.getElementById("servicios");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex flex-col items-center group"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+              <Icons.ShoppingCart size={24} />
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Recados</span>
+          </button>
+
+          <button
+            onClick={() => {
+              const el = document.getElementById("servicios");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex flex-col items-center group"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+              <Icons.Heart size={24} />
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Cuidados</span>
+          </button>
+
+          {/* 4 NUEVOS (emoji para no depender de Icons nuevos) */}
+          <button
+            onClick={() => navigate("/sectores")}
+            className="flex flex-col items-center group"
+            title="Servicios para empresas"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition text-2xl">
+              🍽️
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Hostelería</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/sectores")}
+            className="flex flex-col items-center group"
+            title="Reparto y paquetería"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition text-2xl">
+              🚚
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Reparto</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/sectores")}
+            className="flex flex-col items-center group"
+            title="Limpieza"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition text-2xl">
+              🧼
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Limpieza</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/sectores")}
+            className="flex flex-col items-center group"
+            title="Reparaciones"
+          >
+            <div className="w-14 h-14 bg-white text-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition text-2xl">
+              🔧
+            </div>
+            <span className="text-sm mt-2 font-medium opacity-90">Reparaciones</span>
+          </button>
+        </div>
+
+        {/* BLOQUE INCENTIVOS (NUEVO) */}
+        <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm p-4 md:p-5">
+          <p className="font-bold text-white text-base md:text-lg">
+            ¿Quieres trabajar, necesitas ayuda o buscas personal para tu empresa?
+          </p>
+          <p className="text-white/90 mt-1 text-sm md:text-base leading-relaxed">
+            Date de alta y empieza hoy:{" "}
+            <span className="font-semibold">gana dinero</span> ofreciendo servicios en tu barrio,
+            o publica una tarea para que un vecino te eche una mano.
+          </p>
+
+          <div className="mt-3 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => navigate("/register")}
+              className="bg-white text-brand-600 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-brand-50 transition transform hover:-translate-y-0.5"
+            >
+              Quiero trabajar (alta gratis)
+            </button>
+
+            <button
+              onClick={() => navigate("/register")}
+              className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold shadow-xl hover:bg-slate-800 transition transform hover:-translate-y-0.5"
+            >
+              Necesito ayuda / Publicar tarea
+            </button>
+          </div>
+
+          <p className="mt-3 text-xs text-white/70">
+            Incentivos en la app: recompensas de bienvenida, reputación por reseñas y más visibilidad por buen servicio.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
+          <button
+            onClick={() => navigate("/download")}
+            className="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-slate-800 transition transform hover:-translate-y-1 flex items-center justify-center"
+          >
+            <Icons.Download className="mr-2" size={20} />
+            Descargar App
+          </button>
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-white text-brand-600 px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-brand-50 transition transform hover:-translate-y-1"
+          >
+            Registrarse
+          </button>
+        </div>
+      </div>
+
+    {/* Cleaner App Visual (tu bloque derecho) */}
+<div className="relative mt-10 md:mt-0">
+  <div className="absolute -top-10 -right-10 w-64 h-64 bg-brand-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+  <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+
+  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl relative transform rotate-1 hover:rotate-0 transition duration-500">
+    {/* App Interface Mockup */}
+    <div className="bg-white rounded-2xl h-96 w-full overflow-hidden relative border border-slate-200 shadow-inner flex flex-col">
+      {/* Mock Header */}
+      <div className="bg-brand-500 p-4 flex justify-between items-center text-white">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <Icons.User size={16} />
+          </div>
+          <div className="h-2 w-24 bg-white/20 rounded"></div>
+        </div>
+        <Icons.Menu size={20} className="opacity-70" />
+      </div>
+
+      {/* Mock Content */}
+      <div className="p-4 space-y-3 bg-slate-50 flex-grow relative">
+        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+            <Icons.ShoppingCart size={16} />
+          </div>
+          <div className="space-y-0.5 flex-grow">
+            <div className="text-xs font-bold text-slate-800">Hacer la compra</div>
+            <div className="text-[10px] text-slate-500">y subirla a casa</div>
+          </div>
+          <div className="text-emerald-600 font-bold text-xs">15€</div>
+        </div>
+
+        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3 opacity-90">
+          <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
+            <Icons.PawPrint size={16} />
+          </div>
+          <div className="space-y-0.5 flex-grow">
+            <div className="text-xs font-bold text-slate-800">Pasear a Boby</div>
+            <div className="text-[10px] text-slate-500">1 hora</div>
+          </div>
+          <div className="text-blue-600 font-bold text-xs">10€</div>
+        </div>
+
+        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3 opacity-80">
+          <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
+            <Icons.Hammer size={16} />
+          </div>
+          <div className="space-y-0.5 flex-grow">
+            <div className="text-xs font-bold text-slate-800">Montar estantería</div>
+            <div className="text-[10px] text-slate-500">tipo Ikea</div>
+          </div>
+          <div className="text-amber-600 font-bold text-xs">25€</div>
+        </div>
+
+        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3 opacity-75">
+          <div className="bg-purple-100 p-2 rounded-lg text-purple-600">
+            <Icons.Briefcase size={16} />
+          </div>
+          <div className="space-y-0.5 flex-grow">
+            <div className="text-xs font-bold text-slate-800">Apoyo en evento</div>
+            <div className="text-[10px] text-slate-500">hostelería</div>
+          </div>
+          <div className="text-purple-600 font-bold text-xs">60€</div>
+        </div>
+
+        {/* Floating "Accepted" Notification */}
+        <div
+          className="absolute bottom-6 right-6 left-6 bg-slate-900 text-white p-3 rounded-lg shadow-xl flex items-center space-x-3"
+          style={{ animation: 'yavoyFloat 3s ease-in-out infinite' }}
+        >
+          <div className="bg-green-500 rounded-full p-1">
+            <Icons.CheckCircle size={12} />
+          </div>
+          <div className="text-xs font-medium">¡Juan aceptó tu tarea!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Keyframes inline (sin tocar CSS global) */}
+  <style>
+    {`
+      @keyframes yavoyFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+      }
+    `}
+  </style>
+</div>
+</div>
+</div>
+</section>
 
       {/* 2. HOW IT WORKS */}
       <section id="como-funciona" className="py-20 bg-white">
@@ -434,159 +557,291 @@ const Landing = () => {
         </div>
       </section>
 
+
+
+
       {/* 3. SERVICES (NICHE) */}
-      <section id="servicios" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900">Secciones de Ayuda</h2>
-            <p className="text-lg text-slate-500 mt-2">Pequeñas tareas que marcan una gran diferencia.</p>
+     <section id="servicios" className="py-24 bg-gray-50">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl font-bold text-slate-900">Secciones de Ayuda</h2>
+      <p className="text-lg text-slate-500 mt-2">Pequeñas tareas que marcan una gran diferencia.</p>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-8">
+      {/* SENIORS */}
+      <div className="bg-blue-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-blue-100 overflow-hidden">
+        <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
+          <img
+            src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&q=80&w=600"
+            alt="Acompañamiento mayores"
+            className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
+          />
+        </div>
+        <h3 className="text-2xl font-bold mb-4 text-slate-800">Para Mayores</h3>
+        <ul className="space-y-3 mb-8">
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Acompañamiento médico
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Subir la compra
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Configurar el móvil
+          </li>
+        </ul>
+        <button
+          onClick={() => navigate("/register")}
+          className="w-full py-3 rounded-xl bg-white text-brand-600 font-bold hover:shadow-lg transition shadow-sm border border-brand-100"
+        >
+          Piensa en tus padres
+        </button>
+      </div>
+
+      {/* HOME */}
+      <div className="bg-amber-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-amber-100 overflow-hidden">
+        <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
+          <img
+            src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600"
+            alt="Montar muebles"
+            className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
+          />
+        </div>
+        <h3 className="text-2xl font-bold mb-4 text-slate-800">Para Casa</h3>
+        <ul className="space-y-3 mb-8">
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Montar mueble
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Cambiar bombillas
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Ordenar armarios
+          </li>
+        </ul>
+        <button
+          onClick={() => navigate("/register")}
+          className="w-full py-3 rounded-xl bg-white text-amber-600 font-bold hover:shadow-lg transition shadow-sm border border-amber-100"
+        >
+          Te echamos una mano
+        </button>
+      </div>
+
+      {/* PETS */}
+      <div className="bg-emerald-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-emerald-100 overflow-hidden">
+        <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
+          <img
+            src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=600"
+            alt="Pasear perro"
+            className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
+          />
+        </div>
+        <h3 className="text-2xl font-bold mb-4 text-slate-800">Mascotas</h3>
+        <ul className="space-y-3 mb-8">
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Paseo de tu perro
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Visitas al veterinario
+          </li>
+          <li className="flex items-center text-slate-700">
+            <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Cuidado en vacaciones
+          </li>
+        </ul>
+        <button
+          onClick={() => navigate("/register")}
+          className="w-full py-3 rounded-xl bg-white text-emerald-600 font-bold hover:shadow-lg transition shadow-sm border border-emerald-100"
+        >
+          Para tu mejor amigo
+        </button>
+      </div>
+    </div>
+
+    {/* ===== Incentivos: Trabajadores + Empresas ===== */}
+    <div className="grid lg:grid-cols-2 gap-6 mt-16">
+      {/* WORKERS */}
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+        <div className="flex items-start gap-4 mb-5">
+          <div className="bg-emerald-500 rounded-full p-3 flex-shrink-0">
+            <Icons.Briefcase size={26} className="text-white" />
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* SENIORS */}
-            <div className="bg-blue-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-blue-100 overflow-hidden">
-              <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
-                 <img 
-                    src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&q=80&w=600" 
-                    alt="Acompañamiento mayores" 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" 
-                 />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-slate-800">Para Mayores</h3>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Acompañamiento médico
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Subir la compra
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-brand-500 mr-2" /> Configurar el móvil
-                </li>
-              </ul>
-              <button onClick={() => navigate('/register')} className="w-full py-3 rounded-xl bg-white text-brand-600 font-bold hover:shadow-lg transition shadow-sm border border-brand-100">
-                Piensa en tus padres
-              </button>
-            </div>
-
-            {/* HOME */}
-            <div className="bg-amber-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-amber-100 overflow-hidden">
-               <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
-                 <img 
-                    src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600" 
-                    alt="Montar muebles" 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" 
-                 />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-slate-800">Para Casa</h3>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Montar mueble
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Cambiar bombillas
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-amber-500 mr-2" /> Ordenar armarios
-                </li>
-              </ul>
-              <button onClick={() => navigate('/register')} className="w-full py-3 rounded-xl bg-white text-amber-600 font-bold hover:shadow-lg transition shadow-sm border border-amber-100">
-                Te echamos una mano
-              </button>
-            </div>
-
-            {/* PETS */}
-            <div className="bg-emerald-50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition duration-300 border border-emerald-100 overflow-hidden">
-               <div className="h-48 w-full rounded-2xl overflow-hidden mb-6 relative shadow-md group">
-                 <img 
-                    src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=600" 
-                    alt="Pasear perro" 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" 
-                 />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-slate-800">Mascotas</h3>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Paseo de tu perro
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Visitas al veterinario
-                </li>
-                <li className="flex items-center text-slate-700">
-                  <Icons.CheckCircle size={18} className="text-emerald-500 mr-2" /> Cuidado en vacaciones
-                </li>
-              </ul>
-              <button onClick={() => navigate('/register')} className="w-full py-3 rounded-xl bg-white text-emerald-600 font-bold hover:shadow-lg transition shadow-sm border border-emerald-100">
-                Para tu mejor amigo
-              </button>
-            </div>
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900">¿Quieres trabajar en tu barrio?</h3>
+            <p className="text-slate-600 mt-1">
+              Date de alta gratis y empieza a ganar dinero con tareas cerca de casa. Tú eliges disponibilidad.
+            </p>
           </div>
         </div>
 
-        {/* Value Proposition for Particulares */}
-        <div className="max-w-4xl mx-auto px-4 mt-16">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="bg-blue-500 rounded-full p-3 flex-shrink-0">
-                <Icons.Euro size={28} className="text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Menos que 2 cafés al mes</h3>
-                <p className="text-slate-600 text-lg">Por solo <strong className="text-blue-600">3€</strong> por tarea + la cantidad que decidas pagar</p>
-              </div>
-            </div>
+        <ul className="space-y-2 text-sm text-slate-700 mb-6">
+          <li className="flex items-start">
+            <Icons.Check size={16} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
+            <span>Gana dinero con recados, cuidados, limpieza y reparaciones.</span>
+          </li>
+          <li className="flex items-start">
+            <Icons.Check size={16} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
+            <span>Reputación y reseñas: cuanto mejor trabajas, más te eligen.</span>
+          </li>
+          <li className="flex items-start">
+            <Icons.Check size={16} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
+            <span>Pagos claros y seguros (sin perseguir a nadie).</span>
+          </li>
+          <li className="flex items-start">
+            <Icons.Check size={16} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
+            <span>Identidad verificada (DNI/NIE + selfie) para confianza real.</span>
+          </li>
+        </ul>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <h4 className="font-semibold text-slate-900 mb-3">Ejemplo: Ayuda con la compra</h4>
-                <div className="space-y-2 text-sm text-slate-700">
-                  <div className="flex justify-between">
-                    <span>Comisión plataforma:</span>
-                    <strong className="text-blue-600">3€</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Recompensa para el ayudante:</span>
-                    <strong>10€</strong>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between font-bold text-base">
-                    <span>Total:</span>
-                    <span className="text-blue-600">13€</span>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500 mt-3">✓ Tu padre recibe ayuda, tú pagas menos que una cena</p>
-              </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate("/register")}
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition"
+          >
+            Quiero trabajar
+          </button>
+          <button
+            onClick={() => navigate("/download")}
+            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition"
+          >
+            Descargar App
+          </button>
+        </div>
+      </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <h4 className="font-semibold text-slate-900 mb-3">Ventajas</h4>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex items-start">
-                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Vecinos de confianza cerca de casa</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Tú decides cuánto pagar por la ayuda</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Tranquilidad para ti y para los tuyos</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Sin suscripciones ni compromisos</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <button onClick={() => navigate('/register')} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg transition">
-                Empezar ahora - Solo 3€ por tarea
-              </button>
-            </div>
+      {/* COMPANIES */}
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+        <div className="flex items-start gap-4 mb-5">
+          <div className="bg-slate-900 rounded-full p-3 flex-shrink-0">
+            <Icons.Building2 size={26} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900">¿Eres empresa y necesitas refuerzo?</h3>
+            <p className="text-slate-600 mt-1">
+              Consigue ayuda por horas o por tarea en periodos punta. Publicas y recibes candidatos del barrio.
+            </p>
           </div>
         </div>
-      </section>
+
+        <div className="grid sm:grid-cols-2 gap-3 mb-6">
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Icons.Coffee size={18} className="text-brand-600" /> Hostelería
+            </div>
+            <p className="text-xs text-slate-600 mt-1">Barra, sala, apoyo cocina, eventos.</p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Icons.Package size={18} className="text-brand-600" /> Reparto / Paquetería
+            </div>
+            <p className="text-xs text-slate-600 mt-1">Picos de entregas, rutas cortas.</p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Icons.Sparkles size={18} className="text-brand-600" /> Limpieza
+            </div>
+            <p className="text-xs text-slate-600 mt-1">Local, oficinas, refuerzos puntuales.</p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Icons.Tool size={18} className="text-brand-600" /> Reparaciones
+            </div>
+            <p className="text-xs text-slate-600 mt-1">Manitas, mantenimiento, pequeñas obras.</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate("/register")}
+            className="flex-1 bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition"
+          >
+            Soy empresa
+          </button>
+          <button
+            onClick={() => {
+              const el = document.getElementById("contacto");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex-1 bg-white hover:bg-gray-50 text-slate-900 px-6 py-3 rounded-xl font-bold shadow-sm border border-gray-200 transition"
+          >
+            Hablar con YaVoy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* ===== Value Proposition for Particulares (igual, pero dentro del contenedor) ===== */}
+    <div className="max-w-4xl mx-auto mt-16">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="bg-blue-500 rounded-full p-3 flex-shrink-0">
+            <Icons.Euro size={28} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">Menos que 2 cafés al mes</h3>
+            <p className="text-slate-600 text-lg">
+              Por solo <strong className="text-blue-600">3€</strong> por tarea + la cantidad que decidas pagar
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl p-5 shadow-sm">
+            <h4 className="font-semibold text-slate-900 mb-3">Ejemplo: Ayuda con la compra</h4>
+            <div className="space-y-2 text-sm text-slate-700">
+              <div className="flex justify-between">
+                <span>Comisión plataforma:</span>
+                <strong className="text-blue-600">3€</strong>
+              </div>
+              <div className="flex justify-between">
+                <span>Recompensa para el ayudante:</span>
+                <strong>10€</strong>
+              </div>
+              <div className="border-t pt-2 flex justify-between font-bold text-base">
+                <span>Total:</span>
+                <span className="text-blue-600">13€</span>
+              </div>
+            </div>
+            <p className="text-xs text-slate-500 mt-3">✓ Tu padre recibe ayuda, tú pagas menos que una cena</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-5 shadow-sm">
+            <h4 className="font-semibold text-slate-900 mb-3">Ventajas</h4>
+            <ul className="space-y-2 text-sm text-slate-700">
+              <li className="flex items-start">
+                <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Vecinos de confianza cerca de casa</span>
+              </li>
+              <li className="flex items-start">
+                <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Tú decides cuánto pagar por la ayuda</span>
+              </li>
+              <li className="flex items-start">
+                <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Tranquilidad para ti y para los tuyos</span>
+              </li>
+              <li className="flex items-start">
+                <Icons.Check size={16} className="text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Sin suscripciones ni compromisos</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg transition"
+          >
+            Empezar ahora - Solo 3€ por tarea
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
 
       {/* NEW: COMPANIES ZONE */}
       <section id="empresas" className="py-20 bg-slate-900 text-white overflow-hidden relative">
@@ -728,138 +983,216 @@ const Landing = () => {
          </div>
       </section>
 
-      {/* 4. TRUST & SAFETY & REVIEWS */}
-      <section id="opiniones" className="py-24 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-             <h2 className="text-3xl font-bold text-slate-900">Lo que dicen nuestros vecinos</h2>
-             <p className="text-lg text-slate-500 mt-2">Transacciones reales, personas reales.</p>
+
+
+
+     {/* 4. TRUST & SAFETY & REVIEWS */}
+<section id="opiniones" className="py-24 bg-white overflow-hidden">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="text-center mb-16">
+      <h2 className="text-3xl font-bold text-slate-900">Lo que dicen nuestros vecinos</h2>
+      <p className="text-lg text-slate-500 mt-2">Transacciones reales, personas reales.</p>
+    </div>
+
+    {/* REVIEWS GRID (ahora incluye Empresa) */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      {/* Review 1 - Client */}
+      <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 relative">
+        <div className="absolute top-4 right-4 bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+          Cliente
+        </div>
+        <div className="flex items-center mb-4 text-yellow-400">
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+        </div>
+        <p className="text-slate-700 text-sm italic mb-4">
+          "Me arreglaron el grifo de la cocina en una hora. Rápido y muy apañado."
+        </p>
+        <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-900">Carmen L.</span>
+          <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-700">Pagué 40€</span>
+        </div>
+      </div>
+
+      {/* Review 2 - Helper */}
+      <div className="bg-brand-50 p-6 rounded-2xl border border-brand-100 relative">
+        <div className="absolute top-4 right-4 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+          Ayudante
+        </div>
+        <div className="flex items-center mb-4 text-yellow-400">
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+        </div>
+        <p className="text-slate-700 text-sm italic mb-4">
+          "Ayudé con una mudanza pequeña el sábado por la mañana. Dinero extra muy fácil."
+        </p>
+        <div className="border-t border-brand-200 pt-3 flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-900">Javier M.</span>
+          <span className="text-xs bg-emerald-200 px-2 py-1 rounded text-emerald-800 font-bold">Gané 60€</span>
+        </div>
+      </div>
+
+      {/* Review 3 - Empresa (Hostelería / horas punta) */}
+      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
+        <div className="absolute top-4 right-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+          Empresa
+        </div>
+        <div className="flex items-center mb-4 text-yellow-400">
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+        </div>
+        <p className="text-slate-700 text-sm italic mb-4">
+          "Necesitábamos refuerzo en barra un sábado. En 30 minutos teníamos ayuda y todo perfecto."
+        </p>
+        <div className="border-t border-slate-200 pt-3 flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-900">Bar La Ribera</span>
+          <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-700">Hora punta</span>
+        </div>
+      </div>
+
+      {/* Review 4 - Empresa (Reparto / Paquetería) */}
+      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
+        <div className="absolute top-4 right-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+          Empresa
+        </div>
+        <div className="flex items-center mb-4 text-yellow-400">
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+          <Icons.Star fill="currentColor" size={16} />
+        </div>
+        <p className="text-slate-700 text-sm italic mb-4">
+          "Teníamos picos de entregas. Publicamos una ayuda y lo resolvimos rápido sin líos."
+        </p>
+        <div className="border-t border-slate-200 pt-3 flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-900">Mensajería Local</span>
+          <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-700">Reparto</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Mini CTA incentivo bajo reseñas */}
+    <div className="mb-16">
+      <div className="rounded-3xl p-6 md:p-8 bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <h3 className="text-xl md:text-2xl font-extrabold text-slate-900">
+            ¿Quieres trabajar o necesitas ayuda hoy?
+          </h3>
+          <p className="text-slate-600 mt-1 max-w-2xl">
+            Date de alta gratis y empieza en tu barrio: publica una tarea o gana dinero ayudando a vecinos y empresas
+            (hostelería, reparto/paquetería, limpieza y reparaciones).
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <button
+            onClick={() => navigate("/register")}
+            className="w-full md:w-auto bg-brand-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-brand-600 transition transform hover:-translate-y-0.5"
+          >
+            Quiero trabajar
+          </button>
+          <button
+            onClick={() => navigate("/register")}
+            className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition transform hover:-translate-y-0.5"
+          >
+            Necesito ayuda / Empresa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Trust & Safety (tu bloque, con 1 ajuste ligero de copy) */}
+    <div className="flex flex-col md:flex-row items-center gap-16">
+      <div className="md:w-1/2 hidden md:block">
+        <div className="bg-brand-50 rounded-3xl p-8 relative overflow-hidden">
+          <div className="absolute -right-10 -bottom-10 opacity-10">
+            <Icons.Shield size={200} />
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-              {/* Review 1 - Client */}
-              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 relative">
-                  <div className="absolute top-4 right-4 bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Cliente</div>
-                  <div className="flex items-center mb-4 text-yellow-400">
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                  </div>
-                  <p className="text-slate-700 text-sm italic mb-4">"Me arreglaron el grifo de la cocina en una hora. Rápido y muy apañado."</p>
-                  <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-900">Carmen L.</span>
-                      <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-700">Pagué 40€</span>
-                  </div>
+          <h3 className="text-2xl font-bold text-brand-800 mb-4">Garantía YaVoy</h3>
+          <ul className="space-y-4">
+            <li className="flex items-start">
+              <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600">
+                <Icons.CheckCircle size={20} />
               </div>
+              <p className="text-brand-900 text-sm">
+                Los pagos se liberan solo cuando confirmas que el trabajo está hecho.
+              </p>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600">
+                <Icons.UserCheck size={20} />
+              </div>
+              <p className="text-brand-900 text-sm">
+                Todos los ayudantes pasan un proceso de verificación de identidad.
+              </p>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600">
+                <Icons.MessageCircle size={20} />
+              </div>
+              <p className="text-brand-900 text-sm">
+                Soporte directo para mediar en cualquier incidencia.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-              {/* Review 2 - Helper */}
-              <div className="bg-brand-50 p-6 rounded-2xl border border-brand-100 relative">
-                  <div className="absolute top-4 right-4 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Ayudante</div>
-                  <div className="flex items-center mb-4 text-yellow-400">
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                  </div>
-                  <p className="text-slate-700 text-sm italic mb-4">"Ayudé con una mudanza pequeña el sábado por la mañana. Dinero extra muy fácil."</p>
-                  <div className="border-t border-brand-200 pt-3 flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-900">Javier M.</span>
-                      <span className="text-xs bg-emerald-200 px-2 py-1 rounded text-emerald-800 font-bold">Gané 60€</span>
-                  </div>
-              </div>
+      <div className="md:w-1/2 space-y-6">
+        <h2 className="text-3xl font-bold text-slate-900">Seguridad y confianza ante todo</h2>
+        <p className="text-lg text-slate-500">
+          YaVoy es comunidad, no anonimato. Para particulares, mayores y empresas: perfiles verificados y reputación visible.
+        </p>
 
-               {/* Review 3 - Client */}
-              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 relative">
-                  <div className="absolute top-4 right-4 bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Cliente</div>
-                   <div className="flex items-center mb-4 text-yellow-400">
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                  </div>
-                  <p className="text-slate-700 text-sm italic mb-4">"Necesitaba que pasearan a mi perro por estar con gripe. Laura fue encantadora."</p>
-                  <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-900">Elena R.</span>
-                      <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-700">Pagué 12€</span>
-                  </div>
-              </div>
-
-               {/* Review 4 - Helper */}
-              <div className="bg-brand-50 p-6 rounded-2xl border border-brand-100 relative">
-                  <div className="absolute top-4 right-4 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Ayudante</div>
-                  <div className="flex items-center mb-4 text-yellow-400">
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                       <Icons.Star fill="currentColor" size={16}/>
-                  </div>
-                  <p className="text-slate-700 text-sm italic mb-4">"Hice la compra a una vecina mayor. Me invitó a café y me pagó al momento."</p>
-                  <div className="border-t border-brand-200 pt-3 flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-900">Marcos T.</span>
-                      <span className="text-xs bg-emerald-200 px-2 py-1 rounded text-emerald-800 font-bold">Gané 15€</span>
-                  </div>
-              </div>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1">
+              <Icons.UserCheck size={20} />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800">Verificación de identidad</h4>
+              <p className="text-sm text-slate-600">Sabes quién viene a tu casa. Verificamos DNIs y perfiles.</p>
+            </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center gap-16">
-             <div className="md:w-1/2 hidden md:block">
-                <div className="bg-brand-50 rounded-3xl p-8 relative overflow-hidden">
-                   <div className="absolute -right-10 -bottom-10 opacity-10">
-                       <Icons.Shield size={200} />
-                   </div>
-                   <h3 className="text-2xl font-bold text-brand-800 mb-4">Garantía YaVoy</h3>
-                   <ul className="space-y-4">
-                       <li className="flex items-start">
-                           <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600"><Icons.CheckCircle size={20}/></div>
-                           <p className="text-brand-900 text-sm">Los pagos se liberan solo cuando confirmas que el trabajo está hecho.</p>
-                       </li>
-                       <li className="flex items-start">
-                           <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600"><Icons.UserCheck size={20}/></div>
-                           <p className="text-brand-900 text-sm">Todos los ayudantes pasan un proceso de verificación de identidad.</p>
-                       </li>
-                       <li className="flex items-start">
-                           <div className="bg-white p-2 rounded-lg shadow-sm mr-3 text-brand-600"><Icons.MessageCircle size={20}/></div>
-                           <p className="text-brand-900 text-sm">Soporte directo para mediar en cualquier incidencia.</p>
-                       </li>
-                   </ul>
-                </div>
-             </div>
-             <div className="md:w-1/2 space-y-6">
-                <h2 className="text-3xl font-bold text-slate-900">Seguridad y confianza ante todo</h2>
-                <p className="text-lg text-slate-500">YaVoy es comunidad, no anonimato. Ayudamos a que los vecinos se ayuden con total tranquilidad.</p>
-                
-                <div className="space-y-4">
-                   <div className="flex items-start">
-                     <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1"><Icons.UserCheck size={20}/></div>
-                     <div>
-                       <h4 className="font-bold text-slate-800">Verificación de identidad</h4>
-                       <p className="text-sm text-slate-600">Sabes quién viene a tu casa. Verificamos DNIs y perfiles.</p>
-                     </div>
-                   </div>
-                   <div className="flex items-start">
-                     <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1"><Icons.Star size={20}/></div>
-                     <div>
-                       <h4 className="font-bold text-slate-800">Valoraciones reales</h4>
-                       <p className="text-sm text-slate-600">Tú eliges basándote en la experiencia de otros vecinos.</p>
-                     </div>
-                   </div>
-                   <div className="flex items-start">
-                     <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1"><Icons.MessageCircle size={20}/></div>
-                     <div>
-                       <h4 className="font-bold text-slate-800">Chat seguro</h4>
-                       <p className="text-sm text-slate-600">Habla y acuerda detalles sin necesidad de dar tu número personal.</p>
-                     </div>
-                   </div>
-                </div>
-             </div>
+          <div className="flex items-start">
+            <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1">
+              <Icons.Star size={20} />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800">Valoraciones reales</h4>
+              <p className="text-sm text-slate-600">Tú eliges basándote en la experiencia de otros vecinos.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start">
+            <div className="bg-brand-100 p-2 rounded-lg mr-4 text-brand-600 mt-1">
+              <Icons.MessageCircle size={20} />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800">Chat seguro</h4>
+              <p className="text-sm text-slate-600">
+                Habla y acuerda detalles sin necesidad de dar tu número personal.
+              </p>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
       {/* 5. LOCATION */}
       <section id="donde" className="py-20 bg-slate-900 text-white relative">
@@ -1909,7 +2242,7 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                             <p className="text-sm text-brand-700">
                                 {user.role === 'COMPANY' && 'Acceso completo a publicación de ofertas y gestión de bonos'}
                                 {user.role === 'PARTICULAR' && 'Publica tareas y encuentra ayuda cerca de ti'}
-                                {user.role === 'WORKER' && 'Encuentra trabajos en tu zona'}
+                                {user.role === UserRole.HELPER && 'Encuentra trabajos en tu zona'}
                             </p>
                         </div>
                     </div>

@@ -6,7 +6,7 @@ export enum UserRole {
   ADMIN = 'ADMIN'
 }
 
-export type CompanySector = 
+export type CompanySectorSlug =
   | 'tecnologia-digital'
   | 'hogar-mantenimiento'
   | 'mascotas'
@@ -27,6 +27,7 @@ export type CompanySector =
   | 'tecnologia-domestica'
   | 'moda-textil'
   | 'otros-servicios';
+
 
 export enum JobStatus {
   OPEN = 'OPEN',
@@ -78,7 +79,9 @@ export interface User {
   email: string;
   city?: string;
   district?: string;
-  company_sector?: CompanySector | null;  // nuevo
+  company_sector?: CompanySector | null;
+  created_at?: string;
+  phone?: string;
 }
 
 export interface Job {
@@ -97,7 +100,8 @@ export interface Job {
   creator_user_id: string;
   created_at: string;
   
-    sector?: CompanySector | null;          //  nuevo
+   sector?: CompanySectorSlug | null;
+
   // Expanded properties
   creator?: {
     full_name: string;

@@ -29,15 +29,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
       fetchNotifications();
-      
+
       // Refresh notifications every 10 seconds
       const interval = setInterval(() => {
         fetchNotifications();
       }, 10000);
-      
+
       return () => clearInterval(interval);
     }
-  }, [auth.user?.id]);
+  }, [auth.isAuthenticated, auth.user?.id]);
 
   const fetchNotifications = async () => {
     if (!auth.user?.id) return;
@@ -47,7 +47,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         .select('*')
         .eq('user_id', auth.user.id)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       setNotifications(data || []);
       setUnreadCount((data || []).filter(n => !n.is_read).length);
@@ -62,7 +62,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         .from('VoyNotifications')
         .update({ is_read: true })
         .eq('id', notificationId);
-      
+
       if (error) throw error;
       await fetchNotifications();
     } catch (err) {
@@ -107,7 +107,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
       if (error) throw error;
       alert('Perfil actualizado exitosamente');
       setIsEditProfileOpen(false);
-      // Opcionalmente, recargamos la página o actualizamos el estado del auth
       window.location.reload();
     } catch (err: any) {
       alert('Error al actualizar perfil: ' + err.message);
@@ -126,6 +125,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
   const handleScrollTo = (id: string) => {
     setIsMenuOpen(false);
+
     if (location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {
@@ -144,21 +144,55 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => navigate('/')}>
+            <button
+              type="button"
+              className="flex-shrink-0 flex items-center cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               <img src="/yavoy.png" alt="YaVoy Logo" className="h-12 w-auto mr-2 object-contain" />
-              <span className="font-bold text-2xl text-white tracking-tight">YaVoy</span>
-            </div>
+              <span className="font-bold text-2xl text-white tracking-tight"></span>
+            </button>
 
             {/* Desktop Menu */}
             <div className="hidden lg:flex space-x-6 items-center">
-              <button onClick={() => handleScrollTo('como-funciona')} className="text-white hover:text-blue-100 font-medium transition text-sm">Cómo funciona</button>
-              <Link to="/sectores" className="text-white hover:text-blue-100 font-medium transition text-sm">Sectores</Link>
-              <button onClick={() => handleScrollTo('servicios')} className="text-white hover:text-blue-100 font-medium transition text-sm">Soy Particular</button>
-              <button onClick={() => handleScrollTo('opiniones')} className="text-white hover:text-blue-100 font-medium transition text-sm">Opiniones</button>
-              <button onClick={() => handleScrollTo('empresas')} className="text-white hover:text-blue-100 font-medium transition text-sm">Soy Empresa</button>
-              <button onClick={() => handleScrollTo('donde')} className="text-white hover:text-blue-100 font-medium transition text-sm">Dónde Ayudamos</button>
-              <button onClick={() => handleScrollTo('contacto')} className="text-white hover:text-blue-100 font-medium transition text-sm">Contacto</button>
-              
+              <button onClick={() => handleScrollTo('como-funciona')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Cómo funciona
+              </button>
+
+              <Link to="/sectores" className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Sectores
+              </Link>
+
+              <button onClick={() => handleScrollTo('servicios')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Particulares
+              </button>
+
+              <button onClick={() => handleScrollTo('empresas')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Empresas
+              </button>
+
+              <button onClick={() => handleScrollTo('opiniones')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Opiniones
+              </button>
+
+              <button onClick={() => handleScrollTo('donde')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Barrios
+              </button>
+
+              {/* ✅ NUEVO: Incentivos */}
+              <button onClick={() => handleScrollTo('incentivos')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Incentivos
+              </button>
+
+              <button onClick={() => handleScrollTo('contacto')} className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Contacto
+              </button>
+
+              {/* ✅ NUEVO: Descargar App también en desktop */}
+              <Link to="/download" className="text-white hover:text-blue-100 font-medium transition text-sm">
+                Dowload App
+              </Link>
+
               <div className="h-6 w-px bg-white/30 mx-2"></div>
 
               {auth.isAuthenticated ? (
@@ -166,8 +200,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                   <button onClick={onOpenDashboard} className="text-white hover:text-blue-100 font-medium transition text-sm">
                     Mi Panel
                   </button>
+
                   <div className="relative">
-                    <button 
+                    <button
                       onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                       className="text-white hover:text-blue-100 p-2 transition relative"
                     >
@@ -192,7 +227,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                         {notifications.length > 0 ? (
                           <div className="divide-y divide-gray-100">
                             {notifications.map(notif => (
-                              <div 
+                              <div
                                 key={notif.id}
                                 onClick={() => markAsRead(notif.id)}
                                 className={`p-4 cursor-pointer transition ${
@@ -223,7 +258,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
                   {/* User Profile Button */}
                   <div className="relative">
-                    <button 
+                    <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center space-x-2 pl-2 border-l border-white/30 hover:bg-white/10 rounded-lg px-2 py-1 transition"
                     >
@@ -241,7 +276,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                           <p className="font-bold text-slate-900 text-sm">{auth.user.full_name}</p>
                           <p className="text-xs text-gray-500">{auth.user.email}</p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => {
                             setIsEditProfileOpen(true);
                             setIsProfileOpen(false);
@@ -251,7 +286,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                           <Icons.Edit3 size={16} className="mr-2 text-brand-500" />
                           Editar Perfil
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             setIsChangePasswordOpen(true);
                             setIsProfileOpen(false);
@@ -261,7 +296,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                           <Icons.Shield size={16} className="mr-2 text-brand-500" />
                           Cambiar Contraseña
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             onLogout();
                             setIsProfileOpen(false);
@@ -298,15 +333,45 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         {isMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100">
             <div className="px-4 pt-2 pb-6 space-y-1 shadow-lg h-screen overflow-y-auto">
-              <button onClick={() => handleScrollTo('como-funciona')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Cómo funciona</button>
-              <Link to="/sectores" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Sectores</Link>
-              <button onClick={() => handleScrollTo('servicios')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Soy Particular</button>
-              <button onClick={() => handleScrollTo('opiniones')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Opiniones</button>
-              <button onClick={() => handleScrollTo('empresas')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Soy Empresa</button>
-              <button onClick={() => handleScrollTo('donde')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Dónde Ayudamos</button>
-              <button onClick={() => handleScrollTo('contacto')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Contacto</button>
-              <Link to="/download" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Descargar App</Link>
+              <button onClick={() => handleScrollTo('como-funciona')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Cómo funciona
+              </button>
+
+              <Link to="/sectores" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Sectores
+              </Link>
+
+              <button onClick={() => handleScrollTo('servicios')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Soy Particular
+              </button>
+
+              <button onClick={() => handleScrollTo('opiniones')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Opiniones
+              </button>
+
+              <button onClick={() => handleScrollTo('empresas')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Soy Empresa
+              </button>
+
+              <button onClick={() => handleScrollTo('donde')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Dónde Ayudamos
+              </button>
+
+              {/* ✅ NUEVO: Incentivos */}
+              <button onClick={() => handleScrollTo('incentivos')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Incentivos
+              </button>
+
+              <button onClick={() => handleScrollTo('contacto')} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Contacto
+              </button>
+
+              <Link to="/download" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                Descargar App
+              </Link>
+
               <div className="border-t border-gray-100 my-2"></div>
+
               {auth.isAuthenticated ? (
                 <>
                   <div className="px-3 py-3 border-b border-gray-100 bg-brand-50">
@@ -320,20 +385,31 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                       </div>
                     </div>
                   </div>
-                  <button onClick={() => { onOpenDashboard?.(); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Mi Panel</button>
-                  <button 
+
+                  <button onClick={() => { onOpenDashboard?.(); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                    Mi Panel
+                  </button>
+
+                  <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                     className="w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg flex justify-between items-center"
                   >
                     Notificaciones
                     {unreadCount > 0 && <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{unreadCount}</span>}
                   </button>
-                  <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg">Cerrar Sesión</button>
+
+                  <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg">
+                    Cerrar Sesión
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">Iniciar Sesión</Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-white font-bold bg-green-500 hover:bg-green-600 rounded-lg transition">Registrarse</Link>
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg">
+                    Iniciar Sesión
+                  </Link>
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 text-white font-bold bg-green-500 hover:bg-green-600 rounded-lg transition">
+                    Registrarse
+                  </Link>
                 </>
               )}
             </div>
@@ -345,50 +421,61 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         {children}
       </main>
 
-      <footer className="bg-slate-900 text-slate-400 py-12">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="bg-[#0B2E4E] text-white/75 py-8">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <div className="flex items-center text-white font-bold text-xl mb-4">
-               <img src="/YaVoy.ico" alt="Logo" className="h-8 w-8 mr-2 object-contain" /> YaVoy
+            <div className="flex items-center text-white font-bold text-xl mb-3">
+              <img src="/YaVoy.ico" alt="Logo" className="h-8 w-8 mr-2 object-contain" />
+              YaVoy
             </div>
-            <p className="text-sm">Conectando vecinos, resolviendo problemas, haciendo comunidad.</p>
-            <div className="mt-4 flex space-x-4">
-                {/* Social placeholders */}
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center hover:bg-brand-500 transition cursor-pointer"><Icons.Smartphone size={16}/></div>
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center hover:bg-brand-500 transition cursor-pointer"><Icons.MessageCircle size={16}/></div>
+            <p className="text-sm text-white/70">
+              Conectando vecinos, resolviendo problemas, haciendo comunidad.
+            </p>
+
+            <div className="mt-3 flex space-x-3">
+              <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/15 transition cursor-pointer">
+                <Icons.Smartphone size={16} />
+              </div>
+              <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/15 transition cursor-pointer">
+                <Icons.MessageCircle size={16} />
+              </div>
             </div>
           </div>
+
           <div>
-            <h4 className="text-white font-semibold mb-4">Plataforma</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="text-white font-semibold mb-2">Plataforma</h4>
+            <ul className="space-y-1.5 text-sm">
               <li><Link to="/register" className="hover:text-white transition">Soy Ayudante</Link></li>
               <li><Link to="/register" className="hover:text-white transition">Soy Empresa</Link></li>
               <li><Link to="/register" className="hover:text-white transition">Soy Particular</Link></li>
             </ul>
           </div>
+
           <div>
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="text-white font-semibold mb-2">Legal</h4>
+            <ul className="space-y-1.5 text-sm">
               <li><Link to="/aviso-legal" className="hover:text-white transition">Aviso Legal</Link></li>
-              <li><Link to="/privacidad" className="hover:text-white transition">Política de Privacidad</Link></li>
-              <li><Link to="/cookies" className="hover:text-white transition">Política de Cookies</Link></li>
-              <li><Link to="/terminos" className="hover:text-white transition">Términos de uso</Link></li>
+              <li><Link to="/privacidad" className="hover:text-white transition">Privacidad</Link></li>
+              <li><Link to="/cookies" className="hover:text-white transition">Cookies</Link></li>
+              <li><Link to="/terminos" className="hover:text-white transition">Términos</Link></li>
             </ul>
           </div>
+
           <div>
-            <h4 className="text-white font-semibold mb-4">Descarga</h4>
+            <h4 className="text-white font-semibold mb-2">Descarga</h4>
             <div className="flex flex-col space-y-2">
-              <div className="w-36 h-10 bg-slate-800 rounded flex items-center justify-center cursor-pointer hover:bg-slate-700 transition text-xs font-bold text-white">
+              <div className="w-36 h-10 bg-white/10 rounded flex items-center justify-center cursor-pointer hover:bg-white/15 transition text-xs font-bold text-white">
                 <span className="mr-2 text-lg"></span> App Store
               </div>
-              <div className="w-36 h-10 bg-slate-800 rounded flex items-center justify-center cursor-pointer hover:bg-slate-700 transition text-xs font-bold text-white">
+              <div className="w-36 h-10 bg-white/10 rounded flex items-center justify-center cursor-pointer hover:bg-white/15 transition text-xs font-bold text-white">
                 <span className="mr-2 text-lg">▶</span> Google Play
               </div>
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-slate-800 text-center text-xs">
-          © {new Date().getFullYear()} YaVoy App. Todos los derechos reservados.
+
+        <div className="max-w-7xl mx-auto px-4 mt-6 pt-5 border-t border-white/10 text-center text-xs text-white/55">
+          © {new Date().getFullYear()} YaVoy. Todos los derechos reservados.
         </div>
       </footer>
 
@@ -398,40 +485,40 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h2 className="text-2xl font-bold text-slate-800">Editar Perfil</h2>
-              <button onClick={() => setIsEditProfileOpen(false)}><Icons.X className="text-gray-400 hover:text-gray-600 cursor-pointer" size={24}/></button>
+              <button onClick={() => setIsEditProfileOpen(false)}><Icons.X className="text-gray-400 hover:text-gray-600 cursor-pointer" size={24} /></button>
             </div>
 
             <form onSubmit={handleEditProfile} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
-                <input 
+                <input
                   type="text"
                   value={editForm.full_name}
-                  onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
+                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
-                <input 
+                <input
                   type="text"
                   value={editForm.city}
-                  onChange={(e) => setEditForm({...editForm, city: e.target.value})}
+                  onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="Madrid"
                 />
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsEditProfileOpen(false)}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-bold hover:bg-brand-600 transition"
                 >
@@ -449,16 +536,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h2 className="text-2xl font-bold text-slate-800">Cambiar Contraseña</h2>
-              <button onClick={() => setIsChangePasswordOpen(false)}><Icons.X className="text-gray-400 hover:text-gray-600 cursor-pointer" size={24}/></button>
+              <button onClick={() => setIsChangePasswordOpen(false)}><Icons.X className="text-gray-400 hover:text-gray-600 cursor-pointer" size={24} /></button>
             </div>
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
-                <input 
+                <input
                   type="password"
                   value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="••••••••"
                   required
@@ -467,10 +554,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
-                <input 
+                <input
                   type="password"
                   value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="••••••••"
                   required
@@ -480,14 +567,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
               <p className="text-xs text-gray-500">La contraseña debe tener al menos 6 caracteres.</p>
 
               <div className="flex gap-3 pt-4">
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsChangePasswordOpen(false)}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-bold hover:bg-brand-600 transition"
                 >

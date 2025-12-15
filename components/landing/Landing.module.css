@@ -1,0 +1,200 @@
+:root {
+  --color-primary: #3A6EA5;
+  --color-secondary: #7AC47A;
+  --color-background: #F7F6F2;
+  --color-detail: #B97A57;
+  --color-text: #222;
+  --color-text-secondary: #6B6B6B;
+  --color-white: #FFF;
+}
+
+.landing-root {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Montserrat', 'Open Sans', Arial, sans-serif;
+  font-size: 1.25rem; /* Mayor tamaño base para accesibilidad */
+  line-height: 1.6;
+}
+
+section {
+  margin: 0 auto 2.5rem auto;
+  max-width: 900px;
+  padding: 2.5rem 1.2rem;
+  background: var(--color-white);
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(58,110,165,0.07);
+  outline: none;
+}
+/* LIMPIEZA Y REPARACIÓN DE SINTAXIS */
+:root {
+  --color-primary: #3A6EA5;
+  --color-secondary: #7AC47A;
+  --color-background: #F7F6F2;
+  --color-detail: #B97A57;
+  --color-text: #222;
+  --color-text-secondary: #6B6B6B;
+  --color-white: #FFF;
+}
+
+.landing-root {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Montserrat', 'Open Sans', Arial, sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+section {
+  margin: 0 auto 2.5rem auto;
+  max-width: 900px;
+  padding: 2.5rem 1.2rem;
+  background: var(--color-white);
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(58,110,165,0.07);
+  outline: none;
+}
+
+section:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+h1, h2 {
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 2.1rem;
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  font-size: 2.7rem;
+}
+
+.hero-section {
+  text-align: center;
+  background: linear-gradient(120deg, var(--color-primary) 60%, var(--color-secondary) 100%);
+  color: var(--color-white);
+  padding: 3.5rem 1.2rem 2.5rem 1.2rem;
+  border-radius: 24px;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 24px rgba(58,110,165,0.13);
+}
+
+.hero-section h1 {
+  font-size: 2.7rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.15;
+}
+
+.hero-section p {
+  font-size: 1.35rem;
+  margin-bottom: 2.2rem;
+}
+
+.hero-buttons button {
+  font-size: 1.15rem;
+  margin: 0 0.5rem;
+  padding: 1.1rem 2.2rem;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(58,110,165,0.08);
+}
+.hero-buttons button:focus {
+  outline: 3px solid var(--color-detail);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #7AC47A33;
+}
+
+.hero-buttons .primary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.hero-buttons .secondary {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.icon-list li {
+  font-size: 1.25rem;
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.icon-list li::before {
+  content: '';
+  display: inline-block;
+  width: 2.1em;
+  height: 2.1em;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  margin-right: 0.7em;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px #7AC47A33;
+}
+
+.mayores-msg {
+  color: var(--color-detail);
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
+
+.llamadas-accion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.llamadas-accion button {
+  font-size: 1.18rem;
+  padding: 1.1rem 2.4rem;
+  border-radius: 30px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: var(--color-white);
+  transition: background 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(58,110,165,0.08);
+}
+.llamadas-accion button:focus {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #3A6EA533;
+}
+
+.llamadas-accion .secondary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.llamadas-accion .tertiary {
+  background: var(--color-detail);
+  color: var(--color-white);
+}
+
+@media (max-width: 600px) {
+  .landing-root {
+    font-size: 1.08rem;
+  }
+  section {
+    padding: 1.2rem 0.5rem;
+  }
+  .hero-section h1 {
+    font-size: 1.7rem;
+  }
+  h1, h2 {
+    font-size: 1.3rem;
+  }
+}

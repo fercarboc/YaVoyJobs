@@ -211,7 +211,7 @@ export const SECTORS: Sector[] = [
     name: 'Creatividad y Arte',
     emoji: '🎨',
     description: 'Servicios creativos y artísticos',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'fotografia', name: 'Fotografía' },
       { id: 'video', name: 'Vídeo' },
@@ -225,7 +225,7 @@ export const SECTORS: Sector[] = [
     name: 'Administración y Oficina',
     emoji: '📋',
     description: 'Tareas administrativas',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'gestion-documentos', name: 'Gestión de documentos' },
       { id: 'facturacion', name: 'Facturación' },
@@ -238,7 +238,7 @@ export const SECTORS: Sector[] = [
     name: 'Construcción y Oficios',
     emoji: '🔧',
     description: 'Oficios técnicos básicos',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'albanileria-basica', name: 'Albañilería básica' },
       { id: 'fontaneria-basica', name: 'Fontanería básica' },
@@ -252,7 +252,7 @@ export const SECTORS: Sector[] = [
     name: 'Agricultura y Campo',
     emoji: '🌾',
     description: 'Trabajos agrícolas y rurales',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'recoleccion', name: 'Recolección' },
       { id: 'huertos-urbanos', name: 'Huertos urbanos' },
@@ -266,7 +266,7 @@ export const SECTORS: Sector[] = [
     name: 'Turismo y Alojamiento',
     emoji: '🏨',
     description: 'Servicios para alojamientos turísticos',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'limpieza-apartamentos', name: 'Limpieza de apartamentos' },
       { id: 'checkin-checkout', name: 'Check-in / check-out' },
@@ -279,7 +279,7 @@ export const SECTORS: Sector[] = [
     name: 'Seguridad y Control',
     emoji: '🛡️',
     description: 'Servicios de vigilancia',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'vigilancia-eventos', name: 'Vigilancia eventos' },
       { id: 'control-accesos-seg', name: 'Control accesos' },
@@ -291,7 +291,7 @@ export const SECTORS: Sector[] = [
     name: 'Marketing de Calle',
     emoji: '📣',
     description: 'Promoción y publicidad',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'reparto-flyers', name: 'Reparto de flyers' },
       { id: 'promociones', name: 'Promociones' },
@@ -304,7 +304,7 @@ export const SECTORS: Sector[] = [
     name: 'Tecnología Doméstica',
     emoji: '📱',
     description: 'Instalación y configuración',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'instalacion-wifi', name: 'Instalación WiFi' },
       { id: 'smart-tv', name: 'Smart TV' },
@@ -318,7 +318,7 @@ export const SECTORS: Sector[] = [
     name: 'Moda y Textil',
     emoji: '👗',
     description: 'Servicios de costura y moda',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'arreglos-ropa', name: 'Arreglos de ropa' },
       { id: 'costura', name: 'Costura' },
@@ -331,7 +331,7 @@ export const SECTORS: Sector[] = [
     name: 'Otros Servicios',
     emoji: '⚙️',
     description: 'Servicios diversos',
-    isPrimary: false,
+    isPrimary: true,
     microTasks: [
       { id: 'servicios-puntuales', name: 'Servicios puntuales' },
       { id: 'trabajos-urgentes', name: 'Trabajos urgentes' },
