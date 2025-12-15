@@ -45,7 +45,7 @@ const SectorsPage = () => {
       const { data, error } = await supabase
         .from('VoySectors')
         .select('*')
-        .order('is_primary', { ascending: false })
+        .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       if (error) throw error;
       setSectors(data || []);
