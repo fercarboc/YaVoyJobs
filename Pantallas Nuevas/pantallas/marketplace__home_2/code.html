@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>YaVoyJobs - Marketplace</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
+                },
+                fontFamily: {
+                "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }.no-scrollbar {
+            -ms-overflow-style: none;scrollbar-width: none;}
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white antialiased overflow-x-hidden pb-24">
+<header class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+<div class="flex items-center p-4 justify-between">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+<img alt="User Profile Avatar" class="h-full w-full object-cover" data-alt="User profile picture placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjLxv2_H2iByyXgL-x62V8NUCiyLofHtxHAR7qJyYD8HK7qNyMzlFRkNURyasWdUDE31RfiIpC-W0wSoXmYcUiW0h1W2ZihV1H650aOfZPHctH9HNU0FkfgWveYKxR1eb3n3zdnSrPs0gANFYrufKRj2BwLSuo00fgsKBgez4CU29qYbRh3h6zGdb1nw7gU2XS_1K-8Up1SKYJbkOn9GGmJuutlrUDxno9z18fC1z3bthBK8eS9tPRST7gtEzLzo2_vgUPVBw6qgz9"/>
+</div>
+<h2 class="text-lg font-bold leading-tight flex-1 text-center pr-10">Marketplace</h2>
+<div class="flex w-10 items-center justify-end absolute right-4">
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#111418] dark:text-white">
+<span class="material-symbols-outlined text-2xl">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<div class="px-4 py-2">
+<div class="flex w-full items-center gap-2">
+<label class="flex flex-col h-12 flex-1">
+<div class="flex w-full flex-1 items-center rounded-full bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 h-full overflow-hidden transition-all focus-within:ring-2 focus-within:ring-primary/50">
+<div class="pl-4 pr-2 text-gray-400 dark:text-gray-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input class="flex w-full min-w-0 flex-1 bg-transparent border-none text-[#111418] dark:text-white placeholder:text-gray-400 focus:outline-0 focus:ring-0 h-full text-base font-normal leading-normal px-0" placeholder="Search tools, materials, services..." value=""/>
+</div>
+</label>
+<button class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+<div class="flex gap-2 p-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#111418] dark:bg-white px-5 transition-colors">
+<p class="text-white dark:text-[#111418] text-sm font-medium">All</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-lg">construction</span>
+<p class="text-[#111418] dark:text-white text-sm font-medium">Tools</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-lg">checkroom</span>
+<p class="text-[#111418] dark:text-white text-sm font-medium">Uniforms</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-lg">hardware</span>
+<p class="text-[#111418] dark:text-white text-sm font-medium">Materials</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-lg">support_agent</span>
+<p class="text-[#111418] dark:text-white text-sm font-medium">Services</p>
+</button>
+</div>
+<div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory px-4 pb-4 gap-4">
+<div class="snap-center shrink-0 w-[85%] rounded-2xl overflow-hidden relative aspect-[2/1] bg-gradient-to-br from-primary to-blue-600 shadow-lg">
+<div class="absolute inset-0 bg-[url('https://placeholder.pics/svg/600x300')] bg-cover bg-center opacity-20 mix-blend-overlay" data-alt="Abstract geometric pattern background"></div>
+<div class="absolute inset-0 p-5 flex flex-col justify-center text-white z-10">
+<span class="text-xs font-bold uppercase tracking-wider bg-white/20 w-fit px-2 py-1 rounded mb-2 backdrop-blur-sm">Featured</span>
+<h3 class="text-2xl font-bold mb-1">New DeWalt Arrivals</h3>
+<p class="text-white/90 text-sm mb-3">Get 20% off on all power tools this week.</p>
+<button class="bg-white text-primary text-xs font-bold py-2 px-4 rounded-full w-fit hover:bg-gray-100 transition-colors">Shop Now</button>
+</div>
+</div>
+<div class="snap-center shrink-0 w-[85%] rounded-2xl overflow-hidden relative aspect-[2/1] bg-gray-800 shadow-lg">
+<div class="absolute inset-0 bg-[url('https://placeholder.pics/svg/600x300')] bg-cover bg-center opacity-30" data-alt="Dark concrete texture background"></div>
+<div class="absolute inset-0 p-5 flex flex-col justify-center text-white z-10">
+<span class="text-xs font-bold uppercase tracking-wider bg-primary w-fit px-2 py-1 rounded mb-2">Pro Member</span>
+<h3 class="text-2xl font-bold mb-1">Bulk Discounts</h3>
+<p class="text-gray-200 text-sm mb-3">Register your company for wholesale prices.</p>
+<button class="bg-primary text-white text-xs font-bold py-2 px-4 rounded-full w-fit">Learn More</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col pt-2">
+<div class="flex justify-between items-center px-4 mb-3">
+<h3 class="text-[#111418] dark:text-white text-lg font-bold leading-tight">Featured Stores</h3>
+<a class="text-primary text-sm font-medium hover:underline" href="#">See all</a>
+</div>
+<div class="flex overflow-x-auto no-scrollbar px-4 gap-4 pb-2">
+<div class="flex flex-col items-center gap-2 shrink-0 w-20">
+<div class="size-16 rounded-full bg-white dark:bg-gray-800 p-1 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full bg-[url('https://placeholder.pics/svg/100')] bg-cover bg-center" data-alt="Logo of ToolMaster shop"></div>
+</div>
+<span class="text-xs font-medium text-center truncate w-full dark:text-gray-300">ToolMaster</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 w-20">
+<div class="size-16 rounded-full bg-white dark:bg-gray-800 p-1 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full bg-[url('https://placeholder.pics/svg/100')] bg-cover bg-center" data-alt="Logo of BuildIt shop"></div>
+</div>
+<span class="text-xs font-medium text-center truncate w-full dark:text-gray-300">BuildIt</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 w-20">
+<div class="size-16 rounded-full bg-white dark:bg-gray-800 p-1 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full bg-[url('https://placeholder.pics/svg/100')] bg-cover bg-center" data-alt="Logo of ProGear shop"></div>
+</div>
+<span class="text-xs font-medium text-center truncate w-full dark:text-gray-300">ProGear</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 w-20">
+<div class="size-16 rounded-full bg-white dark:bg-gray-800 p-1 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full bg-[url('https://placeholder.pics/svg/100')] bg-cover bg-center" data-alt="Logo of SafetyFirst shop"></div>
+</div>
+<span class="text-xs font-medium text-center truncate w-full dark:text-gray-300">SafetyFirst</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 w-20">
+<div class="size-16 rounded-full bg-white dark:bg-gray-800 p-1 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full bg-[url('https://placeholder.pics/svg/100')] bg-cover bg-center" data-alt="Logo of ElectroWorld shop"></div>
+</div>
+<span class="text-xs font-medium text-center truncate w-full dark:text-gray-300">ElectroWorld</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col pt-6 px-4">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-[#111418] dark:text-white text-lg font-bold leading-tight">Recommended for you</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<div class="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<button class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-1.5 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg filled">favorite</span>
+</button>
+</div>
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Yellow power drill on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW7ASUUrtHROFIcGq-OR3h856qpDMnDEFR-yWMkeYaxdVu9j3Ms16MQ8wzPS0v91yDFLDvvdfjYVA3h2wWoqr-qGlT7x6lJqcnLO8IEwGr9nzeEofCvjhwOg7vglnnbB6twv7mvezLiGeJHNx_gvBB0B4cv-e1oUPrNfp5x18p99n8qHOlrkEfPvgR4heNINXhrG9dnHgbWanpoTG58byR4GDLr4M-Cd25fGWLzTlIYVO5Z6Ys_iGQipmPoDf5VdQRU0UcNXi3hzWD"/>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">4.8 (120)</span>
+</div>
+<h4 class="text-sm font-semibold text-[#111418] dark:text-white line-clamp-2 mb-1">Cordless Power Drill 18V Kit</h4>
+<div class="mt-auto flex items-center justify-between">
+<p class="text-primary font-bold text-base">$89.99</p>
+<button class="bg-primary/10 text-primary hover:bg-primary hover:text-white p-1.5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<div class="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<button class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-1.5 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Stack of orange safety vests" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3f-Mn45oagP6Q8HxtUaaLeVSkPX03NfEUSiHpc8f2iiynPmmi5YNBsw3_UT-1fmbF19GE6cA54hR0SQMBmvCiERgGkb6QVx0-d3p4giKEcQk6V6TZvrNTUUVmBR6Vh_bHxcmER74hCNDmqOixIxV94wdULuJzVfkXtnWq1VfljCM22-gGdoT-0JBcxc6nZ5S6TZl7KfCUOuFBnah-kxTLeBZGYEYQzuq3ThkK6DA2pf60NQgoIIC9HoD_v-q-aodXQepKG3Abxf-r"/>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">4.9 (56)</span>
+</div>
+<h4 class="text-sm font-semibold text-[#111418] dark:text-white line-clamp-2 mb-1">High-Vis Safety Vest (Pack of 5)</h4>
+<div class="mt-auto flex items-center justify-between">
+<p class="text-primary font-bold text-base">$45.00</p>
+<button class="bg-primary/10 text-primary hover:bg-primary hover:text-white p-1.5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<div class="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
+<div class="absolute top-2 left-2 z-10">
+<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</span>
+</div>
+<div class="absolute top-2 right-2 z-10">
+<button class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-1.5 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Professional tool belt leather" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxwfXX8KX1dNYZ-YDSNBPKW4p7QY2w16W_q9_aA2CQwEkMP6QVLAaWb5GRpm8hH0mT2J5f-nsSHq3JU1ybdAm25Y7wS46shPOc-hY1GDCzDFpaltDt4zUKjpzK0NzRV11hguniApbsiYrCdi54hLi0A3la1eT32aYSSgSkMJNOirKajkAUz_wDGkljGrD3m04R4LVz2FHVywWOOH_c3QNYr2PiBce2INK0OPDV_5zmD1EccFEbMDT1aZiJL7g077FVPJnlJxpDaBFT"/>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">4.5 (32)</span>
+</div>
+<h4 class="text-sm font-semibold text-[#111418] dark:text-white line-clamp-2 mb-1">Leather Pro Tool Belt</h4>
+<div class="mt-auto flex items-center justify-between">
+<div>
+<span class="text-xs text-gray-400 line-through mr-1">$60.00</span>
+<span class="text-primary font-bold text-base">$48.00</span>
+</div>
+<button class="bg-primary/10 text-primary hover:bg-primary hover:text-white p-1.5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<div class="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<button class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-1.5 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Blue prints and measuring tape on table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlDLbV30FK1Jam9Gm_7swlJibLuPw9COFV8Id5p3un1VZebhyUzV48gUeKzK5IPMLmc8M3A0OlnFTqUnIrXGIsf4rEH7AT7UTQkeZ1BeOnmY--IpZnkz_Sg6IYrTxFxQDwNMuZA1W294u16CYP736sJX13_FwnSaoUKL5pnEu-zewe5IXwZv5kepTT6LgUAPkag4XfRdeR_1wCQzz2pct1rhy7-ymY3Hi0tZzhFkNJjvrs18PP_B9jQKclGgrh1yE-e_GgeTwTrxxX"/>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">5.0 (8)</span>
+</div>
+<h4 class="text-sm font-semibold text-[#111418] dark:text-white line-clamp-2 mb-1">Architectural Design Service (1 hr)</h4>
+<div class="mt-auto flex items-center justify-between">
+<p class="text-primary font-bold text-base">$120.00</p>
+<button class="bg-primary/10 text-primary hover:bg-primary hover:text-white p-1.5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 mb-4 flex justify-center">
+<button class="w-full py-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                View All Products
+            </button>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 w-full bg-white dark:bg-[#101922] border-t border-gray-200 dark:border-gray-800 px-6 py-3 pb-5 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">work</span>
+<span class="text-[10px] font-medium">Ofertas</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl filled" style="font-variation-settings: 'FILL' 1">storefront</span>
+<span class="text-[10px] font-medium">Marketplace</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">assignment</span>
+<span class="text-[10px] font-medium">Mis trabajos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+<span class="absolute -top-0.5 -right-0.5 bg-red-500 rounded-full w-2.5 h-2.5 border-2 border-white dark:border-[#101922]"></span>
+</div>
+<span class="text-[10px] font-medium">Chat</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</div>
+</body></html>

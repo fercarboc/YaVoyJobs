@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>YaVoyJobs - Carrito</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen font-display antialiased text-[#111418] dark:text-white overflow-hidden">
+<div class="relative flex flex-col h-screen max-w-md mx-auto bg-white dark:bg-background-dark shadow-2xl overflow-hidden">
+<!-- Header -->
+<header class="shrink-0 flex items-center justify-between px-4 py-3 bg-white dark:bg-background-dark border-b border-gray-100 dark:border-gray-800 z-10">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-[#111418] dark:text-white transition-colors">
+<span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold leading-tight">Mi Carrito</h1>
+<button class="text-sm font-medium text-red-500 hover:text-red-600 transition-colors px-2 py-1 rounded">
+                Vaciar
+            </button>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto pb-32 no-scrollbar">
+<!-- Product List -->
+<div class="flex flex-col gap-4 p-4">
+<!-- Item 1 -->
+<div class="group flex gap-4 p-3 bg-white dark:bg-[#1a2632] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all">
+<div class="relative shrink-0">
+<div class="bg-center bg-no-repeat bg-cover rounded-lg w-[80px] h-[80px] bg-gray-100 dark:bg-gray-800" data-alt="Pair of industrial safety boots side view" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCrqIsWgy0uUl1VuJt8I2E5wusg8aFmhX2PUGM8hYOF8PrrspH4My6kugDlvN0GaIF33HTLARJbyfZBxUhfWOLLlHfIXuLj7ITlumS8OQ4YTWhO2xhtW1dLJocQw5_U9lJMJOFrPDOHCTn3oc-VFj33eG_ywb4tSQiWrJR8aD5zgIdWiJH14Y1Krq-FUQJavtswM5Lc-cwse87RZs4PoXUU65WD_gDc4-2oLYEAuOgOm8sjbuoy917X83XHFgy-V0vD2cAxEMnF1Pab");'>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="text-base font-semibold leading-tight text-[#111418] dark:text-white line-clamp-2">Botas de Seguridad Industrial</h3>
+<button class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Vendido por: YaVoy Gear</p>
+</div>
+<div class="flex items-end justify-between mt-2">
+<p class="text-primary font-bold text-lg">$45.00</p>
+<!-- Stepper -->
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1 border border-gray-100 dark:border-gray-700">
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<span class="w-4 text-center font-semibold text-sm">1</span>
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white shadow-sm hover:bg-blue-600 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group flex gap-4 p-3 bg-white dark:bg-[#1a2632] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all">
+<div class="relative shrink-0">
+<div class="bg-center bg-no-repeat bg-cover rounded-lg w-[80px] h-[80px] bg-gray-100 dark:bg-gray-800" data-alt="Blue technical uniform folded neatly" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBTz7Bv87gkJTvIr1L3q2GGw-3bqEUngf-Z6M45ScDNtv4TP7sSid3A_mR3SGmIgVtsrpr2YikMPV9thQ62zyHE2aUDszQ5Uln4YaImn8RihHdKMY6gNdCl7aIJBIprCV2FC99QFbN7NaM_XS7cF-tXP9KtYKR1kJII6BfjkNumLMecPldhWKdD4UozUPGbqwSm9vNX9bUIqqzIwhgWL-3OYQN7CBqhLqXFnP-rFDWLSVHlIKXWW4k4-3AlJDL1aAc6FmzxQbGXIB0n");'>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="text-base font-semibold leading-tight text-[#111418] dark:text-white line-clamp-2">Uniforme Técnico (Talla L)</h3>
+<button class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Vendido por: ProWear</p>
+</div>
+<div class="flex items-end justify-between mt-2">
+<p class="text-primary font-bold text-lg">$60.00</p>
+<!-- Stepper -->
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1 border border-gray-100 dark:border-gray-700">
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<span class="w-4 text-center font-semibold text-sm">2</span>
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white shadow-sm hover:bg-blue-600 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group flex gap-4 p-3 bg-white dark:bg-[#1a2632] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all">
+<div class="relative shrink-0">
+<div class="bg-center bg-no-repeat bg-cover rounded-lg w-[80px] h-[80px] bg-gray-100 dark:bg-gray-800" data-alt="Yellow protective construction helmet" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2-HiITaF30tzEvZK80F2gXxr-nfuFJcNjj27PFSjg0Eq6XHvDHZsh_rj_jONSoUd5peDGMmudbVJ4B0IDuh_EDEVy3PX2VWD8auxNNf1QF-OCz5VyFreeacY-GNVR-RsEH8GCaZt5bNAj07DskW7yPDCFf7GLPa2BGjStMbRw-zGomPqJHflqokrBkA-OUI7qw0etq25Mz_mGd1C0ZMzkVsyR62zQuyn6oiU417mBgGq_t-XqM81ZZJpv6cYAkynsbo9XjriM6afd");'>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="text-base font-semibold leading-tight text-[#111418] dark:text-white line-clamp-2">Casco de Protección</h3>
+<button class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Vendido por: SafetyFirst</p>
+</div>
+<div class="flex items-end justify-between mt-2">
+<p class="text-primary font-bold text-lg">$25.00</p>
+<!-- Stepper -->
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1 border border-gray-100 dark:border-gray-700">
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<span class="w-4 text-center font-semibold text-sm">1</span>
+<button class="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white shadow-sm hover:bg-blue-600 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Section -->
+<div class="px-6 py-4 mx-4 mb-4 bg-gray-50 dark:bg-[#1a2632] rounded-xl border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between gap-x-6 py-2">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Subtotal</p>
+<p class="text-[#111418] dark:text-white text-sm font-semibold">$190.00</p>
+</div>
+<div class="flex justify-between gap-x-6 py-2">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Envío</p>
+<p class="text-[#111418] dark:text-white text-sm font-semibold">$5.00</p>
+</div>
+<div class="flex justify-between gap-x-6 py-2 border-b border-gray-200 dark:border-gray-700 pb-4">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Impuestos (IVA)</p>
+<p class="text-[#111418] dark:text-white text-sm font-semibold">$29.25</p>
+</div>
+<div class="flex justify-between gap-x-6 pt-4 items-center">
+<p class="text-[#111418] dark:text-white text-base font-bold">Total Estimado</p>
+<p class="text-primary text-xl font-bold">$224.25</p>
+</div>
+</div>
+<!-- Secure checkout badge -->
+<div class="flex items-center justify-center gap-2 mb-8 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span class="text-xs font-medium">Pago 100% Seguro</span>
+</div>
+</main>
+<!-- Sticky Bottom Bar -->
+<div class="absolute bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-gray-100 dark:border-gray-800 p-4 pb-8 z-20">
+<div class="flex flex-col gap-4 max-w-md mx-auto">
+<div class="flex items-center justify-between px-2">
+<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total a pagar</span>
+<span class="text-2xl font-bold text-[#111418] dark:text-white tracking-tight">$224.25</span>
+</div>
+<button class="flex items-center justify-center gap-2 w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold text-base rounded-full shadow-lg shadow-blue-200 dark:shadow-none transition-all active:scale-[0.98]">
+<span>Continuar al Checkout</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

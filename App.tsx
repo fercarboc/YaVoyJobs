@@ -1,7 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
+import RequireAuth from './components/routing/RequireAuth';
+import RequireRole from './components/routing/RequireRole';
+import ProviderDashboard from './components/ProviderDashboard';
+import MarketplaceHome from './components/MarketplaceHome';
 import { Layout } from './components/Layout';
+import { theme } from './theme';
 import { DashboardModal } from './components/DashboardModal';
 import { SubscriptionPanel } from './components/SubscriptionPanel';
 import { SubscriptionPaymentModal } from './components/SubscriptionPaymentModal';
@@ -13,6 +18,7 @@ import { optimizeJobDescription, suggestJobPrice } from './services/geminiServic
 import { supabase } from './services/supabase';
 import { LegalNotice, PrivacyPolicy, CookiesPolicy, TermsOfUse } from './components/LegalPages';
 import { SubscriptionType } from './services/subscriptionService';
+import { chatService, ChatMessage } from './services/chatService';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
@@ -20,7 +26,14 @@ import {
 // --- INITIAL STATE ---
 const INITIAL_AUTH: AuthState = { isAuthenticated: false, user: null, loading: true };
 
+//
+// El sistema de diseño global (theme) se importa desde './theme'.
+// Usa theme.colors, theme.font, theme.spacing, etc. para mantener coherencia visual.
+//
+
 // --- COMPONENTS ---
+
+// El Layout base se aplica a todas las rutas principales para asegurar consistencia visual.
 
 // Sectors Page
 const SectorsPage = () => {
@@ -1465,7 +1478,7 @@ const Login = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
 };
 
 const Register = () => {
-  const [activeTab, setActiveTab] = useState<'PARTICULAR' | 'COMPANY' | 'HELPER'>('PARTICULAR');
+  const [activeTab, setActiveTab] = useState<'PARTICULAR' | 'COMPANY' | 'HELPER' | 'PROVIDER'>('PARTICULAR');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -1473,7 +1486,11 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     cif: '',
-    sector: '' as CompanySector | ''
+    sector: '' as CompanySector | '',
+    store_name: '',
+    store_slug: '',
+    tax_id: '',
+    provider_sector: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -1512,6 +1529,12 @@ const Register = () => {
       setError('Selecciona el sector principal de tu empresa');
       return;
     }
+    if (activeTab === 'PROVIDER') {
+      if (!formData.store_name || !formData.provider_sector || !formData.tax_id) {
+        setError('Completa todos los campos obligatorios para proveedores');
+        return;
+      }
+    }
 
     setLoading(true);
 
@@ -1524,7 +1547,8 @@ const Register = () => {
       if (authError) throw authError;
 
       if (authData.user) {
-        const { error: profileError } = await supabase
+        // 1. Insertar en VoyUsers
+        const { data: voyUser, error: profileError } = await supabase
           .from('VoyUsers')
           .insert([
             {
@@ -1535,12 +1559,62 @@ const Register = () => {
               phone: formData.phone,
               company_sector: activeTab === 'COMPANY' ? formData.sector : null
             }
-          ]);
+          ])
+          .select()
+          .single();
 
         if (profileError) throw profileError;
-        
-        // If Company, also insert into VoyCompanies (skipped for brevity/mock in this step, handled by BE logic typically)
-        
+
+        // 2. Si PROVIDER, crear seller_profile y seller_staff OWNER
+        if (activeTab === 'PROVIDER') {
+          // Generar slug básico
+          let baseSlug = formData.store_name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          let slug = baseSlug;
+          let slugExists = true;
+          let i = 1;
+          while (slugExists) {
+            const { data: existing, error: slugError } = await supabase
+              .from('voy_marketplace.seller_profiles')
+              .select('id')
+              .eq('store_slug', slug)
+              .maybeSingle();
+            if (slugError) throw slugError;
+            if (!existing) slugExists = false;
+            else {
+              slug = `${baseSlug}-${i++}`;
+            }
+          }
+          // Insertar seller_profile
+          const { data: sellerProfile, error: sellerError } = await supabase
+            .from('voy_marketplace.seller_profiles')
+            .insert([
+              {
+                owner_user_id: voyUser.id,
+                store_name: formData.store_name,
+                store_slug: slug,
+                sector_principal: formData.provider_sector,
+                tax_id: formData.tax_id
+              }
+            ])
+            .select()
+            .single();
+          if (sellerError) throw sellerError;
+          // Insertar seller_staff OWNER
+          const { error: staffError } = await supabase
+            .from('voy_marketplace.seller_staff')
+            .insert([
+              {
+                seller_id: sellerProfile.id,
+                user_id: voyUser.id,
+                role: 'OWNER'
+              }
+            ]);
+          if (staffError) throw staffError;
+          navigate('/provider');
+          return;
+        }
+
+        // Si no es provider, flujo normal
         navigate('/');
       }
     } catch (err: any) {
@@ -1563,7 +1637,7 @@ const Register = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="grid grid-cols-3 border-b">
+          <div className="grid grid-cols-4 border-b">
             <button 
               onClick={() => setActiveTab('PARTICULAR')}
               className={`p-4 text-center font-medium transition flex flex-col items-center justify-center ${activeTab === 'PARTICULAR' ? 'bg-brand-50 text-brand-600 border-b-2 border-brand-500' : 'text-slate-500 hover:bg-gray-50'}`}
@@ -1581,6 +1655,12 @@ const Register = () => {
               className={`p-4 text-center font-medium transition flex flex-col items-center justify-center ${activeTab === 'HELPER' ? 'bg-brand-50 text-brand-600 border-b-2 border-brand-500' : 'text-slate-500 hover:bg-gray-50'}`}
             >
               <Icons.Briefcase className="mb-2" /> Ayudante / Trabajador
+            </button>
+            <button 
+              onClick={() => setActiveTab('PROVIDER')}
+              className={`p-4 text-center font-medium transition flex flex-col items-center justify-center ${activeTab === 'PROVIDER' ? 'bg-emerald-50 text-emerald-700 border-b-2 border-emerald-500' : 'text-slate-500 hover:bg-gray-50'}`}
+            >
+              <Icons.Store className="mb-2" /> Proveedor
             </button>
           </div>
 
@@ -1604,43 +1684,46 @@ const Register = () => {
                    <p>Gana dinero realizando tareas en tu zona. Tú eliges tu horario y qué trabajos aceptar.</p>
                 </div>
               )}
+              {activeTab === 'PROVIDER' && (
+                <div className="bg-emerald-50 p-4 rounded-lg flex items-start text-emerald-800 text-sm">
+                   <Icons.Sparkles className="flex-shrink-0 mr-2 mt-1" size={16}/>
+                   <p>Vende tus productos y gestiona pedidos en el marketplace B2B/B2C de YaVoy. ¡Crea tu tienda gratis!</p>
+                </div>
+              )}
             </div>
 
             {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</div>}
 
             <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Campos comunes */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo {activeTab === 'COMPANY' ? '/ Razón Social' : ''}</label>
                 <input name="name" onChange={handleChange} type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" required />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                 <input name="email" onChange={handleChange} type="email" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" required />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
                 <input name="phone" onChange={handleChange} type="tel" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" required />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
                 <input name="password" onChange={handleChange} type="password" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" required />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Contraseña</label>
                 <input name="confirmPassword" onChange={handleChange} type="password" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" required />
               </div>
 
+              {/* Campos específicos COMPANY */}
               {activeTab === 'COMPANY' && (
                 <>
                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-1">CIF / NIF</label>
                     <input name="cif" onChange={handleChange} type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500 outline-none" />
                  </div>
-                 
                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       Sector Principal de tu Empresa <span className="text-red-500">*</span>
@@ -1679,7 +1762,6 @@ const Register = () => {
                         </label>
                       ))}
                     </div>
-                    
                     {!showAllSectors && (
                       <button
                         type="button"
@@ -1694,8 +1776,68 @@ const Register = () => {
                 </>
               )}
 
+              {/* Campos específicos PROVIDER */}
+              {activeTab === 'PROVIDER' && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Tienda / Empresa</label>
+                    <input name="store_name" onChange={handleChange} type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" required={activeTab === 'PROVIDER'} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">CIF / NIF</label>
+                    <input name="tax_id" onChange={handleChange} type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" required={activeTab === 'PROVIDER'} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Sector Principal <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {sectors.filter(s => showAllSectors || s.is_primary).map(sector => (
+                        <label
+                          key={sector.id}
+                          className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition ${
+                            formData.provider_sector === sector.id
+                              ? 'border-emerald-500 bg-emerald-50'
+                              : 'border-gray-200 hover:border-emerald-300 bg-white'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="provider_sector"
+                            value={sector.id}
+                            checked={formData.provider_sector === sector.id}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{sector.emoji}</span>
+                            <div>
+                              <div className="font-semibold text-sm text-slate-900">{sector.name}</div>
+                              <div className="text-xs text-slate-500 mt-0.5">{sector.description.split(',')[0]}</div>
+                            </div>
+                          </div>
+                          {formData.provider_sector === sector.id && (
+                            <Icons.CheckCircle size={20} className="absolute top-2 right-2 text-emerald-600" />
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                    {!showAllSectors && (
+                      <button
+                        type="button"
+                        className="mt-3 text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+                        onClick={() => setShowAllSectors(true)}
+                      >
+                        <Icons.Plus size={16} />
+                        Ver más sectores
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+
               <div className="md:col-span-2 mt-4">
-                <button type="submit" disabled={loading} className="w-full bg-brand-500 text-white py-4 rounded-lg font-bold hover:bg-brand-600 transition shadow-lg disabled:opacity-50">
+                <button type="submit" disabled={loading} className={`w-full py-4 rounded-lg font-bold hover:bg-brand-600 transition shadow-lg disabled:opacity-50 ${activeTab === 'PROVIDER' ? 'bg-emerald-500 text-white' : 'bg-brand-500 text-white'}`}>
                   {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
                 </button>
               </div>
@@ -1798,7 +1940,7 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
     const [editingJobId, setEditingJobId] = useState<string | null>(null);
     
     // Active view state
-    const [activeView, setActiveView] = useState<'panel' | 'anuncios' | 'economia'>('anuncios');
+    const [activeView, setActiveView] = useState<'panel' | 'anuncios' | 'economia' | 'chat'>('anuncios');
     
     // Subscription state
     const [showSubscriptions, setShowSubscriptions] = useState(false);
@@ -1862,7 +2004,7 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
       try {
         const { data, error } = await supabase
           .from('VoyJobApplications')
-          .select('*, helper:VoyUsers(full_name, email, phone)')
+          .select('*, helper:VoyUsers!helper_user_id(full_name, email, phone, selfie_photo_url)')
           .eq('job_id', jobId)
           .order('created_at', { ascending: false });
         
@@ -2135,11 +2277,21 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                         }`}
                     >
                         <Icons.Euro size={18} />
-                        Economía
+                        Economia
+                    </button>
+                    <button
+                        onClick={() => setActiveView('chat')}
+                        className={`px-6 py-3 font-medium transition flex items-center gap-2 border-b-2 ${
+                            activeView === 'chat' 
+                                ? 'border-brand-500 text-brand-600' 
+                                : 'border-transparent text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                        <Icons.MessageCircle size={18} />
+                        Chat
                     </button>
                 </nav>
             </div>
-
             {/* Panel View - Profile & Settings */}
             {activeView === 'panel' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -2373,56 +2525,88 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                                       <h4 className="font-bold text-sm text-slate-800 mb-3">Candidatos:</h4>
                                       {applicants[job.id] && applicants[job.id].length > 0 ? (
                                           <div className="space-y-3 max-h-96 overflow-y-auto">
-                                              {applicants[job.id].map((app: any) => (
-                                                  <div key={app.id} className="bg-white p-3 rounded-lg border border-gray-200">
-                                                      <div className="flex justify-between items-start mb-2">
-                                                          <div className="flex-grow">
-                                                              <p className="font-medium text-sm text-slate-900">{app.helper?.full_name || 'Usuario'}</p>
-                                                              <p className="text-xs text-gray-500">{app.helper?.email || 'N/A'}</p>
-                                                              {app.helper?.phone && <p className="text-xs text-gray-500">{app.helper.phone}</p>}
-                                                          </div>
-                                                          <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                                            app.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                                                            app.status === 'ACCEPTED' ? 'bg-emerald-100 text-emerald-700' :
-                                                            'bg-red-100 text-red-700'
-                                                          }`}>
-                                                              {app.status === 'PENDING' ? 'Pendiente' : app.status === 'ACCEPTED' ? 'Aceptado' : 'Rechazado'}
-                                                          </span>
-                                                      </div>
-                                                      
-                                                      {app.message && (
-                                                          <div className="bg-blue-50 p-2 rounded mb-2 text-xs">
-                                                              <p className="text-gray-700"><span className="font-medium">Mensaje:</span> {app.message}</p>
-                                                          </div>
-                                                      )}
-                                                      
-                                                      {(app.proposed_price || app.proposed_hourly_rate) && (
-                                                          <div className="text-xs text-gray-600 mb-2">
-                                                              {app.proposed_price && <p><span className="font-medium">Precio propuesto:</span> {app.proposed_price}€</p>}
-                                                              {app.proposed_hourly_rate && <p><span className="font-medium">Tarifa propuesta:</span> {app.proposed_hourly_rate}€/h</p>}
-                                                          </div>
-                                                      )}
-                                                      
-                                                      <p className="text-xs text-gray-400">{new Date(app.created_at).toLocaleDateString()}</p>
-                                                      
-                                                      {app.status === 'PENDING' && (
-                                                          <div className="flex gap-2 mt-2">
-                                                              <button 
-                                                                  onClick={() => handleAcceptApplicant(app.id, job.id, app.helper_user_id)}
-                                                                  className="flex-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-medium hover:bg-emerald-200 transition"
-                                                              >
-                                                                  Aceptar
-                                                              </button>
-                                                              <button 
-                                                                  onClick={() => handleRejectApplicant(app.id, job.id, app.helper_user_id)}
-                                                                  className="flex-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200 transition"
-                                                              >
-                                                                  Rechazar
-                                                              </button>
-                                                          </div>
-                                                      )}
-                                                  </div>
-                                              ))}
+                                              {applicants[job.id].map((app: any) => {
+                                                  const initials = (app.helper?.full_name || app.helper_user_id || 'U N')
+                                                    .split(' ')
+                                                    .filter(Boolean)
+                                                    .slice(0, 2)
+                                                    .map((p: string) => p[0]?.toUpperCase())
+                                                    .join('');
+                                                  return (
+                                                    <div key={app.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div className="flex items-center gap-3 flex-grow">
+                                                                <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center text-xs font-bold text-slate-600">
+                                                                  {app.helper?.selfie_photo_url ? (
+                                                                    <img src={app.helper.selfie_photo_url} alt={app.helper?.full_name || 'Usuario'} className="w-full h-full object-cover" />
+                                                                  ) : (
+                                                                    initials || 'U'
+                                                                  )}
+                                                                </div>
+                                                                <div>
+                                                                  <p className="font-medium text-sm text-slate-900">{app.helper?.full_name || 'Usuario'}</p>
+                                                                  <p className="text-xs text-gray-500">{app.helper?.email || 'N/A'}</p>
+                                                                  {app.helper?.phone && <p className="text-xs text-gray-500">{app.helper.phone}</p>}
+                                                                </div>
+                                                            </div>
+                                                            <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                                              app.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                                              app.status === 'ACCEPTED' ? 'bg-emerald-100 text-emerald-700' :
+                                                              'bg-red-100 text-red-700'
+                                                            }`}>
+                                                                {app.status === 'PENDING' ? 'Pendiente' : app.status === 'ACCEPTED' ? 'Aceptado' : 'Rechazado'}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        {app.message && (
+                                                            <div className="bg-blue-50 p-2 rounded mb-2 text-xs">
+                                                                <p className="text-gray-700"><span className="font-medium">Mensaje:</span> {app.message}</p>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {(app.proposed_price || app.proposed_hourly_rate) && (
+                                                            <div className="text-xs text-gray-600 mb-2">
+                                                                {app.proposed_price && <p><span className="font-medium">Precio propuesto:</span> {app.proposed_price}€</p>}
+                                                                {app.proposed_hourly_rate && <p><span className="font-medium">Tarifa propuesta:</span> {app.proposed_hourly_rate}€/h</p>}
+                                                            </div>
+                                                        )}
+                                                        
+                                                        <p className="text-xs text-gray-400">{new Date(app.created_at).toLocaleDateString()}</p>
+                                                        
+                                                        <div className="flex gap-2 mt-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setActiveView('chat');
+                                                                    setExpandedJobId(null);
+                                                                    setIsApplyModalOpen(false);
+                                                                    setSelectedJob(null);
+                                                                }}
+                                                                className="flex-1 px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium hover:bg-blue-100 transition flex items-center justify-center gap-1"
+                                                            >
+                                                                <Icons.MessageCircle size={14} />
+                                                                Chat
+                                                            </button>
+                                                            {app.status === 'PENDING' && (
+                                                              <>
+                                                                <button 
+                                                                    onClick={() => handleAcceptApplicant(app.id, job.id, app.helper_user_id)}
+                                                                    className="flex-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-medium hover:bg-emerald-200 transition"
+                                                                >
+                                                                    Aceptar
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleRejectApplicant(app.id, job.id, app.helper_user_id)}
+                                                                    className="flex-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200 transition"
+                                                                >
+                                                                    Rechazar
+                                                                </button>
+                                                              </>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                  );
+                                              })}
                                           </div>
                                       ) : (
                                           <p className="text-sm text-gray-500 italic">No hay candidatos aún.</p>
@@ -2650,7 +2834,19 @@ const ClientDashboard = ({ user, onToast }: { user: User; onToast: (toast: { mes
                 </div>
             )}
 
-            {/* Economía View - Financial Dashboard */}
+            {/* Chat View */}
+            {activeView === 'chat' && (
+                <div className="space-y-4">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h2 className="text-xl font-bold text-slate-900 mb-2">Mensajes</h2>
+                        <p className="text-sm text-slate-600">
+                            El chat web estará disponible aquí. Mientras tanto puedes usar la app móvil para chatear con candidatos y clientes.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Economia View - Financial Dashboard */}
             {activeView === 'economia' && (
                 <div className="space-y-6">
                     {/* Stats Cards */}
@@ -2850,6 +3046,14 @@ const WorkerDashboard = ({ user }: { user: User }) => {
       pendingEarnings: 0,
       activeOpportunities: 0
     });
+
+    // Chat state (employer -> candidatos)
+    const [chatPartner, setChatPartner] = useState<{ id: string; name: string } | null>(null);
+    const [chatId, setChatId] = useState<string | null>(null);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const [chatInput, setChatInput] = useState('');
+    const [chatLoading, setChatLoading] = useState(false);
+    const [chatError, setChatError] = useState<string | null>(null);
 
     useEffect(() => {
       fetchJobs();
@@ -3054,6 +3258,57 @@ const WorkerDashboard = ({ user }: { user: User }) => {
       }
     };
 
+    const handleOpenChatWith = async (workerId: string, workerName: string) => {
+      setActiveView('chat');
+      setChatPartner({ id: workerId, name: workerName });
+      setChatError(null);
+      setChatLoading(true);
+      try {
+        const createdChatId = await chatService.getOrCreateChat(workerId, user.id);
+        setChatId(createdChatId);
+        const messages = await chatService.getMessages(createdChatId);
+        setChatMessages(messages);
+      } catch (err: any) {
+        console.error('Error abriendo chat', err);
+        setChatError('No se pudo abrir el chat. Intenta de nuevo.');
+      } finally {
+        setChatLoading(false);
+      }
+    };
+
+    const handleSendChatMessage = async () => {
+      if (!chatId || !chatInput.trim()) return;
+      const text = chatInput.trim();
+      setChatInput('');
+      setChatMessages(prev => [...prev, {
+        id: `temp-${Date.now()}`,
+        chat_id: chatId,
+        sender_id: user.id,
+        message: text,
+        created_at: new Date().toISOString(),
+        read: false
+      }]);
+      try {
+        await chatService.sendMessage(chatId, user.id, text);
+        const messages = await chatService.getMessages(chatId);
+        setChatMessages(messages);
+      } catch (err) {
+        console.error('Error enviando mensaje', err);
+        setChatError('No se pudo enviar el mensaje.');
+      }
+    };
+
+    const getCategoryColor = (category: string) => {
+      switch (category) {
+        case 'MAYORES': return { bg: 'bg-emerald-500', text: 'text-emerald-700' };
+        case 'HOGAR': return { bg: 'bg-indigo-500', text: 'text-indigo-700' };
+        case 'MASCOTAS': return { bg: 'bg-amber-500', text: 'text-amber-700' };
+        case 'RECADOS': return { bg: 'bg-sky-500', text: 'text-sky-700' };
+        case 'DIGITAL': return { bg: 'bg-purple-500', text: 'text-purple-700' };
+        default: return { bg: 'bg-slate-500', text: 'text-slate-700' };
+      }
+    };
+
     return (
         <div className="max-w-6xl mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold text-slate-800 mb-6">Mi Panel de Trabajos</h1>
@@ -3146,93 +3401,66 @@ const WorkerDashboard = ({ user }: { user: User }) => {
                 {loading ? (
                   <div className="text-center">Cargando ofertas...</div>
                 ) : (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filtered.map(job => (
-                          <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col h-full relative group">
-                              {/* Badges */}
-                              <div className="absolute top-4 right-4 flex flex-col items-end space-y-1">
-                                  {job.contract && job.contract.length > 0 && (
-                                      <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">CONTRATO</span>
-                                  )}
-                                  {job.schedule && job.schedule.length > 0 && (
-                                      <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">RECURRENTE</span>
-                                  )}
+                  <div className="space-y-3">
+                    {filtered.map(job => {
+                      const catColor = getCategoryColor(job.category);
+                      const price = job.contract && job.contract[0]
+                        ? `${job.contract[0].monthly_salary}€ / mes`
+                        : `${job.price_fixed || job.price_hourly || 0}€${job.price_hourly ? '/h' : ''}`;
+                      return (
+                        <div key={job.id} className="flex items-start justify-between bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition p-4">
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <div className={`w-10 h-10 rounded-full ${catColor.bg} text-white flex items-center justify-center text-sm font-bold shrink-0`}>
+                              {(job.title || 'T')[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] font-bold uppercase text-gray-400">{job.category || 'OTROS'}</span>
+                                {job.contract && job.contract.length > 0 && (
+                                  <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-1 rounded">Contrato</span>
+                                )}
+                                {job.schedule && job.schedule.length > 0 && (
+                                  <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded">Recurrente</span>
+                                )}
                               </div>
-
-                              <div className="p-6 flex-grow">
-                                  <div className="flex justify-between items-start mb-4 pr-16">
-                                      <div className="flex items-center space-x-2">
-                                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
-                                              {(job.creator?.full_name || 'U').charAt(0)}
-                                          </div>
-                                          <span className="text-sm font-medium text-gray-700 truncate max-w-[100px]">{job.creator?.full_name || 'Usuario'}</span>
-                                      </div>
-                                  </div>
-                                  
-                                  <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">{job.title}</h3>
-                                  <p className="text-slate-600 text-sm mb-4 line-clamp-3">{job.description}</p>
-                                  
-                                  {/* Price Display */}
-                                  <div className="mb-4">
-                                      {job.contract && job.contract[0] ? (
-                                          <div className="flex items-baseline">
-                                              <span className="text-2xl font-bold text-slate-900">{job.contract[0].monthly_salary}€</span>
-                                              <span className="text-sm text-slate-500 ml-1">/ mes</span>
-                                          </div>
-                                      ) : (
-                                          <div className="flex items-baseline">
-                                              <span className="text-2xl font-bold text-slate-900">{job.price_fixed || job.price_hourly}€</span>
-                                              {job.price_hourly && job.price_hourly > 0 && <span className="text-sm text-slate-500 ml-1">/ hora</span>}
-                                          </div>
-                                      )}
-                                  </div>
-
-                                  {/* Details: Location, Schedule, SS */}
-                                  <div className="space-y-2 text-xs text-gray-500">
-                                      <div className="flex items-center">
-                                          <Icons.MapPin size={12} className="mr-2 text-gray-400" /> 
-                                          {job.city || 'Madrid'}
-                                      </div>
-                                      
-                                      {job.schedule && job.schedule[0] && (
-                                          <div className="flex items-start">
-                                              <Icons.Clock size={12} className="mr-2 mt-0.5 text-gray-400" />
-                                              <div>
-                                                  <div className="flex gap-1 mb-1">
-                                                      {job.schedule[0].day_of_week?.map(d => (
-                                                          <span key={d} className="bg-gray-100 px-1 rounded text-[10px] font-bold text-slate-600">{getDayLabel(d)}</span>
-                                                      ))}
-                                                  </div>
-                                                  {job.schedule[0].start_time && (
-                                                      <span>{job.schedule[0].start_time.slice(0,5)} - {job.schedule[0].end_time?.slice(0,5)}</span>
-                                                  )}
-                                              </div>
-                                          </div>
-                                      )}
-
-                                      {job.contract && job.contract[0]?.social_security && (
-                                          <div className="flex items-center text-emerald-600 font-medium">
-                                              <Icons.CheckCircle size={12} className="mr-2" /> Seguridad Social Incluida
-                                          </div>
-                                      )}
-                                  </div>
+                              <h3 className="text-base font-bold text-slate-900 truncate">{job.title}</h3>
+                              <p className="text-xs text-slate-600 line-clamp-1">{job.description}</p>
+                              <div className="flex flex-wrap gap-2 mt-2 text-[11px] text-gray-500">
+                                <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-gray-400" /> {job.city || 'Madrid'}</span>
+                                {job.schedule && job.schedule[0]?.day_of_week && (
+                                  <span className="flex items-center gap-1">
+                                    <Icons.Clock size={12} className="text-gray-400" />
+                                    {job.schedule[0].day_of_week.map((d: number) => getDayLabel(d)).join(', ')}
+                                  </span>
+                                )}
+                                {job.schedule && job.schedule[0]?.start_time && (
+                                  <span className="text-gray-500">{job.schedule[0].start_time.slice(0,5)} - {job.schedule[0].end_time?.slice(0,5)}</span>
+                                )}
+                                {job.contract && job.contract[0]?.social_security && (
+                                  <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                                    <Icons.CheckCircle size={12} /> SS Incluida
+                                  </span>
+                                )}
                               </div>
-                              
-                              <div className="bg-gray-50 p-4 border-t border-gray-100">
-                                  <button 
-                                      onClick={() => handleAccept(job)}
-                                      disabled={appliedJobs.includes(job.id)}
-                                      className={`w-full py-2 rounded-lg font-bold text-sm transition ${
-                                        appliedJobs.includes(job.id)
-                                          ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                          : 'bg-slate-900 text-white hover:bg-brand-600'
-                                      }`}
-                                  >
-                                      {appliedJobs.includes(job.id) ? '✓ Ya has candidado' : 'Ver Detalles y Candidar'}
-                                  </button>
-                              </div>
+                            </div>
                           </div>
-                      ))}
+                          <div className="flex flex-col items-end gap-2 ml-4 shrink-0">
+                            <div className="text-lg font-bold text-slate-900">{price}</div>
+                            <button 
+                              onClick={() => handleAccept(job)}
+                              disabled={appliedJobs.includes(job.id)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                appliedJobs.includes(job.id)
+                                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                  : 'bg-slate-900 text-white hover:bg-brand-600'
+                              }`}
+                            >
+                              {appliedJobs.includes(job.id) ? 'Ya enviado' : 'Ver y Candidatar'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
                 {!loading && filtered.length === 0 && (
@@ -3528,22 +3756,7 @@ const WorkerDashboard = ({ user }: { user: User }) => {
     );
 };
 
-// --- APP ROUTING & LOGIC ---
 
-const ProtectedRoute = ({ children, auth, roles }: { children: React.ReactElement, auth: AuthState, roles: UserRole[] }) => {
-    if (auth.loading) return <div>Cargando...</div>;
-    if (auth.user?.id === 'admin-local') return children;
-
-    if (!auth.isAuthenticated || !auth.user) {
-        return <Navigate to="/login" replace />;
-    }
-    
-    if (roles.includes(UserRole.HELPER) && auth.user.role === UserRole.HELPER) return children;
-    if ((roles.includes(UserRole.PARTICULAR) || roles.includes(UserRole.COMPANY)) && (auth.user.role === UserRole.PARTICULAR || auth.user.role === UserRole.COMPANY)) return children;
-    if (roles.includes(UserRole.ADMIN) && auth.user.role === UserRole.ADMIN) return children;
-
-    return <Navigate to="/" replace />;
-};
 
 export const App: React.FC = () => {
     const [auth, setAuth] = useState<AuthState>(INITIAL_AUTH);
@@ -3575,33 +3788,32 @@ export const App: React.FC = () => {
     }, []);
 
     const fetchProfile = async (authUserId: string, email: string) => {
-        try {
-            const { data, error } = await supabase
-                .from('VoyUsers')
-                .select('*')
-                .eq('auth_user_id', authUserId)
-                .single();
-            
-            if (data) {
-                setAuth({
-                    isAuthenticated: true,
-                    loading: false,
-                    user: {
-                        id: data.id,
-                        auth_user_id: data.auth_user_id,
-                        full_name: data.full_name,
-                        email: data.email,
-                        role: data.role as UserRole,
-                        city: data.city
-                    }
-                });
-            } else {
-                setAuth({ isAuthenticated: false, user: null, loading: false });
-            }
-        } catch (e) {
-            console.error("Error fetching profile", e);
-            setAuth({ isAuthenticated: false, user: null, loading: false });
+      try {
+        const { data, error } = await supabase
+          .from('VoyUsers')
+          .select('*')
+          .eq('auth_user_id', authUserId)
+          .single();
+        if (data) {
+          setAuth({
+            isAuthenticated: true,
+            user: {
+              id: data.id,
+              auth_user_id: data.auth_user_id,
+              email: data.email,
+              full_name: data.full_name,
+              role: data.role,
+              phone: data.phone
+            },
+            loading: false
+          });
+        } else {
+          setAuth({ isAuthenticated: false, user: null, loading: false });
         }
+      } catch (e) {
+        console.error("Error fetching profile", e);
+        setAuth({ isAuthenticated: false, user: null, loading: false });
+      }
     }
 
     const handleLogout = async () => {
@@ -3664,3 +3876,4 @@ export const App: React.FC = () => {
         </HashRouter>
     );
 };
+

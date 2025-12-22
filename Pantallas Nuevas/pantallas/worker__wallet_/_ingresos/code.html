@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Worker Wallet - YaVoyJobs</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-white dark:bg-[#101922] shadow-xl">
+<!-- Header -->
+<div class="flex items-center p-4 pb-2 justify-between sticky top-0 bg-white dark:bg-[#101922] z-10">
+<div class="text-[#111418] dark:text-white flex size-12 shrink-0 items-center justify-start cursor-pointer transition-colors hover:text-primary">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</div>
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Mi Billetera</h2>
+<div class="flex size-12 items-center justify-end">
+<span class="material-symbols-outlined text-[#111418] dark:text-white cursor-pointer hover:text-primary">help</span>
+</div>
+</div>
+<!-- Main Content Scroll Area -->
+<div class="flex-1 overflow-y-auto pb-24">
+<!-- Hero Card: Current Balance -->
+<div class="p-4">
+<div class="relative w-full rounded-2xl bg-gradient-to-br from-[#137fec] to-[#0b5bb5] p-6 text-white shadow-lg overflow-hidden">
+<!-- Decorational circle -->
+<div class="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/10 blur-xl"></div>
+<div class="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-black/5 blur-xl"></div>
+<div class="relative z-10 flex flex-col gap-1">
+<div class="flex items-center gap-2 opacity-90">
+<span class="material-symbols-outlined text-sm">account_balance_wallet</span>
+<p class="text-sm font-medium">Ganancias este mes</p>
+</div>
+<h1 class="text-4xl font-bold tracking-tight py-2">$1,450.00</h1>
+<div class="mt-4 flex items-end justify-between">
+<div class="flex flex-col">
+<p class="text-xs opacity-70 mb-0.5">Pendientes de pago</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-300 text-sm">schedule</span>
+<p class="text-base font-semibold text-yellow-50">$200.00</p>
+</div>
+</div>
+<button class="flex items-center gap-2 rounded-full bg-white/20 hover:bg-white/30 px-4 py-2 text-sm font-bold backdrop-blur-sm transition-all">
+<span>Retirar</span>
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Chart Section -->
+<div class="px-4 py-2">
+<div class="rounded-2xl bg-white dark:bg-[#1a2632] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-base font-bold text-[#111418] dark:text-white">Historial Semestral</h3>
+<div class="flex items-center gap-1 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm">trending_up</span>
+<span class="text-xs font-bold text-green-700 dark:text-green-400">+12%</span>
+</div>
+</div>
+<div class="grid grid-cols-6 gap-2 items-end h-[140px]">
+<!-- Jan -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-[#eef4ff] dark:bg-slate-700 rounded-t-md relative group-hover:bg-primary/50 transition-all h-[40%]"></div>
+<span class="text-[10px] font-medium text-slate-400">Ene</span>
+</div>
+<!-- Feb -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-[#eef4ff] dark:bg-slate-700 rounded-t-md relative group-hover:bg-primary/50 transition-all h-[55%]"></div>
+<span class="text-[10px] font-medium text-slate-400">Feb</span>
+</div>
+<!-- Mar -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-[#eef4ff] dark:bg-slate-700 rounded-t-md relative group-hover:bg-primary/50 transition-all h-[35%]"></div>
+<span class="text-[10px] font-medium text-slate-400">Mar</span>
+</div>
+<!-- Apr -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-[#eef4ff] dark:bg-slate-700 rounded-t-md relative group-hover:bg-primary/50 transition-all h-[70%]"></div>
+<span class="text-[10px] font-medium text-slate-400">Abr</span>
+</div>
+<!-- May -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-[#eef4ff] dark:bg-slate-700 rounded-t-md relative group-hover:bg-primary/50 transition-all h-[50%]"></div>
+<span class="text-[10px] font-medium text-slate-400">May</span>
+</div>
+<!-- Jun (Current) -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="w-full bg-primary rounded-t-md relative shadow-md shadow-primary/30 h-[85%]"></div>
+<span class="text-[10px] font-bold text-primary">Jun</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Filters -->
+<div class="mt-4 px-4">
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+<button class="shrink-0 rounded-full bg-[#111418] dark:bg-white text-white dark:text-[#111418] px-4 py-2 text-sm font-bold shadow-sm">Todos</button>
+<button class="shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Confirmado</button>
+<button class="shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Pendiente</button>
+</div>
+</div>
+<!-- Transactions List Header -->
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight px-4 pb-2 pt-4">Movimientos</h2>
+<!-- Transactions Items -->
+<div class="px-4 flex flex-col gap-3">
+<!-- Item 1: Confirmed Work -->
+<div class="flex flex-col p-4 bg-white dark:bg-[#1a2632] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex gap-3">
+<div class="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">cleaning_services</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-[#111418] dark:text-white leading-tight">Limpieza de Oficina</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Empresa ABC • Hoy, 10:00 AM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-[#111418] dark:text-white">+$80.00</p>
+</div>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            Confirmado
+                        </span>
+<div class="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+</div>
+</div>
+<!-- Item 2: Incentive -->
+<div class="flex flex-col p-4 bg-white dark:bg-[#1a2632] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex gap-3">
+<div class="h-10 w-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[20px]">redeem</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-[#111418] dark:text-white leading-tight">Incentivo: Puntualidad</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Bono Mensual • Ayer</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-[#111418] dark:text-white">+$15.00</p>
+</div>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            Confirmado
+                        </span>
+<div class="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+</div>
+</div>
+<!-- Item 3: Pending Work -->
+<div class="flex flex-col p-4 bg-white dark:bg-[#1a2632] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex gap-3">
+<div class="h-10 w-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-[20px]">electrical_services</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-[#111418] dark:text-white leading-tight">Reparación Eléctrica</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Juan Pérez • 12 Jun</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-400 dark:text-slate-500">+$120.00</p>
+</div>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                            Pendiente
+                        </span>
+<div class="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+<span class="text-[10px] text-slate-400">En revisión</span>
+</div>
+</div>
+<!-- Item 4: Confirmed Work -->
+<div class="flex flex-col p-4 bg-white dark:bg-[#1a2632] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex gap-3">
+<div class="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">local_shipping</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-[#111418] dark:text-white leading-tight">Mudanza Local</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Familia López • 10 Jun</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-[#111418] dark:text-white">+$240.00</p>
+</div>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            Confirmado
+                        </span>
+<div class="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+</div>
+</div>
+</div>
+<div class="h-10"></div>
+</div>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-[#101922] border-t border-slate-100 dark:border-slate-800 pb-5 pt-3 px-6 z-20">
+<div class="flex items-center justify-between">
+<div class="flex flex-col items-center gap-1 cursor-pointer group">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">work</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">Trabajos</span>
+</div>
+<div class="flex flex-col items-center gap-1 cursor-pointer">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+<span class="text-[10px] font-medium text-primary">Ingresos</span>
+</div>
+<div class="flex flex-col items-center gap-1 cursor-pointer group">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">person</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">Perfil</span>
+</div>
+</div>
+</div>
+</div>
+</body></html>

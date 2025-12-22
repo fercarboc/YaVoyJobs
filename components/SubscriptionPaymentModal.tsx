@@ -7,7 +7,13 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
+const stripePublishableKey =
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
+  import.meta.env.STRIPE_PUBLISHABLE_KEY;
+
+const stripePromise = stripePublishableKey
+  ? loadStripe(stripePublishableKey)
+  : Promise.resolve(null);
 
 interface SubscriptionPaymentFormProps {
   onSuccess: () => void;
@@ -108,6 +114,14 @@ export function SubscriptionPaymentModal({
   amount
 }: SubscriptionPaymentModalProps) {
   if (!isOpen) return null;
+
+  if (!stripePublishableKey) {
+    return (
+      <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg">
+        Falta configurar VITE_STRIPE_PUBLISHABLE_KEY en el entorno para habilitar pagos.
+      </div>
+    );
+  }
 
   const options = {
     clientSecret,

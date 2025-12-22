@@ -75,9 +75,18 @@ export interface User {
   id: string; // This corresponds to VoyUsers.id
   auth_user_id: string; // Supabase Auth ID
   full_name: string;
+  last_name?: string;
   role: UserRole;
   email: string;
   city?: string;
+  address?: string;
+  postal_code?: string;
+  province?: string;
+  country?: string;
+  document_type?: string;
+  document_number?: string;
+  selfie_photo_url?: string;
+  document_photo_url?: string;
   district?: string;
   company_sector?: CompanySector | null;
   created_at?: string;
@@ -196,4 +205,3 @@ export const COMPANY_SECTORS: {
   { id: 'MARKETING_PUBLICIDAD', label: 'Marketing y Publicidad', short: 'Marketing' },
   { id: 'TRANSPORTE_MOVILIDAD', label: 'Transporte y Movilidad', short: 'Transporte' },
 ];
-

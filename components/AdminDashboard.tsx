@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Input } from './common/Input';
+import { Button } from './common/Button';
 import { supabase } from '../services/supabase';
 import { Icons } from './Icons';
 
@@ -486,12 +488,12 @@ export const AdminDashboard: React.FC = () => {
               </h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <input
+                  <Input
                     type="checkbox"
                     id="free_period"
                     checked={settings.free_period_enabled}
-                    onChange={(e) => setSettings({ ...settings, free_period_enabled: e.target.checked })}
-                    className="w-5 h-5 text-brand-600 rounded focus:ring-brand-500"
+                    onChange={e => setSettings({ ...settings, free_period_enabled: e.target.checked })}
+                    style={{ width: 20, height: 20 }}
                   />
                   <label htmlFor="free_period" className="font-medium text-gray-700">Habilitar período gratuito para nuevos usuarios</label>
                 </div>
@@ -500,20 +502,20 @@ export const AdminDashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 ml-8">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
-                      <input
+                      <Input
                         type="date"
                         value={settings.free_period_start}
-                        onChange={(e) => setSettings({ ...settings, free_period_start: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                        onChange={e => setSettings({ ...settings, free_period_start: e.target.value })}
+                        required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-                      <input
+                      <Input
                         type="date"
                         value={settings.free_period_end}
-                        onChange={(e) => setSettings({ ...settings, free_period_end: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                        onChange={e => setSettings({ ...settings, free_period_end: e.target.value })}
+                        required
                       />
                     </div>
                   </div>
@@ -531,13 +533,13 @@ export const AdminDashboard: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Bono 5 Anuncios</label>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       type="number"
                       value={settings.bono_5_price}
-                      onChange={(e) => setSettings({ ...settings, bono_5_price: parseFloat(e.target.value) })}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
-                      min="0"
-                      step="0.01"
+                      onChange={e => setSettings({ ...settings, bono_5_price: parseFloat(e.target.value) })}
+                      min={0}
+                      step={0.01}
+                      required
                     />
                     <span className="text-gray-600 font-medium">€</span>
                   </div>
@@ -545,13 +547,13 @@ export const AdminDashboard: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Bono 10 Anuncios</label>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       type="number"
                       value={settings.bono_10_price}
-                      onChange={(e) => setSettings({ ...settings, bono_10_price: parseFloat(e.target.value) })}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
-                      min="0"
-                      step="0.01"
+                      onChange={e => setSettings({ ...settings, bono_10_price: parseFloat(e.target.value) })}
+                      min={0}
+                      step={0.01}
+                      required
                     />
                     <span className="text-gray-600 font-medium">€</span>
                   </div>
@@ -559,13 +561,13 @@ export const AdminDashboard: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Bono 20 Anuncios</label>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       type="number"
                       value={settings.bono_20_price}
-                      onChange={(e) => setSettings({ ...settings, bono_20_price: parseFloat(e.target.value) })}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
-                      min="0"
-                      step="0.01"
+                      onChange={e => setSettings({ ...settings, bono_20_price: parseFloat(e.target.value) })}
+                      min={0}
+                      step={0.01}
+                      required
                     />
                     <span className="text-gray-600 font-medium">€</span>
                   </div>
@@ -575,13 +577,10 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Save Button */}
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <button
-                onClick={saveSettings}
-                className="px-6 py-3 bg-brand-500 text-white font-bold rounded-lg hover:bg-brand-600 transition shadow-lg flex items-center gap-2"
-              >
+              <Button onClick={saveSettings} style={{ padding: '12px 24px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Icons.CheckCircle size={20} />
                 Guardar Configuración
-              </button>
+              </Button>
             </div>
           </div>
         </div>

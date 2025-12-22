@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nuevo Producto - YaVoyJobs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1C252E",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }.toggle-checkbox:checked {
+            right: 0;
+            border-color: #137fec;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #137fec;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display antialiased overflow-x-hidden">
+<div class="relative flex flex-col min-h-screen w-full max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-xl">
+<div class="sticky top-0 z-50 flex items-center justify-between p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#111418] dark:text-white">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Nuevo Producto</h2>
+<div class="size-10 flex items-center justify-center">
+<button class="text-gray-500 dark:text-gray-400">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex-1 flex flex-col px-4 pt-2 pb-32 gap-6">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Información General</h3>
+<div class="flex items-center gap-2">
+<span class="text-sm font-medium text-gray-600 dark:text-gray-300">Estado</span>
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:border-primary transition-all duration-300 top-0.5 right-5 checked:right-0" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer peer-checked:bg-primary transition-colors duration-300" for="toggle"></label>
+</div>
+</div>
+</div>
+<label class="flex flex-col w-full">
+<span class="text-base font-medium pb-2 ml-1">Nombre del producto</span>
+<input class="form-input w-full h-12 px-5 rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-base focus:border-primary focus:ring-1 focus:ring-primary placeholder-gray-400 transition-shadow" placeholder="Ej. Zapatillas Deportivas Pro" type="text"/>
+</label>
+<label class="flex flex-col w-full">
+<span class="text-base font-medium pb-2 ml-1">Categoría</span>
+<div class="relative">
+<select class="form-select w-full h-12 px-5 rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-base focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer">
+<option disabled="" selected="" value="">Selecciona una categoría</option>
+<option value="electronics">Electrónica</option>
+<option value="fashion">Moda y Accesorios</option>
+<option value="home">Hogar y Jardín</option>
+<option value="tools">Herramientas</option>
+<option value="services">Servicios</option>
+</select>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</div>
+</label>
+<div class="grid grid-cols-2 gap-4">
+<label class="flex flex-col w-full">
+<span class="text-base font-medium pb-2 ml-1">Precio</span>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">€</span>
+<input class="form-input w-full h-12 pl-9 pr-4 rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-base focus:border-primary focus:ring-1 focus:ring-primary placeholder-gray-400" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</label>
+<label class="flex flex-col w-full">
+<span class="text-base font-medium pb-2 ml-1">Stock <span class="text-xs text-gray-400 font-normal">(Opcional)</span></span>
+<input class="form-input w-full h-12 px-5 rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-base focus:border-primary focus:ring-1 focus:ring-primary placeholder-gray-400" placeholder="∞" type="number"/>
+</label>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Detalles y Multimedia</h3>
+<label class="flex flex-col w-full">
+<span class="text-base font-medium pb-2 ml-1">Descripción y Características</span>
+<textarea class="form-textarea w-full min-h-[140px] p-5 rounded border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-base focus:border-primary focus:ring-1 focus:ring-primary placeholder-gray-400 resize-none" placeholder="Describe las características principales del producto..."></textarea>
+<div class="flex justify-end mt-1">
+<span class="text-xs text-gray-400">0/1000</span>
+</div>
+</label>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="text-base font-medium ml-1">Fotos del producto</span>
+<span class="text-xs font-medium text-gray-400">Máx 5 fotos</span>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar py-1">
+<button class="flex flex-col items-center justify-center size-24 shrink-0 rounded bg-surface-light dark:bg-surface-dark border-2 border-dashed border-gray-300 dark:border-gray-700 text-primary hover:bg-blue-50 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-3xl mb-1">add_a_photo</span>
+<span class="text-xs font-medium">Subir</span>
+</button>
+<div class="relative size-24 shrink-0 rounded overflow-hidden group">
+<img alt="Preview of product" class="size-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy5V6Y6J81_RsPTkXUgowvO5zJ6zJGJHvFmxnu6iwk0m6cAHuQ4afaGavipVRojPwgIaa9y0pDxxgMMtiSaq43LbgtUUtaT7Ir2-CRTtmvpKJ-irFewuTEa0PE5wBHwGlBgcZFIbD0AKehxKXC_HIjrYaD5TZSi7xRQ3wjADGevvDTSwQ2EmyuEZm2TmhnPN_wuBPFIvL05czfRtEa27r7ks5Xs-zj6RB2It8tv8NZpr1F8hALLe8j1wD2cQtcG2hO3lNEn9rvRmru"/>
+<button class="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<div class="absolute bottom-0 w-full bg-black/60 py-0.5 text-center">
+<span class="text-[10px] text-white font-medium uppercase">Portada</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Variantes</h3>
+<div class="p-4 rounded border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark flex items-center justify-between group cursor-pointer hover:border-primary/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500">
+<span class="material-symbols-outlined">style</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Opciones del producto</span>
+<span class="text-xs text-gray-500">Talla, Color, Material...</span>
+</div>
+</div>
+<div class="flex items-center text-primary font-medium text-sm">
+                        Configurar
+                        <span class="material-symbols-outlined text-base ml-1">chevron_right</span>
+</div>
+</div>
+</div>
+<div class="space-y-4 pt-2">
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Promociones y Ofertas</h3>
+<div class="p-4 rounded border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark space-y-4">
+<div class="grid grid-cols-2 gap-3">
+<label class="flex flex-col w-full">
+<span class="text-xs font-bold text-gray-500 mb-1 uppercase">Tipo Descuento</span>
+<select class="form-select w-full h-10 px-3 rounded border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+<option value="none">Sin descuento</option>
+<option value="percent">Porcentaje (%)</option>
+<option value="fixed">Precio Oferta (€)</option>
+</select>
+</label>
+<label class="flex flex-col w-full">
+<span class="text-xs font-bold text-gray-500 mb-1 uppercase">Valor</span>
+<input class="form-input w-full h-10 px-3 rounded border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Ej. 20" type="number"/>
+</label>
+</div>
+<div class="space-y-2">
+<span class="text-xs font-bold text-gray-500 uppercase">Vigencia (Opcional)</span>
+<div class="flex items-center gap-2">
+<input class="form-input w-full h-10 px-3 rounded border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm text-gray-500" type="date"/>
+<span class="text-gray-400">-</span>
+<input class="form-input w-full h-10 px-3 rounded border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm text-gray-500" type="date"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 w-full max-w-md bg-white dark:bg-[#101922] border-t border-gray-200 dark:border-gray-800 p-4 pb-8 z-50">
+<button class="w-full h-12 bg-primary hover:bg-blue-600 active:bg-blue-700 text-white font-bold rounded-full shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">save</span>
+<span>Guardar Producto</span>
+</button>
+</div>
+</div>
+
+</body></html>

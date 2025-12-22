@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Worker: Mis Trabajos</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.unfilled { font-variation-settings: 'FILL' 0; }
+        
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-white dark:bg-[#101922] shadow-2xl">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-md pt-4 pb-2">
+<div class="flex flex-col gap-2 px-4">
+<div class="flex items-center h-12 justify-between">
+<div class="w-12"></div> <!-- Spacer for centering if needed -->
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<h1 class="text-[#111418] dark:text-white tracking-tight text-[28px] font-bold leading-tight">Mis Trabajos</h1>
+</div>
+<!-- Segmented Buttons -->
+<div class="flex px-4 py-3">
+<div class="flex h-12 flex-1 items-center justify-center rounded-full bg-[#f0f2f4] dark:bg-slate-800 p-1 relative">
+<!-- Tab 1 -->
+<label class="group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 relative z-0">
+<input class="peer invisible w-0 absolute" name="job-tabs" type="radio" value="Candidaturas"/>
+<span class="absolute inset-0 bg-white dark:bg-[#101922] shadow-sm rounded-full opacity-0 peer-checked:opacity-100 transition-all duration-200"></span>
+<span class="relative z-10 truncate text-sm font-medium leading-normal text-[#617589] dark:text-slate-400 peer-checked:text-primary dark:peer-checked:text-primary transition-colors">Candidaturas</span>
+</label>
+<!-- Tab 2 -->
+<label class="group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 relative z-0">
+<input class="peer invisible w-0 absolute" name="job-tabs" type="radio" value="Asignados"/>
+<span class="absolute inset-0 bg-white dark:bg-[#101922] shadow-sm rounded-full opacity-0 peer-checked:opacity-100 transition-all duration-200"></span>
+<span class="relative z-10 truncate text-sm font-medium leading-normal text-[#617589] dark:text-slate-400 peer-checked:text-primary dark:peer-checked:text-primary transition-colors">Asignados</span>
+</label>
+<!-- Tab 3 (Active for Demo) -->
+<label class="group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 relative z-0">
+<input checked="" class="peer invisible w-0 absolute" name="job-tabs" type="radio" value="Finalizados"/>
+<span class="absolute inset-0 bg-primary shadow-[0_2px_8px_rgba(19,127,236,0.3)] rounded-full opacity-0 peer-checked:opacity-100 transition-all duration-200"></span>
+<span class="relative z-10 truncate text-sm font-medium leading-normal text-[#617589] dark:text-slate-400 peer-checked:text-white transition-colors">Finalizados</span>
+</label>
+</div>
+</div>
+<!-- Subtle Divider -->
+<div class="h-[1px] w-full bg-slate-100 dark:bg-slate-800"></div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 flex flex-col pb-24">
+<!-- Section Header: Octubre -->
+<div class="sticky top-[148px] z-0 bg-white/95 dark:bg-[#101922]/95 backdrop-blur-sm px-4 py-3 border-b border-slate-50 dark:border-slate-800/50">
+<h3 class="text-[#617589] dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Octubre 2023</h3>
+</div>
+<!-- Card 1: Completed with Review -->
+<div class="px-4 py-3">
+<div class="flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1a2632] p-4 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+<div class="flex justify-between items-start gap-4">
+<div class="flex flex-col gap-1 flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold uppercase tracking-wide">Finalizado</span>
+<span class="text-[#617589] dark:text-slate-500 text-xs">12 Oct</span>
+</div>
+<h4 class="text-[#111418] dark:text-white text-lg font-bold leading-snug">Limpieza de Oficina</h4>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-medium">Empresa: TechStart S.L.</p>
+<p class="text-[#111418] dark:text-slate-200 text-sm font-semibold mt-0.5">Total: 45€</p>
+</div>
+<div class="h-20 w-20 shrink-0 rounded-xl bg-cover bg-center" data-alt="Modern bright office interior" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDc3qKtY-81mYS2DqeocL7L3xAeKARMl-J-Rq4OigMIAx5qWR4hVBnUEjmyrXSw25-icRmv0EfOYU3VmpmMEXhPNm6WKNXP28EQ7fF9JJbIpQcd633sb2ddSDoLqyoXg6BAptFd0NzedGY0TydPqYPHUJqyhi4NEMm5Cubqj_8wahcKHZQlMcvJmbQTlbk66bNfw5WlJG9N67sudEq2ORl64-VZzpS40-YjlX0ZEw6iPxlaRAH2J940iIqP2sf8wR_yPlaudDg8-OJ5");'></div>
+</div>
+<!-- Rating Section -->
+<div class="mt-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-1 text-amber-400 mb-1">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="text-[#111418] dark:text-white font-bold text-sm ml-1">5.0</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 italic">"¡Excelente trabajo! Muy puntual y detallista con la limpieza de los cristales. Repetiremos."</p>
+</div>
+</div>
+</div>
+<!-- Card 2: Completed with Review -->
+<div class="px-4 py-3">
+<div class="flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1a2632] p-4 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+<div class="flex justify-between items-start gap-4">
+<div class="flex flex-col gap-1 flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold uppercase tracking-wide">Finalizado</span>
+<span class="text-[#617589] dark:text-slate-500 text-xs">05 Oct</span>
+</div>
+<h4 class="text-[#111418] dark:text-white text-lg font-bold leading-snug">Jardinería Express</h4>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-medium">Particular: Ana G.</p>
+<p class="text-[#111418] dark:text-slate-200 text-sm font-semibold mt-0.5">Total: 30€</p>
+</div>
+<div class="h-20 w-20 shrink-0 rounded-xl bg-cover bg-center" data-alt="Green lush garden with tools" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuClKusXestg113HUghrj2PmdrQLx--40w4_io4ZK-FdAui0W2uZpQVJsO3iCq0GuODy-WMLJd4Ftfax-kG_E9H3O4YLlhb8npO4dZvIEsy3GmVoYZTohlFg2KD7jyL9C2PtNm4GyXrknLh2-Ex4RtOnpU6ZmY43cKrXg0cwHYmnU03WFgPBCB93jo6L0cxMAavOuUwkhWxakAYyDEnVvXF1TPyxEX_sJRe_77Bae8d_Ie-UMryOc7Yo7SIqFaUmLdwIacg5rsT5J0xr");'></div>
+</div>
+<!-- Rating Section -->
+<div class="mt-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-1 text-amber-400 mb-1">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined unfilled text-[20px] text-slate-300 dark:text-slate-600">star</span>
+<span class="text-[#111418] dark:text-white font-bold text-sm ml-1">4.0</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 italic">"Buen servicio, aunque llegó unos minutos tarde por el tráfico."</p>
+</div>
+</div>
+</div>
+<!-- Section Header: Septiembre -->
+<div class="sticky top-[148px] z-0 bg-white/95 dark:bg-[#101922]/95 backdrop-blur-sm px-4 py-3 border-b border-slate-50 dark:border-slate-800/50 mt-2">
+<h3 class="text-[#617589] dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Septiembre 2023</h3>
+</div>
+<!-- Card 3: Completed without Review -->
+<div class="px-4 py-3">
+<div class="flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1a2632] p-4 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+<div class="flex justify-between items-start gap-4">
+<div class="flex flex-col gap-1 flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold uppercase tracking-wide">Finalizado</span>
+<span class="text-[#617589] dark:text-slate-500 text-xs">28 Sep</span>
+</div>
+<h4 class="text-[#111418] dark:text-white text-lg font-bold leading-snug">Montaje Muebles IKEA</h4>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-medium">Particular: Carlos M.</p>
+<p class="text-[#111418] dark:text-slate-200 text-sm font-semibold mt-0.5">Total: 55€</p>
+</div>
+<div class="h-20 w-20 shrink-0 rounded-xl bg-cover bg-center" data-alt="Furniture assembly tools and wood" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA7OMhnQqf2p8wY6Km-aKonH5btjhANxfZsnVDEOjFnLpJqtsaysNyyeaNBN31PNFtXlqlb0IKgmU5C5bw6ikKuhBdM-jToOX8AaKE8gL8sr_x2IrJ-rqRPYca89E3buVcTre7fwM6CsVXf2kw9S2_nuVc-zqvR_zTm1c9cLk2h1wVPhaieoF-Tlusn2-llX0-CudUWD6FvCvoFzulQj1X5oj0fiKi6_0i-RBVUtA84Htc6b-bUVB12ubdQR9bDDVQ27QGlRk8EIE6G");'></div>
+</div>
+<!-- Rating Section (Pending Review State) -->
+<div class="mt-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<span class="text-sm text-[#617589] dark:text-slate-500">Valoración pendiente del cliente</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4: Historical -->
+<div class="px-4 py-3">
+<div class="flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1a2632] p-4 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800 opacity-70 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start gap-4">
+<div class="flex flex-col gap-1 flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-bold uppercase tracking-wide">Cancelado</span>
+<span class="text-[#617589] dark:text-slate-500 text-xs">15 Sep</span>
+</div>
+<h4 class="text-[#111418] dark:text-white text-lg font-bold leading-snug">Reparación Eléctrica</h4>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-medium">Empresa: LuzNorte</p>
+</div>
+<div class="h-20 w-20 shrink-0 rounded-xl bg-cover bg-center grayscale" data-alt="Electrical wiring and tools" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjkGjUVOH0gyu95AvDJn6lj6i29p6wcKGdVvgemmPJjtj21DJTSi8ACRgFUaTrIpHdUiDR2FhQpaLo6Ck5YY3S29bOfbsCe4eSy3dZaAqG6ig5Je7FD88_IN7GfX0gZcSf4XDox2j5tX-5MNGk53MM1JdvyzRtKtxmq_fdiX70ZF_tlYWBp2K45dRP4Ws6NvJ8-7OrSauCem3rqmf7nYUd1qQUzjadzEgvII60B2Rn2HJiSb2nINCKdNNVBWU1X9rddWINNFf3ZMny");'></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 w-full max-w-md bg-white dark:bg-[#101922] border-t border-slate-200 dark:border-slate-800 pb-safe">
+<div class="flex items-center justify-around h-16 px-2">
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-[#617589] dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-[#617589] dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="text-[10px] font-medium">Buscar</span>
+</button>
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-primary dark:text-primary">
+<span class="material-symbols-outlined text-[24px] font-variation-settings-fill">work</span>
+<span class="text-[10px] font-medium">Mis Trabajos</span>
+</button>
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-[#617589] dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</button>
+</div>
+<!-- Safe Area Spacer for iOS Home Bar -->
+<div class="h-4 w-full"></div>
+</div>
+</div>
+</body></html>

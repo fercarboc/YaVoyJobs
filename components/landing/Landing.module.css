@@ -1,3 +1,63 @@
+/* Incentive Cards */
+.incentive-section {
+  margin: 0 auto 2.5rem auto;
+  max-width: 900px;
+  padding: 2.5rem 1.2rem;
+  background: var(--color-white);
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(58,110,165,0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.incentive-cards-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.incentive-card {
+  border: 2.5px solid var(--color-primary);
+  border-radius: 16px;
+  background: var(--color-background);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 260px;
+  max-width: 320px;
+  box-shadow: 0 2px 10px rgba(58,110,165,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.incentive-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 24px rgba(58,110,165,0.13);
+}
+.incentive-icon {
+  font-size: 2.7rem;
+  margin-bottom: 1rem;
+}
+.incentive-card h3 {
+  color: var(--color-primary);
+  font-size: 1.35rem;
+  margin-bottom: 0.7rem;
+  text-align: center;
+}
+.incentive-card p {
+  color: var(--color-text-secondary);
+  font-size: 1.08rem;
+  text-align: center;
+}
+.incentive-contact {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--color-detail);
+  text-align: center;
+}
 :root {
   --color-primary: #3A6EA5;
   --color-secondary: #7AC47A;

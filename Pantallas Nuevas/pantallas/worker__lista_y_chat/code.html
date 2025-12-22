@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>YaVoyJobs - Worker Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white">
+<!-- Wrapper for Phone Simulation -->
+<div class="relative flex h-auto min-h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-[#101922] shadow-2xl overflow-hidden border-x border-slate-200 dark:border-slate-800">
+<!-- === SECTION 1: INBOX LIST === -->
+<!-- Header -->
+<div class="flex items-center bg-white dark:bg-[#101922] p-4 pb-2 justify-between sticky top-0 z-20">
+<div class="flex size-12 shrink-0 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-[#101922] shadow-sm relative" data-alt="Worker profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6qpTd_p__yQLGROEsBi-CmMYnpc7fBqLDuSIo_jjjA0Qk2T-NKMMApx_yUjO1TZdQasNMWjs0zrbx7-6xBoTRo0y5AkSgvSfKnfH0TIEfeHeTKnSmHg7ZA8L9Ab99-SD0mggwXrU8OF6bxoSpEVNg3yRNiMU_g3NRMasXFKlZ5XGSMbPT_oVzzMN0GPuIU11RfGk2edPE5U5-H59PVYlQAiFaESpCTLh-o5iTsmndwBbKpjF88iOyfqA07gqDqZajg2-0Qf31c2Ky");'>
+<div class="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-white dark:border-[#101922]"></div>
+</div>
+</div>
+<h2 class="text-[#111418] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] flex-1 px-3">Mensajes</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-[#f0f2f4] dark:bg-slate-800 text-[#111418] dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">edit_square</span>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 py-3 bg-white dark:bg-[#101922]">
+<label class="flex flex-col w-full">
+<div class="flex w-full flex-1 items-stretch rounded-full h-12">
+<div class="text-[#617589] dark:text-slate-400 flex border-none bg-[#f0f2f4] dark:bg-slate-800 items-center justify-center pl-4 rounded-l-full border-r-0">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-full text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border-none bg-[#f0f2f4] dark:bg-slate-800 focus:border-none h-full placeholder:text-[#617589] dark:placeholder:text-slate-500 px-4 pl-2 text-base font-normal leading-normal transition-all" placeholder="Buscar conversaciones" value=""/>
+</div>
+</label>
+</div>
+<!-- List Items -->
+<div class="flex flex-col bg-white dark:bg-[#101922]">
+<!-- Active Item (Highlight) -->
+<div class="relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full my-2"></div>
+<div class="flex items-center gap-4 bg-primary/5 dark:bg-primary/10 px-4 min-h-[72px] py-3 justify-between cursor-pointer">
+<div class="flex items-center gap-4 overflow-hidden">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0 relative" data-alt="Company logo with geometric shapes" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAkU01BDcy5eCpic8Y1gpfi92HPCTNqXMT6HvpcciKQntzHPX4Pthijn3saFg9lqLTfCjvcmUdCYKvMCQvfiphRtsHNxMpR9I6RNBjENuK0Z1NAQWAjd85XH3ysHjy4_aiQMj0cNshKALoc0ReepHq-Cm2GKt4SbAQBqJaox6Ru2IAjIFsliL6l5DEKo7E-fjUfQzY7QbtKLtx9b2-CRGF4G0yw67icmVvDD9BBGZTAZ8WPW61uhw93fBgzLzlNFAZXperv9sgEzi2Q");'>
+<div class="absolute bottom-0 right-0 size-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#101922]"></div>
+</div>
+<div class="flex flex-col justify-center min-w-0">
+<p class="text-[#111418] dark:text-white text-base font-bold leading-normal truncate">Construcciones Madrid S.L.</p>
+<p class="text-[#111418] dark:text-white text-sm font-medium leading-normal truncate">Hola, ya estoy en camino.</p>
+</div>
+</div>
+<div class="shrink-0 flex flex-col items-end gap-1">
+<p class="text-primary text-xs font-bold leading-normal">10:33 AM</p>
+<div class="size-2.5 bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Inactive Item -->
+<div class="flex items-center gap-4 bg-white dark:bg-[#101922] px-4 min-h-[72px] py-3 justify-between border-b border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+<div class="flex items-center gap-4 overflow-hidden">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0" data-alt="Portrait of a smiling man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCZOXWTUSehOoNFP1Mh0tb3jppGaCQwDpd-9QQ0DzGGMul6mxBgP740voIbJlNb4DuFDsQTAqcN3kb1XOfYTi7b0iLrwsUucIqYA_Y4ID-ZDkd9SeK4Ms-1GtLxomJ2J0iYzaQgRWRbxtbdfG1VtzzNO1Y-0H6uxDhEKug9s-eHCefnOkIs4Dd1FD0miQKLOIuRz5RhTmUv9dJQA9ul07N9ubHbfaj0aPrfobJAg1kyafZv3MaT37-S9Iuax3FTVwAaS4lphWFTiGRK");'></div>
+<div class="flex flex-col justify-center min-w-0">
+<p class="text-[#111418] dark:text-white text-base font-medium leading-normal truncate">Juan Pérez (Particular)</p>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-normal leading-normal truncate">Gracias por el presupuesto.</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-[#617589] dark:text-slate-500 text-sm font-normal leading-normal">Ayer</p></div>
+</div>
+<!-- Inactive Item 2 -->
+<div class="flex items-center gap-4 bg-white dark:bg-[#101922] px-4 min-h-[72px] py-3 justify-between border-b border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+<div class="flex items-center gap-4 overflow-hidden">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0" data-alt="Abstract company logo in orange" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm0CvZ5bNmiOjN7pKhjLAqAaQ5KKhzU-L48C2o1O5y_aRe5ho4ORRRgZc6UlFjLIY6vHvlIQw5HzC1tf3lUX9cZ4CimUU3uiDPrRpPqKc3tWi7jslJaJM1D9pbxkq6Ir7miG427YAyv39bDmEX-jYWM2LxNjutpebR3CuCySIHOfOtVQudbg5m6Jx8C0cLVfEcH-1JFEbdScaknux8Hg1Hvv1afKl1A6uRcj56PqMXvhDBT3-IW8eoPLXoNQhtULc9kqrzX08vozD7");'></div>
+<div class="flex flex-col justify-center min-w-0">
+<p class="text-[#111418] dark:text-white text-base font-medium leading-normal truncate">Reformas Express</p>
+<p class="text-[#617589] dark:text-slate-400 text-sm font-normal leading-normal truncate">¿Podrías enviarme la factura?</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-[#617589] dark:text-slate-500 text-sm font-normal leading-normal">Lun</p></div>
+</div>
+</div>
+<!-- Visual Separator for Demo Purposes -->
+<div class="py-6 bg-background-light dark:bg-background-dark flex flex-col items-center justify-center gap-2 border-y border-slate-200 dark:border-slate-800">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Vista Detalle (Chat Abierto)</span>
+<span class="material-symbols-outlined text-slate-300">arrow_downward</span>
+</div>
+<!-- === SECTION 2: ACTIVE CHAT VIEW === -->
+<div class="flex flex-col h-[600px] bg-white dark:bg-[#101922] relative">
+<!-- Chat Header -->
+<div class="flex items-center gap-2 px-4 py-3 bg-white dark:bg-[#101922] shadow-sm z-10 border-b border-slate-100 dark:border-slate-800">
+<button class="text-[#111418] dark:text-white p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-3 flex-1">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 shrink-0 relative" data-alt="Company logo with geometric shapes" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuATSDC0nazZOyHDrWF063PWdpTtj_-z-qYKBY_n9anApG93_re0U7qeAVmeAbXKWcXNYQ1NL8zvrsotOO7W71DwDbGSELdX_twLa87Hig_HbVuPjZ4JoS4A8lXD_x4s0VpI9M-Wsl0fQELpSbnYAEk-KDXcs0RJLiT382HhQmZoRr3DpWCi5h3aU9pTUEiqJfIxjylurmwjCGhuQLpfPnzU8W26o8Mkk0NNAzm6IcXToo2ZAPx7npH26QpTQXE3tGK9vcPPc-q6Jeg0");'>
+<div class="absolute bottom-0 right-0 size-2.5 bg-green-500 rounded-full border-2 border-white dark:border-[#101922]"></div>
+</div>
+<div class="flex flex-col">
+<p class="text-[#111418] dark:text-white text-sm font-bold leading-tight line-clamp-1">Construcciones Madrid S.L.</p>
+<p class="text-green-600 dark:text-green-400 text-xs font-medium leading-none">En línea</p>
+</div>
+</div>
+<button class="text-[#617589] dark:text-slate-400 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-4 bg-[#f6f7f8] dark:bg-[#0b1219] flex flex-col gap-4">
+<!-- Safety Warning Banner -->
+<div class="flex items-start gap-3 rounded-xl bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800/30 p-3 shadow-sm mx-1">
+<div class="text-yellow-600 dark:text-yellow-500 shrink-0">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<p class="text-yellow-800 dark:text-yellow-100 text-sm font-bold leading-tight">Seguridad</p>
+<p class="text-yellow-700 dark:text-yellow-200/80 text-xs font-normal leading-normal">Por tu seguridad, nunca compartas contraseñas ni datos bancarios por este chat.</p>
+</div>
+</div>
+<!-- Timestamp -->
+<div class="flex justify-center">
+<span class="text-[10px] font-bold text-[#617589] dark:text-slate-500 uppercase tracking-wide">Hoy 10:30 AM</span>
+</div>
+<!-- Incoming Message -->
+<div class="flex items-end gap-2 max-w-[85%]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-8 w-8 shrink-0 mb-1" data-alt="Company logo small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCv1kor8TgG7hSAGDapgY9_E-XQPMP8DYkcPvn9eUB2zefWUPSQWN6wX1J8jQfEhExomOkRdgJvf7VSV7ox_D8SAkB5mFZ8sipOZYkwQKDXcigGomFbHeWK1RtVLBXYNqZf60NQF1TGbC6iMgkoxiqx9Ltm5wLmTdmy_JlbDF4oqmVOdn_3cOIsc_VPThMng8ffEegG6-DZiBqV30KoN7rIK6vYILsUfBdv1464xzc8ktc3D9GxsJAyLm2HRNdmYSPrx3FE4nFCZRt6");'></div>
+<div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl rounded-bl-none shadow-sm text-[#111418] dark:text-slate-100 text-sm leading-relaxed border border-slate-100 dark:border-slate-700">
+<p>Hola, ¿puedes venir mañana a las 8? Necesitamos que revises la instalación del segundo piso.</p>
+</div>
+</div>
+<!-- Outgoing Message -->
+<div class="flex items-end gap-2 max-w-[85%] self-end flex-row-reverse">
+<div class="bg-primary p-3.5 rounded-2xl rounded-br-none shadow-md text-white text-sm leading-relaxed">
+<p>Hola, claro que sí. Justo voy saliendo para allá para ver cómo está la zona.</p>
+</div>
+</div>
+<!-- Outgoing Message (Location) -->
+<div class="flex flex-col items-end gap-1 max-w-[80%] self-end">
+<div class="bg-white dark:bg-slate-800 p-1.5 rounded-2xl rounded-br-none shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden w-full">
+<div class="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-100 mb-2">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-location="Madrid City Center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2XB_qYhqbJkX24n7BK4p-hrpFNqDTDAIZciagooP-0TKbn1KrlaF9bUu4nSLHFTb_GnR5sy1oHCZ78Moz-JQyCXagXpdqPqf2MZapWr9xKvoF_m-sd85CVpfu9X_d3t5L6Sg6RJFCwRYcjprYzw3EEwf4DngCb9uYnsjUCDvExTKwxD4SeV8cVrGpyA0ERENlLf7gWtNc3SXOkyd11UoH7IG_WjDM1PXILoJHEM1Qzstx0hnCfGi2Lo2045K0avmyYFLQiMQCvkn7");'></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-white/90 dark:bg-slate-900/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-red-500 text-[24px]">location_on</span>
+</div>
+</div>
+</div>
+<div class="px-2 pb-1 flex justify-between items-center">
+<span class="text-xs font-bold text-[#111418] dark:text-white">Ubicación actual</span>
+<span class="text-[10px] text-[#617589] dark:text-slate-400">Hace un momento</span>
+</div>
+</div>
+<div class="flex items-center gap-1 pr-1">
+<span class="text-[10px] text-[#617589] dark:text-slate-500">Leído 10:33 AM</span>
+<span class="material-symbols-outlined text-primary text-[14px]">done_all</span>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-3 bg-white dark:bg-[#101922] border-t border-slate-100 dark:border-slate-800">
+<!-- Quick Actions Chips -->
+<div class="flex gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
+<button class="flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 dark:bg-primary/20 active:scale-95 transition-all px-4 py-1.5 rounded-full border border-primary/10">
+<span class="material-symbols-outlined text-primary text-[18px]">my_location</span>
+<span class="text-xs font-bold text-primary">Enviar ubicación</span>
+</button>
+<button class="flex items-center gap-1.5 bg-[#f0f2f4] dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all px-4 py-1.5 rounded-full border border-transparent">
+<span class="material-symbols-outlined text-[#617589] dark:text-slate-300 text-[18px]">attach_money</span>
+<span class="text-xs font-bold text-[#617589] dark:text-slate-300">Presupuesto</span>
+</button>
+</div>
+<!-- Input Field Row -->
+<div class="flex items-end gap-2">
+<button class="size-10 flex items-center justify-center text-[#617589] dark:text-slate-400 hover:text-primary hover:bg-[#f0f2f4] dark:hover:bg-slate-800 transition-all rounded-full shrink-0">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<div class="flex-1 bg-[#f0f2f4] dark:bg-slate-800 rounded-[20px] flex items-center min-h-[44px] px-4 py-2 border border-transparent focus-within:border-primary/30 transition-colors">
+<input class="w-full bg-transparent border-none p-0 text-base focus:ring-0 placeholder:text-[#617589] dark:placeholder:text-slate-500 text-[#111418] dark:text-white leading-normal" placeholder="Escribe un mensaje..." type="text"/>
+<button class="ml-2 text-[#617589] dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+<button class="size-10 bg-primary hover:bg-blue-600 transition-colors text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 active:scale-90 shrink-0">
+<span class="material-symbols-outlined fill-current">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<div class="sticky bottom-0 bg-white dark:bg-[#101922] border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-30">
+<button class="flex flex-col items-center gap-1.5 text-[#617589] dark:text-slate-500 hover:text-primary transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-semibold tracking-wide">Inicio</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-[#617589] dark:text-slate-500 hover:text-primary transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">work</span>
+<span class="text-[10px] font-semibold tracking-wide">Trabajos</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-primary transition-colors relative w-16">
+<div class="relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="absolute -top-0.5 -right-0.5 size-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#101922]"></span>
+</div>
+<span class="text-[10px] font-bold tracking-wide">Chat</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-[#617589] dark:text-slate-500 hover:text-primary transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-semibold tracking-wide">Perfil</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { theme } from '../theme';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
 import { UserRole, AuthState, Notification } from '../types';
 import { supabase } from '../services/supabase';
+import { Modal } from './common/Modal';
+import { Input } from './common/Input';
+import { Button } from './common/Button';
+import { UserAvatar } from './common/Avatar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -139,8 +144,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <nav className="sticky top-0 z-50 bg-blue-600 shadow-lg">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: theme.colors.background,
+        fontFamily: theme.font.family,
+        color: theme.colors.text,
+      }}
+    >
+      <nav
+        className="sticky top-0 z-50 shadow-lg"
+        style={{ background: theme.colors.primary }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
@@ -262,9 +277,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center space-x-2 pl-2 border-l border-white/30 hover:bg-white/10 rounded-lg px-2 py-1 transition"
                     >
-                      <div className="w-8 h-8 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-sm">
-                        {auth.user.full_name?.charAt(0).toUpperCase() || 'U'}
-                      </div>
+                      <UserAvatar user={auth.user} size={32} />
                       <span className="text-white font-medium text-sm">{auth.user.full_name}</span>
                       <Icons.ChevronDown size={16} className={`text-white transition ${isProfileOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -376,9 +389,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                 <>
                   <div className="px-3 py-3 border-b border-gray-100 bg-brand-50">
                     <div className="flex items-center space-x-2">
-                      <div className="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold">
-                        {auth.user.full_name?.charAt(0).toUpperCase() || 'U'}
-                      </div>
+                      <UserAvatar user={auth.user} size={40} />
                       <div>
                         <p className="font-bold text-slate-900 text-sm">{auth.user.full_name}</p>
                         <p className="text-xs text-slate-500">{auth.user.email}</p>
@@ -421,7 +432,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         {children}
       </main>
 
-      <footer className="bg-[#0B2E4E] text-white/75 py-8">
+      <footer
+        className="py-8"
+        style={{ background: '#0B2E4E', color: 'rgba(255,255,255,0.75)' }}
+      >
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <div className="flex items-center text-white font-bold text-xl mb-3">
@@ -474,60 +488,43 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 mt-6 pt-5 border-t border-white/10 text-center text-xs text-white/55">
+        <div
+          className="max-w-7xl mx-auto px-4 mt-6 pt-5 border-t text-center text-xs"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.55)' }}
+        >
           © {new Date().getFullYear()} YaVoy. Todos los derechos reservados.
         </div>
       </footer>
 
       {/* Edit Profile Modal */}
       {isEditProfileOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-              <h2 className="text-2xl font-bold text-slate-800">Editar Perfil</h2>
-              <button onClick={() => setIsEditProfileOpen(false)}><Icons.X className="text-gray-400 hover:text-gray-600 cursor-pointer" size={24} /></button>
+        <Modal open={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} title="Editar Perfil">
+          <form onSubmit={handleEditProfile}>
+            <Input
+              label="Nombre Completo"
+              type="text"
+              value={editForm.full_name}
+              onChange={e => setEditForm({ ...editForm, full_name: e.target.value })}
+              required
+            />
+            <Input
+              label="Ciudad"
+              type="text"
+              value={editForm.city}
+              onChange={e => setEditForm({ ...editForm, city: e.target.value })}
+              placeholder="Madrid"
+              required
+            />
+            <div style={{ display: 'flex', gap: 12, paddingTop: 16 }}>
+              <Button type="button" variant="secondary" style={{ flex: 1 }} onClick={() => setIsEditProfileOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" style={{ flex: 1 }}>
+                Guardar Cambios
+              </Button>
             </div>
-
-            <form onSubmit={handleEditProfile} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
-                <input
-                  type="text"
-                  value={editForm.full_name}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
-                <input
-                  type="text"
-                  value={editForm.city}
-                  onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="Madrid"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditProfileOpen(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-bold hover:bg-brand-600 transition"
-                >
-                  Guardar Cambios
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+          </form>
+        </Modal>
       )}
 
       {/* Change Password Modal */}
@@ -576,7 +573,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-bold hover:bg-brand-600 transition"
+                  className="flex-1 px-4 py-2 rounded-lg font-bold transition"
+                  style={{
+                    background: theme.colors.primary,
+                    color: theme.colors.surface,
+                  }}
                 >
                   Cambiar Contraseña
                 </button>

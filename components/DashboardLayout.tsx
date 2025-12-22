@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
+import { Button } from './common/Button';
 import { AuthState, Notification } from '../types';
 import { supabase } from '../services/supabase';
 
@@ -40,7 +41,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, auth
       
       if (error) throw error;
       setNotifications(data || []);
-      setUnreadCount((data || []).filter(n => !n.is_read).length);
+                <Button
     } catch (err) {
       console.error('Error fetching notifications:', err);
     }
@@ -60,7 +61,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, auth
     }
   };
 
-  const getRoleLabel = (role: string) => {
+                      <Button
     switch (role) {
       case 'WORKER': return 'Trabajador';
       case 'COMPANY': return 'Empresa';
