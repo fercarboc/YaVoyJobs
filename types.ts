@@ -91,6 +91,16 @@ export interface User {
   company_sector?: CompanySector | null;
   created_at?: string;
   phone?: string;
+  neighborhood?: string; // ✅ añadir esto
+   birth_year?: number | null;
+  is_active?: boolean | null;
+
+  verification_document?: string | null;
+  verification_status?: string | null;
+  verification_type?: string | null;
+  verification_requested_at?: string | null;
+
+  updated_at?: string;
 }
 
 export interface Job {

@@ -1,0 +1,354 @@
+table_schema,table_name,policyname,permissive,roles,cmd,using_expression,with_check_expression
+public,VoyAdminLogs,VoyAdminLogs_admin_only_insert,PERMISSIVE,{public},INSERT,null,is_admin()
+public,VoyAdminLogs,VoyAdminLogs_admin_only_select,PERMISSIVE,{public},SELECT,is_admin(),null
+public,VoyAdminLogs,voyadminlogs_admin,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyChats,VoyChats_delete_service,PERMISSIVE,{public},DELETE,(auth.role() = 'service_role'::text),null
+public,VoyChats,VoyChats_insert_1to1,PERMISSIVE,{public},INSERT,null,((auth.uid() = company_user_id) OR (auth.uid() = helper_user_id))
+public,VoyChats,VoyChats_select_1to1,PERMISSIVE,{public},SELECT,((auth.uid() = company_user_id) OR (auth.uid() = helper_user_id)),null
+public,VoyChats,VoyChats_update_1to1,PERMISSIVE,{public},UPDATE,((auth.uid() = company_user_id) OR (auth.uid() = helper_user_id)),((auth.uid() = company_user_id) OR (auth.uid() = helper_user_id))
+public,VoyCompanies,VoyCompanies_delete_own_or_admin,PERMISSIVE,{public},DELETE,((owner_user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyCompanies,VoyCompanies_insert_own,PERMISSIVE,{public},INSERT,null,((owner_user_id = current_voy_user_id()) OR is_admin())
+public,VoyCompanies,VoyCompanies_select_own_or_admin,PERMISSIVE,{public},SELECT,((owner_user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyCompanies,VoyCompanies_update_own_or_admin,PERMISSIVE,{public},UPDATE,((owner_user_id = current_voy_user_id()) OR is_admin()),((owner_user_id = current_voy_user_id()) OR is_admin())
+public,VoyCompanySubscriptions,Companies can create own subscriptions,PERMISSIVE,{public},INSERT,null,"(company_user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyCompanySubscriptions,Companies can view own subscriptions,PERMISSIVE,{public},SELECT,"((company_user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid()))) OR (EXISTS ( SELECT 1
+   FROM ""VoyUsers""
+  WHERE ((""VoyUsers"".auth_user_id = auth.uid()) AND (""VoyUsers"".role = 'ADMIN'::""VoyUserRole"")))))",null
+public,VoyCompanySubscriptions,Service role can update subscriptions,PERMISSIVE,{public},UPDATE,true,true
+public,VoyCompanySubscriptions,voycompanysubs_insert_owner,PERMISSIVE,{authenticated},INSERT,null,((company_user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyCompanySubscriptions,voycompanysubs_update_owner,PERMISSIVE,{authenticated},UPDATE,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (company_user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (company_user_id = auth.uid()))
+public,VoyCompanySubscriptions,voycompanysubs_view,PERMISSIVE,{authenticated},SELECT,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (company_user_id = auth.uid())),null
+public,VoyEmergencyAlertResponses,Anyone can insert alert responses,PERMISSIVE,{authenticated},INSERT,null,true
+public,VoyEmergencyAlertResponses,Anyone can view alert responses,PERMISSIVE,{authenticated},SELECT,true,null
+public,VoyEmergencyAlertResponses,voyemgresponses_insert_responder,PERMISSIVE,{authenticated},INSERT,null,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyEmergencyAlerts"" a
+  WHERE ((a.id = ""VoyEmergencyAlertResponses"".alert_id) AND (a.user_id = auth.uid())))))"
+public,VoyEmergencyAlertResponses,voyemgresponses_responder_or_owner,PERMISSIVE,{authenticated},SELECT,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyEmergencyAlerts"" a
+  WHERE ((a.id = ""VoyEmergencyAlertResponses"".alert_id) AND (a.user_id = auth.uid())))))",null
+public,VoyEmergencyAlerts,Users can insert own emergency alerts,PERMISSIVE,{authenticated},INSERT,null,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyEmergencyAlerts,Users can update own emergency alerts,PERMISSIVE,{authenticated},UPDATE,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))","(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyEmergencyAlerts,Users can view own emergency alerts,PERMISSIVE,{authenticated},SELECT,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyEmergencyAlerts,voyemgalerts_owner,PERMISSIVE,{authenticated},ALL,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()))
+public,VoyEmergencyContacts,Users can delete own emergency contacts,PERMISSIVE,{authenticated},DELETE,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyEmergencyContacts,Users can insert own emergency contacts,PERMISSIVE,{authenticated},INSERT,null,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyEmergencyContacts,Users can update own emergency contacts,PERMISSIVE,{authenticated},UPDATE,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))","(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyEmergencyContacts,Users can view own emergency contacts,PERMISSIVE,{authenticated},SELECT,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyEmergencyContacts,voyemgcontacts_owner,PERMISSIVE,{authenticated},ALL,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()))
+public,VoyHelpers,VoyHelpers_delete_own_or_admin,PERMISSIVE,{public},DELETE,((user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyHelpers,VoyHelpers_insert_self,PERMISSIVE,{public},INSERT,null,((user_id = current_voy_user_id()) OR is_admin())
+public,VoyHelpers,VoyHelpers_select_own_or_admin,PERMISSIVE,{public},SELECT,((user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyHelpers,VoyHelpers_update_own_or_admin,PERMISSIVE,{public},UPDATE,((user_id = current_voy_user_id()) OR is_admin()),((user_id = current_voy_user_id()) OR is_admin())
+public,VoyInsurancePlans,voyinsplans_admin,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyInsurancePolicies,voyinspolicies_owner,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyInsuranceProviders,voyinsproviders_admin,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyInvoices,VoyInvoices_select_related,PERMISSIVE,{public},SELECT,((issuer_user_id = current_voy_user_id()) OR (payer_user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyInvoices,voyinvoices_view,PERMISSIVE,{authenticated},SELECT,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (issuer_user_id = auth.uid()) OR (payer_user_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobAssignments"" a
+  WHERE ((a.id = ""VoyInvoices"".assignment_id) AND ((a.requester_user_id = auth.uid()) OR (a.helper_user_id = auth.uid()))))))",null
+public,VoyJobApplications,VoyJobApplications_delete_related,PERMISSIVE,{public},DELETE,"((helper_user_id = current_voy_user_id()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobApplications"".job_id) AND (j.creator_user_id = current_voy_user_id())))))",null
+public,VoyJobApplications,VoyJobApplications_insert_self,PERMISSIVE,{public},INSERT,null,((helper_user_id = current_voy_user_id()) OR is_admin())
+public,VoyJobApplications,VoyJobApplications_select_related,PERMISSIVE,{public},SELECT,"((helper_user_id = current_voy_user_id()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobApplications"".job_id) AND (j.creator_user_id = current_voy_user_id())))))",null
+public,VoyJobApplications,VoyJobApplications_update_related,PERMISSIVE,{public},UPDATE,"((helper_user_id = current_voy_user_id()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobApplications"".job_id) AND (j.creator_user_id = current_voy_user_id())))))","((helper_user_id = current_voy_user_id()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobApplications"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyJobApplications,voyjobapps_owner,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (helper_user_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobApplications"".job_id) AND (j.creator_user_id = auth.uid())))))",((helper_user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyJobAssignments,VoyJobAssignments_insert_admin_or_owner,PERMISSIVE,{public},INSERT,null,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobAssignments"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyJobAssignments,VoyJobAssignments_select_related,PERMISSIVE,{public},SELECT,((helper_user_id = current_voy_user_id()) OR (requester_user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyJobAssignments,VoyJobAssignments_update_admin_or_owner,PERMISSIVE,{public},UPDATE,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobAssignments"".job_id) AND (j.creator_user_id = current_voy_user_id())))))","(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobAssignments"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyJobAssignments,voyjobassign_owner,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (helper_user_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobAssignments"".job_id) AND (j.creator_user_id = auth.uid())))))","(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobAssignments"".job_id) AND (j.creator_user_id = auth.uid())))))"
+public,VoyJobInsurance,voyjobinsurance_link,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobInsurance"".job_id) AND (j.creator_user_id = auth.uid())))) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobAssignments"" a
+  WHERE ((a.job_id = ""VoyJobInsurance"".job_id) AND (a.helper_user_id = auth.uid())))))","(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyJobInsurance"".job_id) AND (j.creator_user_id = auth.uid())))))"
+public,VoyJobs,VoyJobs_delete_creator_or_admin,PERMISSIVE,{public},DELETE,((creator_user_id = current_voy_user_id()) OR is_admin()),null
+public,VoyJobs,VoyJobs_insert_creator,PERMISSIVE,{public},INSERT,null,((creator_user_id = current_voy_user_id()) OR is_admin())
+public,VoyJobs,VoyJobs_select_public_and_own,PERMISSIVE,{public},SELECT,"((status = 'OPEN'::""VoyJobStatus"") OR (creator_user_id = current_voy_user_id()) OR is_admin())",null
+public,VoyJobs,VoyJobs_update_creator_or_admin,PERMISSIVE,{public},UPDATE,((creator_user_id = current_voy_user_id()) OR is_admin()),((creator_user_id = current_voy_user_id()) OR is_admin())
+public,VoyJobs,voyjobs_insert_employer,PERMISSIVE,{authenticated},INSERT,null,((creator_user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyJobs,voyjobs_owner_or_assignee,PERMISSIVE,{authenticated},SELECT,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (creator_user_id = auth.uid())),null
+public,VoyJobs,voyjobs_update_owner,PERMISSIVE,{authenticated},UPDATE,((creator_user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text)),((creator_user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyMessages,VoyMessages_delete_service,PERMISSIVE,{public},DELETE,(auth.role() = 'service_role'::text),null
+public,VoyMessages,VoyMessages_insert,PERMISSIVE,{public},INSERT,null,"(EXISTS ( SELECT 1
+   FROM ""VoyChats"" c
+  WHERE ((c.id = ""VoyMessages"".chat_id) AND ((auth.uid() = c.company_user_id) OR (auth.uid() = c.helper_user_id)) AND (c.status = 'ACTIVE'::text))))"
+public,VoyMessages,VoyMessages_insert_in_chat,PERMISSIVE,{public},INSERT,null,"((EXISTS ( SELECT 1
+   FROM (""VoyChats"" c
+     JOIN ""VoyUsers"" u ON (((u.id = c.company_user_id) OR (u.id = c.helper_user_id))))
+  WHERE ((c.id = ""VoyMessages"".chat_id) AND (u.auth_user_id = auth.uid())))) AND (sender_user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())
+ LIMIT 1)))"
+public,VoyMessages,VoyMessages_select,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM ""VoyChats"" c
+  WHERE ((c.id = ""VoyMessages"".chat_id) AND ((auth.uid() = c.company_user_id) OR (auth.uid() = c.helper_user_id)))))",null
+public,VoyMessages,VoyMessages_select_in_chat,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM (""VoyChats"" c
+     JOIN ""VoyUsers"" u ON (((u.id = c.company_user_id) OR (u.id = c.helper_user_id))))
+  WHERE ((c.id = ""VoyMessages"".chat_id) AND (u.auth_user_id = auth.uid()))))",null
+public,VoyMessages,VoyMessages_update_own,PERMISSIVE,{public},UPDATE,"(sender_user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())
+ LIMIT 1))","(sender_user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())
+ LIMIT 1))"
+public,VoyMessages,VoyMessages_update_service,PERMISSIVE,{public},UPDATE,(auth.role() = 'service_role'::text),(auth.role() = 'service_role'::text)
+public,VoyMicroTasks,Public can read microtasks,PERMISSIVE,{public},SELECT,true,null
+public,VoyMicroTasks,voymicrotasks_admin_write,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyMicroTasks,voymicrotasks_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,true,null
+public,VoyNotifications,System can insert notifications,PERMISSIVE,{authenticated},INSERT,null,true
+public,VoyNotifications,Users can update own notifications,PERMISSIVE,{authenticated},UPDATE,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))","(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))"
+public,VoyNotifications,Users can view own notifications,PERMISSIVE,{authenticated},SELECT,"(user_id IN ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyNotifications,VoyNotifications_insert_any_logged_in,PERMISSIVE,{public},INSERT,null,((current_voy_user_id() IS NOT NULL) OR is_admin())
+public,VoyNotifications,VoyNotifications_insert_system,PERMISSIVE,{public},INSERT,null,(is_admin() OR (current_voy_user_id() = user_id))
+public,VoyNotifications,VoyNotifications_select_own,PERMISSIVE,{public},SELECT,((current_voy_user_id() = user_id) OR is_admin()),null
+public,VoyNotifications,VoyNotifications_update_own,PERMISSIVE,{public},UPDATE,((current_voy_user_id() = user_id) OR is_admin()),((current_voy_user_id() = user_id) OR is_admin())
+public,VoyNotifications,voynotifications_select_own,PERMISSIVE,{authenticated},SELECT,((user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text)),null
+public,VoyNotifications,voynotifications_write_own,PERMISSIVE,{authenticated},ALL,((user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text)),((user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyPayments,Allow payment inserts,PERMISSIVE,{public},INSERT,null,true
+public,VoyPayments,Service role can insert payments,PERMISSIVE,{public},INSERT,null,true
+public,VoyPayments,Service role can update payments,PERMISSIVE,{public},UPDATE,true,null
+public,VoyPayments,Users can view their own payments,PERMISSIVE,{public},SELECT,(auth.uid() = user_id),null
+public,VoyPayments,voypayments_insert_employer,PERMISSIVE,{authenticated},INSERT,null,((user_id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyPayments,voypayments_update_owner,PERMISSIVE,{authenticated},UPDATE,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()))
+public,VoyPayments,voypayments_view,PERMISSIVE,{authenticated},SELECT,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyPayments"".job_id) AND (j.creator_user_id = auth.uid())))) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobApplications"" a
+  WHERE ((a.id = ""VoyPayments"".application_id) AND (a.helper_user_id = auth.uid())))))",null
+public,VoyReferralCodes,VoyReferralCodes_select_own,PERMISSIVE,{public},SELECT,(owner_user_id = voy_current_user_id()),null
+public,VoyReferralCodes,voyrefcodes_owner,PERMISSIVE,{authenticated},ALL,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (owner_user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (owner_user_id = auth.uid()))
+public,VoyReferralEvents,VoyReferralEvents_select_related,PERMISSIVE,{public},SELECT,((referrer_user_id = voy_current_user_id()) OR (referred_user_id = voy_current_user_id())),null
+public,VoyReferralEvents,voyrefevents_owner,PERMISSIVE,{authenticated},SELECT,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (referrer_user_id = auth.uid()) OR (referred_user_id = auth.uid())),null
+public,VoyReviews,VoyReviews_insert_participant,PERMISSIVE,{public},INSERT,null,"((EXISTS ( SELECT 1
+   FROM ""VoyJobAssignments"" a
+  WHERE ((a.job_id = ""VoyReviews"".job_id) AND ((a.helper_user_id = current_voy_user_id()) OR (a.requester_user_id = current_voy_user_id()))))) OR is_admin())"
+public,VoyReviews,VoyReviews_select_all,PERMISSIVE,{public},SELECT,true,null
+public,VoyRewardCampaigns,voyrewardcampaigns_admin,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoyRewards,Rewards: user can select own,PERMISSIVE,{public},SELECT,"(user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyRewards,VoyRewards_select_own,PERMISSIVE,{public},SELECT,(user_id = voy_current_user_id()),null
+public,VoyRewards,voyrewards_owner,PERMISSIVE,{authenticated},ALL,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()))
+public,VoySectors,Public can read sectors,PERMISSIVE,{public},SELECT,true,null
+public,VoySectors,voysectors_admin_write,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'role'::text) = 'admin'::text),((auth.jwt() ->> 'role'::text) = 'admin'::text)
+public,VoySectors,voysectors_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,true,null
+public,VoyUsers,Allow authenticated users to insert their profile,PERMISSIVE,{authenticated},INSERT,null,(auth.uid() = auth_user_id)
+public,VoyUsers,Allow public read for specific fields,PERMISSIVE,{anon},SELECT,true,null
+public,VoyUsers,Allow users to read their own profile,PERMISSIVE,{authenticated},SELECT,(auth.uid() = auth_user_id),null
+public,VoyUsers,Allow users to update their own profile,PERMISSIVE,{authenticated},UPDATE,(auth.uid() = auth_user_id),(auth.uid() = auth_user_id)
+public,VoyUsers,VoyUsers_admin_all,PERMISSIVE,{public},ALL,is_admin(),is_admin()
+public,VoyUsers,VoyUsers_delete_admin,PERMISSIVE,{public},DELETE,is_admin(),null
+public,VoyUsers,VoyUsers_insert_any,PERMISSIVE,{public},INSERT,null,true
+public,VoyUsers,VoyUsers_select_own_or_admin,PERMISSIVE,{public},SELECT,((id = current_voy_user_id()) OR is_admin()),null
+public,VoyUsers,VoyUsers_select_self,PERMISSIVE,{public},SELECT,((auth.uid() = auth_user_id) OR is_admin()),null
+public,VoyUsers,VoyUsers_update_own_or_admin,PERMISSIVE,{public},UPDATE,((id = current_voy_user_id()) OR is_admin()),((id = current_voy_user_id()) OR is_admin())
+public,VoyUsers,VoyUsers_update_self,PERMISSIVE,{public},UPDATE,((auth.uid() = auth_user_id) OR is_admin()),((auth.uid() = auth_user_id) OR is_admin())
+public,VoyUsers,voyusers_insert_self,PERMISSIVE,{authenticated},INSERT,null,((id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyUsers,voyusers_select_own,PERMISSIVE,{authenticated},SELECT,((id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text)),null
+public,VoyUsers,voyusers_update_own,PERMISSIVE,{authenticated},UPDATE,((id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text)),((id = auth.uid()) OR ((auth.jwt() ->> 'role'::text) = 'admin'::text))
+public,VoyWalletLedger,Ledger: user can select own,PERMISSIVE,{public},SELECT,"(user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyWalletLedger,VoyWalletLedger_select_own,PERMISSIVE,{public},SELECT,(user_id = voy_current_user_id()),null
+public,VoyWalletLedger,voywalletledger_owner,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyWallets"" w
+  WHERE ((w.id = ""VoyWalletLedger"".wallet_id) AND (w.user_id = auth.uid())))))","(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyWallets"" w
+  WHERE ((w.id = ""VoyWalletLedger"".wallet_id) AND (w.user_id = auth.uid())))))"
+public,VoyWallets,VoyWallets_select_own,PERMISSIVE,{public},SELECT,(user_id = voy_current_user_id()),null
+public,VoyWallets,Wallets: user can select own,PERMISSIVE,{public},SELECT,"(user_id = ( SELECT ""VoyUsers"".id
+   FROM ""VoyUsers""
+  WHERE (""VoyUsers"".auth_user_id = auth.uid())))",null
+public,VoyWallets,voywallets_owner,PERMISSIVE,{authenticated},ALL,(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid())),(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (user_id = auth.uid()))
+public,VoyWorkContracts,VoyWorkContracts_delete_owner_or_admin,PERMISSIVE,{public},DELETE,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = current_voy_user_id())))))",null
+public,VoyWorkContracts,VoyWorkContracts_insert_owner_or_admin,PERMISSIVE,{public},INSERT,null,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyWorkContracts,VoyWorkContracts_select_related,PERMISSIVE,{public},SELECT,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = current_voy_user_id())))))",null
+public,VoyWorkContracts,VoyWorkContracts_update_owner_or_admin,PERMISSIVE,{public},UPDATE,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = current_voy_user_id())))))","(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyWorkContracts,voycontracts_owner,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = auth.uid())))) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobAssignments"" a
+  WHERE ((a.job_id = ""VoyWorkContracts"".job_id) AND (a.helper_user_id = auth.uid())))))","(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkContracts"".job_id) AND (j.creator_user_id = auth.uid())))))"
+public,VoyWorkSchedules,VoyWorkSchedules_insert_update_delete_owner,PERMISSIVE,{public},ALL,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkSchedules"".job_id) AND (j.creator_user_id = current_voy_user_id())))))","(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkSchedules"".job_id) AND (j.creator_user_id = current_voy_user_id())))))"
+public,VoyWorkSchedules,VoyWorkSchedules_select_related,PERMISSIVE,{public},SELECT,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkSchedules"".job_id) AND (j.creator_user_id = current_voy_user_id())))))",null
+public,VoyWorkSchedules,voyschedules_owner,PERMISSIVE,{authenticated},ALL,"(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkSchedules"".job_id) AND (j.creator_user_id = auth.uid())))) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobAssignments"" a
+  WHERE ((a.job_id = ""VoyWorkSchedules"".job_id) AND (a.helper_user_id = auth.uid())))))","(((auth.jwt() ->> 'role'::text) = 'admin'::text) OR (EXISTS ( SELECT 1
+   FROM ""VoyJobs"" j
+  WHERE ((j.id = ""VoyWorkSchedules"".job_id) AND (j.creator_user_id = auth.uid())))))"
+voy_marketplace,buyer_profiles,buyer_profiles_admin_all,PERMISSIVE,{public},ALL,voy_marketplace.is_admin(),voy_marketplace.is_admin()
+voy_marketplace,buyer_profiles,buyer_profiles_insert_own,PERMISSIVE,{public},INSERT,null,(user_id = voy_marketplace.current_voy_user_id())
+voy_marketplace,buyer_profiles,buyer_profiles_select_own,PERMISSIVE,{public},SELECT,(user_id = voy_marketplace.current_voy_user_id()),null
+voy_marketplace,buyer_profiles,buyer_profiles_update_own,PERMISSIVE,{public},UPDATE,(user_id = voy_marketplace.current_voy_user_id()),(user_id = voy_marketplace.current_voy_user_id())
+voy_marketplace,categories,categories_admin_write,PERMISSIVE,{public},ALL,voy_marketplace.is_admin(),voy_marketplace.is_admin()
+voy_marketplace,categories,categories_public_read,PERMISSIVE,{public},SELECT,true,null
+voy_marketplace,credit_notes,credit_notes_read_related,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = credit_notes.return_id) AND ((o.buyer_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(o.seller_id)))))",null
+voy_marketplace,credit_notes,credit_notes_write_seller_admin,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = credit_notes.return_id) AND voy_marketplace.is_seller_member(o.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = credit_notes.return_id) AND voy_marketplace.is_seller_member(o.seller_id)))))"
+voy_marketplace,inventory,inventory_seller_manage,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = inventory.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = inventory.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))"
+voy_marketplace,invoices,invoices_read_related,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = invoices.order_id) AND ((o.buyer_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(o.seller_id)))))",null
+voy_marketplace,invoices,invoices_write_seller_or_admin,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = invoices.order_id) AND voy_marketplace.is_seller_member(o.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = invoices.order_id) AND voy_marketplace.is_seller_member(o.seller_id)))))"
+voy_marketplace,order_items,order_items_buyer_delete_draft,PERMISSIVE,{public},DELETE,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = order_items.order_id) AND (o.buyer_user_id = voy_marketplace.current_voy_user_id()) AND (o.status = 'draft'::voy_marketplace.order_status))))",null
+voy_marketplace,order_items,order_items_buyer_insert_draft,PERMISSIVE,{public},INSERT,null,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = order_items.order_id) AND (o.buyer_user_id = voy_marketplace.current_voy_user_id()) AND (o.status = 'draft'::voy_marketplace.order_status))))"
+voy_marketplace,order_items,order_items_buyer_read,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = order_items.order_id) AND (o.buyer_user_id = voy_marketplace.current_voy_user_id()))))",null
+voy_marketplace,order_items,order_items_seller_read,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = order_items.order_id) AND (voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(o.seller_id)))))",null
+voy_marketplace,orders,orders_buyer_insert,PERMISSIVE,{public},INSERT,null,(buyer_user_id = voy_marketplace.current_voy_user_id())
+voy_marketplace,orders,orders_buyer_read_own,PERMISSIVE,{public},SELECT,(buyer_user_id = voy_marketplace.current_voy_user_id()),null
+voy_marketplace,orders,orders_buyer_update_draft,PERMISSIVE,{public},UPDATE,"((buyer_user_id = voy_marketplace.current_voy_user_id()) AND (status = ANY (ARRAY['draft'::voy_marketplace.order_status, 'pending_payment'::voy_marketplace.order_status])))","((buyer_user_id = voy_marketplace.current_voy_user_id()) AND (status = ANY (ARRAY['draft'::voy_marketplace.order_status, 'pending_payment'::voy_marketplace.order_status])))"
+voy_marketplace,orders,orders_seller_read,PERMISSIVE,{public},SELECT,(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id)),null
+voy_marketplace,orders,orders_seller_update_status,PERMISSIVE,{public},UPDATE,(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id)),(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id))
+voy_marketplace,product_images,product_images_public_read,PERMISSIVE,{public},SELECT,true,null
+voy_marketplace,product_images,product_images_seller_manage,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = product_images.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = product_images.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))"
+voy_marketplace,product_prices,product_prices_seller_manage,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = product_prices.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.products p
+  WHERE ((p.id = product_prices.product_id) AND voy_marketplace.is_seller_member(p.seller_id)))))"
+voy_marketplace,products,products_public_read_active,PERMISSIVE,{public},SELECT,(is_active = true),null
+voy_marketplace,products,products_seller_manage,PERMISSIVE,{public},ALL,(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id)),(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id))
+voy_marketplace,promotion_products,promotion_products_seller_manage,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.promotions pr
+  WHERE ((pr.id = promotion_products.promotion_id) AND voy_marketplace.is_seller_member(pr.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.promotions pr
+  WHERE ((pr.id = promotion_products.promotion_id) AND voy_marketplace.is_seller_member(pr.seller_id)))))"
+voy_marketplace,promotions,promotions_seller_manage,PERMISSIVE,{public},ALL,(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id)),(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id))
+voy_marketplace,return_items,return_items_read_related,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = return_items.return_id) AND ((o.buyer_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(o.seller_id)))))",null
+voy_marketplace,return_items,return_items_write_seller_admin,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = return_items.return_id) AND voy_marketplace.is_seller_member(o.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM (voy_marketplace.returns r
+     JOIN voy_marketplace.orders o ON ((o.id = r.order_id)))
+  WHERE ((r.id = return_items.return_id) AND voy_marketplace.is_seller_member(o.seller_id)))))"
+voy_marketplace,returns,returns_buyer_insert,PERMISSIVE,{public},INSERT,null,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = returns.order_id) AND (o.buyer_user_id = voy_marketplace.current_voy_user_id()))))"
+voy_marketplace,returns,returns_read_related,PERMISSIVE,{public},SELECT,"(EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = returns.order_id) AND ((o.buyer_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(o.seller_id)))))",null
+voy_marketplace,returns,returns_seller_update,PERMISSIVE,{public},UPDATE,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = returns.order_id) AND voy_marketplace.is_seller_member(o.seller_id)))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.orders o
+  WHERE ((o.id = returns.order_id) AND voy_marketplace.is_seller_member(o.seller_id)))))"
+voy_marketplace,seller_plans,seller_plans_admin_write,PERMISSIVE,{public},ALL,voy_marketplace.is_admin(),voy_marketplace.is_admin()
+voy_marketplace,seller_plans,seller_plans_public_read,PERMISSIVE,{public},SELECT,(is_active = true),null
+voy_marketplace,seller_profiles,seller_profiles_insert_owner,PERMISSIVE,{public},INSERT,null,((owner_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin())
+voy_marketplace,seller_profiles,seller_profiles_select_member,PERMISSIVE,{public},SELECT,"(voy_marketplace.is_admin() OR (owner_user_id = voy_marketplace.current_voy_user_id()) OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.seller_staff ss
+  WHERE ((ss.seller_id = seller_profiles.id) AND (ss.user_id = voy_marketplace.current_voy_user_id())))))",null
+voy_marketplace,seller_profiles,seller_profiles_update_owner,PERMISSIVE,{public},UPDATE,((owner_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin()),((owner_user_id = voy_marketplace.current_voy_user_id()) OR voy_marketplace.is_admin())
+voy_marketplace,seller_staff,seller_staff_manage_owner,PERMISSIVE,{public},ALL,"(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.seller_profiles sp
+  WHERE ((sp.id = seller_staff.seller_id) AND (sp.owner_user_id = voy_marketplace.current_voy_user_id())))))","(voy_marketplace.is_admin() OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.seller_profiles sp
+  WHERE ((sp.id = seller_staff.seller_id) AND (sp.owner_user_id = voy_marketplace.current_voy_user_id())))))"
+voy_marketplace,seller_staff,seller_staff_select_member,PERMISSIVE,{public},SELECT,"(voy_marketplace.is_admin() OR (user_id = voy_marketplace.current_voy_user_id()) OR (EXISTS ( SELECT 1
+   FROM voy_marketplace.seller_profiles sp
+  WHERE ((sp.id = seller_staff.seller_id) AND (sp.owner_user_id = voy_marketplace.current_voy_user_id())))))",null
+voy_marketplace,seller_subscriptions,seller_subscriptions_read_seller,PERMISSIVE,{public},SELECT,(voy_marketplace.is_admin() OR voy_marketplace.is_seller_member(seller_id)),null
+voy_marketplace,seller_subscriptions,seller_subscriptions_write_admin,PERMISSIVE,{public},ALL,voy_marketplace.is_admin(),voy_marketplace.is_admin()

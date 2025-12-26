@@ -1,0 +1,346 @@
+table_schema,table_name,column_name,data_type,is_nullable,column_default
+public,VoyAdminLogs,id,uuid,NO,gen_random_uuid()
+public,VoyAdminLogs,admin_user_id,uuid,YES,null
+public,VoyAdminLogs,action,text,NO,null
+public,VoyAdminLogs,details,jsonb,YES,null
+public,VoyAdminLogs,created_at,timestamp with time zone,NO,now()
+public,VoyChats,id,uuid,NO,gen_random_uuid()
+public,VoyChats,job_id,uuid,NO,null
+public,VoyChats,company_user_id,uuid,NO,null
+public,VoyChats,helper_user_id,uuid,NO,null
+public,VoyChats,created_at,timestamp with time zone,YES,now()
+public,VoyChats,updated_at,timestamp with time zone,YES,now()
+public,VoyChats,last_message_at,timestamp with time zone,YES,now()
+public,VoyChats,status,text,NO,'ACTIVE'::text
+public,VoyChats,readonly_at,timestamp with time zone,YES,null
+public,VoyChats,purge_after,timestamp with time zone,YES,null
+public,VoyChats,last_message_preview,text,YES,null
+public,VoyCompanies,id,uuid,NO,gen_random_uuid()
+public,VoyCompanies,owner_user_id,uuid,NO,null
+public,VoyCompanies,name,text,NO,null
+public,VoyCompanies,cif,text,YES,null
+public,VoyCompanies,sector,text,YES,null
+public,VoyCompanies,phone,text,YES,null
+public,VoyCompanies,email,text,YES,null
+public,VoyCompanies,website,text,YES,null
+public,VoyCompanies,address,text,YES,null
+public,VoyCompanies,city,text,YES,'Madrid'::text
+public,VoyCompanies,district,text,YES,null
+public,VoyCompanies,neighborhood,text,YES,null
+public,VoyCompanies,created_at,timestamp with time zone,NO,now()
+public,VoyCompanies,updated_at,timestamp with time zone,NO,now()
+public,VoyCompanySubscriptions,id,uuid,NO,gen_random_uuid()
+public,VoyCompanySubscriptions,company_user_id,uuid,NO,null
+public,VoyCompanySubscriptions,subscription_type,text,NO,null
+public,VoyCompanySubscriptions,amount,numeric,NO,null
+public,VoyCompanySubscriptions,currency,text,YES,'EUR'::text
+public,VoyCompanySubscriptions,status,text,NO,'pending'::text
+public,VoyCompanySubscriptions,start_date,timestamp with time zone,YES,null
+public,VoyCompanySubscriptions,end_date,timestamp with time zone,YES,null
+public,VoyCompanySubscriptions,created_at,timestamp with time zone,YES,now()
+public,VoyCompanySubscriptions,updated_at,timestamp with time zone,YES,now()
+public,VoyCompanySubscriptions,stripe_payment_intent_id,text,YES,null
+public,VoyCompanySubscriptions,stripe_subscription_id,text,YES,null
+public,VoyCompanySubscriptions,metadata,jsonb,YES,'{}'::jsonb
+public,VoyEmergencyAlertResponses,id,uuid,NO,uuid_generate_v4()
+public,VoyEmergencyAlertResponses,alert_id,uuid,NO,null
+public,VoyEmergencyAlertResponses,contact_id,uuid,YES,null
+public,VoyEmergencyAlertResponses,responder_name,text,YES,null
+public,VoyEmergencyAlertResponses,responder_phone,text,YES,null
+public,VoyEmergencyAlertResponses,response_type,text,NO,null
+public,VoyEmergencyAlertResponses,response_time,timestamp with time zone,YES,now()
+public,VoyEmergencyAlertResponses,notes,text,YES,null
+public,VoyEmergencyAlertResponses,location,text,YES,null
+public,VoyEmergencyAlertResponses,latitude,numeric,YES,null
+public,VoyEmergencyAlertResponses,longitude,numeric,YES,null
+public,VoyEmergencyAlerts,id,uuid,NO,uuid_generate_v4()
+public,VoyEmergencyAlerts,user_id,uuid,NO,null
+public,VoyEmergencyAlerts,alert_type,text,NO,null
+public,VoyEmergencyAlerts,location,text,YES,null
+public,VoyEmergencyAlerts,latitude,numeric,YES,null
+public,VoyEmergencyAlerts,longitude,numeric,YES,null
+public,VoyEmergencyAlerts,status,text,NO,'ACTIVE'::text
+public,VoyEmergencyAlerts,notes,text,YES,null
+public,VoyEmergencyAlerts,created_at,timestamp with time zone,YES,now()
+public,VoyEmergencyAlerts,resolved_at,timestamp with time zone,YES,null
+public,VoyEmergencyAlerts,resolved_by,uuid,YES,null
+public,VoyEmergencyContacts,id,uuid,NO,uuid_generate_v4()
+public,VoyEmergencyContacts,user_id,uuid,NO,null
+public,VoyEmergencyContacts,name,text,NO,null
+public,VoyEmergencyContacts,phone,text,NO,null
+public,VoyEmergencyContacts,relationship,text,YES,null
+public,VoyEmergencyContacts,created_at,timestamp with time zone,YES,now()
+public,VoyEmergencyContacts,updated_at,timestamp with time zone,YES,now()
+public,VoyHelpers,id,uuid,NO,gen_random_uuid()
+public,VoyHelpers,user_id,uuid,NO,null
+public,VoyHelpers,bio,text,YES,null
+public,VoyHelpers,skills,ARRAY,YES,null
+public,VoyHelpers,min_hourly_rate,numeric,YES,null
+public,VoyHelpers,max_distance_km,numeric,YES,null
+public,VoyHelpers,rating_avg,numeric,YES,0
+public,VoyHelpers,rating_count,integer,YES,0
+public,VoyHelpers,created_at,timestamp with time zone,NO,now()
+public,VoyHelpers,updated_at,timestamp with time zone,NO,now()
+public,VoyInsurancePlans,id,uuid,NO,gen_random_uuid()
+public,VoyInsurancePlans,policy_id,uuid,NO,null
+public,VoyInsurancePlans,risk_level,smallint,NO,null
+public,VoyInsurancePlans,name,text,NO,null
+public,VoyInsurancePlans,price_per_job,numeric,NO,0
+public,VoyInsurancePlans,price_per_hour,numeric,YES,null
+public,VoyInsurancePlans,coverage_amount,numeric,YES,null
+public,VoyInsurancePlans,deductible,numeric,YES,null
+public,VoyInsurancePlans,coverage_summary,text,YES,null
+public,VoyInsurancePlans,exclusions,jsonb,YES,'{}'::jsonb
+public,VoyInsurancePlans,is_active,boolean,NO,true
+public,VoyInsurancePlans,created_at,timestamp with time zone,NO,now()
+public,VoyInsurancePlans,updated_at,timestamp with time zone,NO,now()
+public,VoyInsurancePolicies,id,uuid,NO,gen_random_uuid()
+public,VoyInsurancePolicies,provider_id,uuid,NO,null
+public,VoyInsurancePolicies,policy_number,text,NO,null
+public,VoyInsurancePolicies,status,text,NO,'ACTIVE'::text
+public,VoyInsurancePolicies,start_date,date,NO,null
+public,VoyInsurancePolicies,end_date,date,NO,null
+public,VoyInsurancePolicies,territory,text,YES,'España'::text
+public,VoyInsurancePolicies,claims_instructions,text,YES,null
+public,VoyInsurancePolicies,policy_document_url,text,YES,null
+public,VoyInsurancePolicies,metadata,jsonb,YES,'{}'::jsonb
+public,VoyInsurancePolicies,created_at,timestamp with time zone,NO,now()
+public,VoyInsurancePolicies,updated_at,timestamp with time zone,NO,now()
+public,VoyInsuranceProviders,id,uuid,NO,gen_random_uuid()
+public,VoyInsuranceProviders,name,text,NO,null
+public,VoyInsuranceProviders,legal_name,text,YES,null
+public,VoyInsuranceProviders,cif,text,YES,null
+public,VoyInsuranceProviders,website,text,YES,null
+public,VoyInsuranceProviders,claims_phone,text,YES,null
+public,VoyInsuranceProviders,claims_email,text,YES,null
+public,VoyInsuranceProviders,admin_contact_name,text,YES,null
+public,VoyInsuranceProviders,admin_contact_phone,text,YES,null
+public,VoyInsuranceProviders,admin_contact_email,text,YES,null
+public,VoyInsuranceProviders,broker_name,text,YES,null
+public,VoyInsuranceProviders,broker_phone,text,YES,null
+public,VoyInsuranceProviders,broker_email,text,YES,null
+public,VoyInsuranceProviders,notes,text,YES,null
+public,VoyInsuranceProviders,documents_url,text,YES,null
+public,VoyInsuranceProviders,created_at,timestamp with time zone,NO,now()
+public,VoyInsuranceProviders,updated_at,timestamp with time zone,NO,now()
+public,VoyInvoices,id,uuid,NO,gen_random_uuid()
+public,VoyInvoices,assignment_id,uuid,YES,null
+public,VoyInvoices,issuer_user_id,uuid,NO,null
+public,VoyInvoices,payer_user_id,uuid,NO,null
+public,VoyInvoices,amount,numeric,NO,null
+public,VoyInvoices,currency,text,NO,'EUR'::text
+public,VoyInvoices,status,USER-DEFINED,NO,"'DRAFT'::""VoyInvoiceStatus"""
+public,VoyInvoices,issued_at,timestamp with time zone,YES,now()
+public,VoyInvoices,paid_at,timestamp with time zone,YES,null
+public,VoyInvoices,description,text,YES,null
+public,VoyInvoices,created_at,timestamp with time zone,NO,now()
+public,VoyInvoices,updated_at,timestamp with time zone,NO,now()
+public,VoyJobApplications,id,uuid,NO,gen_random_uuid()
+public,VoyJobApplications,job_id,uuid,NO,null
+public,VoyJobApplications,helper_user_id,uuid,NO,null
+public,VoyJobApplications,message,text,YES,null
+public,VoyJobApplications,proposed_price,numeric,YES,null
+public,VoyJobApplications,proposed_hourly_rate,numeric,YES,null
+public,VoyJobApplications,status,USER-DEFINED,NO,"'PENDING'::""VoyApplicationStatus"""
+public,VoyJobApplications,created_at,timestamp with time zone,NO,now()
+public,VoyJobApplications,updated_at,timestamp with time zone,NO,now()
+public,VoyJobAssignments,id,uuid,NO,gen_random_uuid()
+public,VoyJobAssignments,job_id,uuid,NO,null
+public,VoyJobAssignments,helper_user_id,uuid,NO,null
+public,VoyJobAssignments,requester_user_id,uuid,NO,null
+public,VoyJobAssignments,agreed_price,numeric,YES,null
+public,VoyJobAssignments,agreed_hourly_rate,numeric,YES,null
+public,VoyJobAssignments,notes,text,YES,null
+public,VoyJobAssignments,status,USER-DEFINED,NO,"'ASSIGNED'::""VoyJobStatus"""
+public,VoyJobAssignments,started_at,timestamp with time zone,YES,null
+public,VoyJobAssignments,completed_at,timestamp with time zone,YES,null
+public,VoyJobAssignments,created_at,timestamp with time zone,NO,now()
+public,VoyJobAssignments,updated_at,timestamp with time zone,NO,now()
+public,VoyJobInsurance,id,uuid,NO,gen_random_uuid()
+public,VoyJobInsurance,job_id,uuid,NO,null
+public,VoyJobInsurance,policy_id,uuid,NO,null
+public,VoyJobInsurance,plan_id,uuid,NO,null
+public,VoyJobInsurance,risk_level,smallint,NO,null
+public,VoyJobInsurance,insurance_fee,numeric,NO,0
+public,VoyJobInsurance,currency,text,NO,'EUR'::text
+public,VoyJobInsurance,status,text,NO,'APPLIED'::text
+public,VoyJobInsurance,certificate_ref,text,YES,null
+public,VoyJobInsurance,notes,text,YES,null
+public,VoyJobInsurance,metadata,jsonb,YES,'{}'::jsonb
+public,VoyJobInsurance,created_at,timestamp with time zone,NO,now()
+public,VoyJobInsurance,updated_at,timestamp with time zone,NO,now()
+public,VoyJobs,id,uuid,NO,gen_random_uuid()
+public,VoyJobs,creator_user_id,uuid,NO,null
+public,VoyJobs,company_id,uuid,YES,null
+public,VoyJobs,title,text,NO,null
+public,VoyJobs,description,text,YES,null
+public,VoyJobs,category,text,NO,null
+public,VoyJobs,job_type,USER-DEFINED,NO,"'ONE_OFF'::""VoyJobType"""
+public,VoyJobs,price_fixed,numeric,YES,null
+public,VoyJobs,price_hourly,numeric,YES,null
+public,VoyJobs,price_negotiable,boolean,NO,false
+public,VoyJobs,city,text,YES,'Madrid'::text
+public,VoyJobs,district,text,YES,null
+public,VoyJobs,neighborhood,text,YES,null
+public,VoyJobs,address_hint,text,YES,null
+public,VoyJobs,start_at,timestamp with time zone,YES,null
+public,VoyJobs,end_at,timestamp with time zone,YES,null
+public,VoyJobs,status,USER-DEFINED,NO,"'OPEN'::""VoyJobStatus"""
+public,VoyJobs,created_at,timestamp with time zone,NO,now()
+public,VoyJobs,updated_at,timestamp with time zone,NO,now()
+public,VoyJobs,microtask_id,text,YES,null
+public,VoyMessages,id,uuid,NO,gen_random_uuid()
+public,VoyMessages,chat_id,uuid,NO,null
+public,VoyMessages,sender_user_id,uuid,NO,null
+public,VoyMessages,content,text,YES,null
+public,VoyMessages,file_url,text,YES,null
+public,VoyMessages,file_name,text,YES,null
+public,VoyMessages,file_type,text,YES,null
+public,VoyMessages,created_at,timestamp with time zone,YES,now()
+public,VoyMessages,updated_at,timestamp with time zone,YES,now()
+public,VoyMessages,read_at,timestamp with time zone,YES,null
+public,VoyMicroTasks,id,text,NO,null
+public,VoyMicroTasks,sector_id,text,NO,null
+public,VoyMicroTasks,name,text,NO,null
+public,VoyMicroTasks,created_at,timestamp with time zone,YES,now()
+public,VoyMicroTasks,risk_level,smallint,YES,null
+public,VoyNotifications,id,uuid,NO,gen_random_uuid()
+public,VoyNotifications,user_id,uuid,NO,null
+public,VoyNotifications,title,text,NO,null
+public,VoyNotifications,message,text,NO,null
+public,VoyNotifications,type,text,NO,null
+public,VoyNotifications,related_job_id,uuid,YES,null
+public,VoyNotifications,related_application_id,uuid,YES,null
+public,VoyNotifications,is_read,boolean,YES,false
+public,VoyNotifications,created_at,timestamp with time zone,YES,now()
+public,VoyPayments,id,uuid,NO,uuid_generate_v4()
+public,VoyPayments,user_id,uuid,NO,null
+public,VoyPayments,job_id,uuid,NO,null
+public,VoyPayments,application_id,uuid,NO,null
+public,VoyPayments,amount,numeric,NO,null
+public,VoyPayments,currency,character varying,YES,'EUR'::character varying
+public,VoyPayments,status,character varying,NO,'pending'::character varying
+public,VoyPayments,stripe_payment_intent_id,character varying,YES,null
+public,VoyPayments,stripe_charge_id,character varying,YES,null
+public,VoyPayments,payment_method,character varying,YES,null
+public,VoyPayments,error_message,text,YES,null
+public,VoyPayments,metadata,jsonb,YES,null
+public,VoyPayments,created_at,timestamp with time zone,YES,now()
+public,VoyPayments,updated_at,timestamp with time zone,YES,now()
+public,VoyPayments,description,text,YES,null
+public,VoyPayments,payment_type,character varying,YES,null
+public,VoyReferralCodes,id,uuid,NO,gen_random_uuid()
+public,VoyReferralCodes,code,text,NO,null
+public,VoyReferralCodes,owner_user_id,uuid,NO,null
+public,VoyReferralCodes,owner_role,text,NO,null
+public,VoyReferralCodes,created_at,timestamp with time zone,NO,now()
+public,VoyReferralEvents,id,uuid,NO,gen_random_uuid()
+public,VoyReferralEvents,referrer_user_id,uuid,NO,null
+public,VoyReferralEvents,referred_user_id,uuid,NO,null
+public,VoyReferralEvents,event_type,text,NO,null
+public,VoyReferralEvents,status,text,NO,'pending'::text
+public,VoyReferralEvents,metadata,jsonb,NO,'{}'::jsonb
+public,VoyReferralEvents,created_at,timestamp with time zone,NO,now()
+public,VoyReferralEvents,updated_at,timestamp with time zone,NO,now()
+public,VoyReviews,id,uuid,NO,gen_random_uuid()
+public,VoyReviews,job_id,uuid,NO,null
+public,VoyReviews,assignment_id,uuid,YES,null
+public,VoyReviews,reviewer_user_id,uuid,NO,null
+public,VoyReviews,reviewed_user_id,uuid,NO,null
+public,VoyReviews,review_type,USER-DEFINED,NO,"'HELPER'::""VoyReviewType"""
+public,VoyReviews,rating,integer,NO,null
+public,VoyReviews,comment,text,YES,null
+public,VoyReviews,created_at,timestamp with time zone,NO,now()
+public,VoyRewardCampaigns,id,uuid,NO,gen_random_uuid()
+public,VoyRewardCampaigns,name,text,NO,null
+public,VoyRewardCampaigns,city,text,NO,'Madrid'::text
+public,VoyRewardCampaigns,district,text,YES,null
+public,VoyRewardCampaigns,neighborhood,text,YES,null
+public,VoyRewardCampaigns,start_at,timestamp with time zone,NO,null
+public,VoyRewardCampaigns,end_at,timestamp with time zone,NO,null
+public,VoyRewardCampaigns,rules,jsonb,NO,'{}'::jsonb
+public,VoyRewardCampaigns,created_at,timestamp with time zone,NO,now()
+public,VoyRewards,id,uuid,NO,gen_random_uuid()
+public,VoyRewards,user_id,uuid,NO,null
+public,VoyRewards,reward_type,text,NO,null
+public,VoyRewards,amount,numeric,NO,null
+public,VoyRewards,currency,text,NO,'EUR'::text
+public,VoyRewards,status,text,NO,null
+public,VoyRewards,unlock_at,timestamp with time zone,YES,null
+public,VoyRewards,expires_at,timestamp with time zone,YES,null
+public,VoyRewards,source_table,text,YES,null
+public,VoyRewards,source_id,uuid,YES,null
+public,VoyRewards,metadata,jsonb,NO,'{}'::jsonb
+public,VoyRewards,created_at,timestamp with time zone,NO,now()
+public,VoyRewards,updated_at,timestamp with time zone,NO,now()
+public,VoySectors,id,text,NO,null
+public,VoySectors,name,text,NO,null
+public,VoySectors,emoji,text,NO,null
+public,VoySectors,description,text,NO,null
+public,VoySectors,is_primary,boolean,NO,true
+public,VoySectors,created_at,timestamp with time zone,YES,now()
+public,VoySectors,display_order,integer,YES,null
+public,VoySectors,risk_level,smallint,YES,null
+public,VoyUsers,id,uuid,NO,gen_random_uuid()
+public,VoyUsers,auth_user_id,uuid,NO,null
+public,VoyUsers,role,USER-DEFINED,NO,"'PARTICULAR'::""VoyUserRole"""
+public,VoyUsers,full_name,text,NO,null
+public,VoyUsers,email,text,NO,null
+public,VoyUsers,phone,text,YES,null
+public,VoyUsers,birth_year,integer,YES,null
+public,VoyUsers,is_active,boolean,NO,true
+public,VoyUsers,city,text,YES,'Madrid'::text
+public,VoyUsers,district,text,YES,null
+public,VoyUsers,neighborhood,text,YES,null
+public,VoyUsers,created_at,timestamp with time zone,NO,now()
+public,VoyUsers,updated_at,timestamp with time zone,NO,now()
+public,VoyUsers,company_sector,text,YES,null
+public,VoyUsers,document_type,character varying,YES,'NIF'::character varying
+public,VoyUsers,document_number,character varying,YES,null
+public,VoyUsers,address,text,YES,null
+public,VoyUsers,postal_code,character varying,YES,null
+public,VoyUsers,province,character varying,YES,null
+public,VoyUsers,country,character varying,YES,'España'::character varying
+public,VoyUsers,document_photo_url,text,YES,null
+public,VoyUsers,selfie_photo_url,text,YES,null
+public,VoyUsers,verification_document,text,YES,null
+public,VoyUsers,verification_status,text,YES,null
+public,VoyUsers,verification_type,text,YES,null
+public,VoyUsers,verification_requested_at,timestamp with time zone,YES,null
+public,VoyWalletLedger,id,uuid,NO,gen_random_uuid()
+public,VoyWalletLedger,wallet_id,uuid,NO,null
+public,VoyWalletLedger,user_id,uuid,NO,null
+public,VoyWalletLedger,amount,numeric,NO,null
+public,VoyWalletLedger,direction,text,NO,null
+public,VoyWalletLedger,reason_code,text,NO,null
+public,VoyWalletLedger,reward_id,uuid,YES,null
+public,VoyWalletLedger,reference_table,text,YES,null
+public,VoyWalletLedger,reference_id,uuid,YES,null
+public,VoyWalletLedger,metadata,jsonb,NO,'{}'::jsonb
+public,VoyWalletLedger,created_at,timestamp with time zone,NO,now()
+public,VoyWallets,id,uuid,NO,gen_random_uuid()
+public,VoyWallets,user_id,uuid,NO,null
+public,VoyWallets,balance,numeric,NO,0
+public,VoyWallets,currency,text,NO,'EUR'::text
+public,VoyWallets,created_at,timestamp with time zone,NO,now()
+public,VoyWallets,updated_at,timestamp with time zone,NO,now()
+public,VoyWorkContracts,id,uuid,NO,gen_random_uuid()
+public,VoyWorkContracts,job_id,uuid,NO,null
+public,VoyWorkContracts,contract_type,text,NO,null
+public,VoyWorkContracts,monthly_salary,numeric,YES,null
+public,VoyWorkContracts,social_security,boolean,YES,false
+public,VoyWorkContracts,union_required,boolean,YES,false
+public,VoyWorkContracts,notes,text,YES,null
+public,VoyWorkContracts,contract_document_url,text,YES,null
+public,VoyWorkContracts,created_at,timestamp with time zone,YES,now()
+public,VoyWorkContracts,updated_at,timestamp with time zone,YES,now()
+public,VoyWorkSchedules,id,uuid,NO,gen_random_uuid()
+public,VoyWorkSchedules,job_id,uuid,NO,null
+public,VoyWorkSchedules,period_type,text,NO,null
+public,VoyWorkSchedules,day_of_week,ARRAY,YES,null
+public,VoyWorkSchedules,start_time,time without time zone,YES,null
+public,VoyWorkSchedules,end_time,time without time zone,YES,null
+public,VoyWorkSchedules,start_date,date,YES,null
+public,VoyWorkSchedules,end_date,date,YES,null
+public,VoyWorkSchedules,created_at,timestamp with time zone,YES,now()
+public,VoyWorkSchedules,updated_at,timestamp with time zone,YES,now()

@@ -1,0 +1,146 @@
+table_schema,table_name,column_name,data_type,is_nullable,column_default
+voy_marketplace,buyer_profiles,user_id,uuid,NO,null
+voy_marketplace,buyer_profiles,buyer_type,USER-DEFINED,NO,'PARTICULAR'::voy_marketplace.buyer_type
+voy_marketplace,buyer_profiles,is_verified,boolean,NO,false
+voy_marketplace,buyer_profiles,verified_at,timestamp with time zone,YES,null
+voy_marketplace,buyer_profiles,business_name,text,YES,null
+voy_marketplace,buyer_profiles,tax_id,text,YES,null
+voy_marketplace,buyer_profiles,billing_address,text,YES,null
+voy_marketplace,buyer_profiles,billing_city,text,YES,null
+voy_marketplace,buyer_profiles,billing_postcode,text,YES,null
+voy_marketplace,buyer_profiles,billing_province,text,YES,null
+voy_marketplace,buyer_profiles,billing_country,text,YES,'España'::text
+voy_marketplace,buyer_profiles,sector,text,YES,null
+voy_marketplace,buyer_profiles,notes,text,YES,null
+voy_marketplace,buyer_profiles,created_at,timestamp with time zone,NO,now()
+voy_marketplace,buyer_profiles,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,categories,id,uuid,NO,gen_random_uuid()
+voy_marketplace,categories,name,text,NO,null
+voy_marketplace,categories,parent_id,uuid,YES,null
+voy_marketplace,categories,created_at,timestamp with time zone,NO,now()
+voy_marketplace,categories,slug,text,YES,null
+voy_marketplace,categories,is_active,boolean,NO,true
+voy_marketplace,categories,sort_order,integer,NO,0
+voy_marketplace,categories,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,credit_notes,id,uuid,NO,gen_random_uuid()
+voy_marketplace,credit_notes,return_id,uuid,NO,null
+voy_marketplace,credit_notes,credit_note_number,text,NO,null
+voy_marketplace,credit_notes,issued_at,timestamp with time zone,NO,now()
+voy_marketplace,credit_notes,pdf_url,text,YES,null
+voy_marketplace,credit_notes,amount,numeric,NO,null
+voy_marketplace,inventory,product_id,uuid,NO,null
+voy_marketplace,inventory,stock,integer,NO,0
+voy_marketplace,inventory,reserved,integer,NO,0
+voy_marketplace,inventory,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,invoices,id,uuid,NO,gen_random_uuid()
+voy_marketplace,invoices,order_id,uuid,NO,null
+voy_marketplace,invoices,invoice_number,text,NO,null
+voy_marketplace,invoices,issued_at,timestamp with time zone,NO,now()
+voy_marketplace,invoices,pdf_url,text,YES,null
+voy_marketplace,invoices,total,numeric,NO,null
+voy_marketplace,order_items,id,uuid,NO,gen_random_uuid()
+voy_marketplace,order_items,order_id,uuid,NO,null
+voy_marketplace,order_items,product_id,uuid,NO,null
+voy_marketplace,order_items,title_snapshot,text,NO,null
+voy_marketplace,order_items,unit_snapshot,text,NO,null
+voy_marketplace,order_items,price_channel_snapshot,text,NO,null
+voy_marketplace,order_items,unit_price_snapshot,numeric,NO,null
+voy_marketplace,order_items,qty,integer,NO,1
+voy_marketplace,order_items,vat_rate_snapshot,numeric,NO,0.21
+voy_marketplace,order_items,line_total,numeric,NO,null
+voy_marketplace,orders,id,uuid,NO,gen_random_uuid()
+voy_marketplace,orders,buyer_user_id,uuid,NO,null
+voy_marketplace,orders,seller_id,uuid,NO,null
+voy_marketplace,orders,buyer_type_snapshot,text,NO,null
+voy_marketplace,orders,status,USER-DEFINED,NO,'draft'::voy_marketplace.order_status
+voy_marketplace,orders,subtotal,numeric,NO,0
+voy_marketplace,orders,vat_total,numeric,NO,0
+voy_marketplace,orders,total,numeric,NO,0
+voy_marketplace,orders,delivery_type,USER-DEFINED,NO,'delivery'::voy_marketplace.delivery_type
+voy_marketplace,orders,delivery_address,text,YES,null
+voy_marketplace,orders,created_at,timestamp with time zone,NO,now()
+voy_marketplace,orders,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,product_images,id,uuid,NO,gen_random_uuid()
+voy_marketplace,product_images,product_id,uuid,NO,null
+voy_marketplace,product_images,image_url,text,NO,null
+voy_marketplace,product_images,sort_order,integer,NO,0
+voy_marketplace,product_images,created_at,timestamp with time zone,NO,now()
+voy_marketplace,product_prices,product_id,uuid,NO,null
+voy_marketplace,product_prices,currency,text,NO,'EUR'::text
+voy_marketplace,product_prices,price_retail,numeric,NO,null
+voy_marketplace,product_prices,price_pro,numeric,YES,null
+voy_marketplace,product_prices,price_horeca,numeric,YES,null
+voy_marketplace,product_prices,min_qty_horeca,integer,YES,null
+voy_marketplace,product_prices,min_order_amount_horeca,numeric,YES,null
+voy_marketplace,product_prices,pack_size,integer,YES,null
+voy_marketplace,product_prices,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,products,id,uuid,NO,gen_random_uuid()
+voy_marketplace,products,seller_id,uuid,NO,null
+voy_marketplace,products,title,text,NO,null
+voy_marketplace,products,description,text,YES,null
+voy_marketplace,products,category_id,uuid,YES,null
+voy_marketplace,products,sku,text,YES,null
+voy_marketplace,products,unit,USER-DEFINED,NO,'unit'::voy_marketplace.unit_type
+voy_marketplace,products,vat_rate,numeric,NO,0.21
+voy_marketplace,products,is_active,boolean,NO,true
+voy_marketplace,products,created_at,timestamp with time zone,NO,now()
+voy_marketplace,products,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,promotion_products,promotion_id,uuid,NO,null
+voy_marketplace,promotion_products,product_id,uuid,NO,null
+voy_marketplace,promotions,id,uuid,NO,gen_random_uuid()
+voy_marketplace,promotions,seller_id,uuid,NO,null
+voy_marketplace,promotions,name,text,NO,null
+voy_marketplace,promotions,starts_at,timestamp with time zone,NO,null
+voy_marketplace,promotions,ends_at,timestamp with time zone,NO,null
+voy_marketplace,promotions,promo_type,USER-DEFINED,NO,null
+voy_marketplace,promotions,value,numeric,NO,null
+voy_marketplace,promotions,scope,USER-DEFINED,NO,'ALL_PRODUCTS'::voy_marketplace.promotion_scope
+voy_marketplace,promotions,channel_scope,USER-DEFINED,NO,'ALL'::voy_marketplace.promotion_channel_scope
+voy_marketplace,promotions,is_active,boolean,NO,true
+voy_marketplace,promotions,created_at,timestamp with time zone,NO,now()
+voy_marketplace,return_items,id,uuid,NO,gen_random_uuid()
+voy_marketplace,return_items,return_id,uuid,NO,null
+voy_marketplace,return_items,order_item_id,uuid,NO,null
+voy_marketplace,return_items,qty,integer,NO,1
+voy_marketplace,return_items,refund_amount,numeric,NO,0
+voy_marketplace,returns,id,uuid,NO,gen_random_uuid()
+voy_marketplace,returns,order_id,uuid,NO,null
+voy_marketplace,returns,status,USER-DEFINED,NO,'requested'::voy_marketplace.return_status
+voy_marketplace,returns,reason,text,YES,null
+voy_marketplace,returns,created_at,timestamp with time zone,NO,now()
+voy_marketplace,returns,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,seller_plans,id,uuid,NO,gen_random_uuid()
+voy_marketplace,seller_plans,name,text,NO,null
+voy_marketplace,seller_plans,monthly_fee,numeric,NO,0
+voy_marketplace,seller_plans,features_json,jsonb,NO,'{}'::jsonb
+voy_marketplace,seller_plans,is_active,boolean,NO,true
+voy_marketplace,seller_plans,created_at,timestamp with time zone,NO,now()
+voy_marketplace,seller_profiles,id,uuid,NO,gen_random_uuid()
+voy_marketplace,seller_profiles,owner_user_id,uuid,NO,null
+voy_marketplace,seller_profiles,store_name,text,NO,null
+voy_marketplace,seller_profiles,store_slug,text,NO,null
+voy_marketplace,seller_profiles,tax_id,text,YES,null
+voy_marketplace,seller_profiles,sector_principal,text,YES,null
+voy_marketplace,seller_profiles,address,text,YES,null
+voy_marketplace,seller_profiles,city,text,YES,null
+voy_marketplace,seller_profiles,postcode,text,YES,null
+voy_marketplace,seller_profiles,province,text,YES,null
+voy_marketplace,seller_profiles,country,text,YES,'España'::text
+voy_marketplace,seller_profiles,email_orders,text,YES,null
+voy_marketplace,seller_profiles,phone_orders,text,YES,null
+voy_marketplace,seller_profiles,is_active,boolean,NO,true
+voy_marketplace,seller_profiles,plan_id,uuid,YES,null
+voy_marketplace,seller_profiles,created_at,timestamp with time zone,NO,now()
+voy_marketplace,seller_profiles,updated_at,timestamp with time zone,NO,now()
+voy_marketplace,seller_staff,seller_id,uuid,NO,null
+voy_marketplace,seller_staff,user_id,uuid,NO,null
+voy_marketplace,seller_staff,staff_role,USER-DEFINED,NO,'SALES'::voy_marketplace.seller_staff_role
+voy_marketplace,seller_staff,created_at,timestamp with time zone,NO,now()
+voy_marketplace,seller_staff,is_active,boolean,NO,true
+voy_marketplace,seller_subscriptions,id,uuid,NO,gen_random_uuid()
+voy_marketplace,seller_subscriptions,seller_id,uuid,NO,null
+voy_marketplace,seller_subscriptions,plan_id,uuid,NO,null
+voy_marketplace,seller_subscriptions,status,text,NO,'active'::text
+voy_marketplace,seller_subscriptions,stripe_subscription_id,text,YES,null
+voy_marketplace,seller_subscriptions,current_period_end,timestamp with time zone,YES,null
+voy_marketplace,seller_subscriptions,created_at,timestamp with time zone,NO,now()

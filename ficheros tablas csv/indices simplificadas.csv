@@ -1,0 +1,141 @@
+table_schema,table_name,index_name,indexdef
+public,VoyAdminLogs,VoyAdminLogs_pkey,"CREATE UNIQUE INDEX ""VoyAdminLogs_pkey"" ON public.""VoyAdminLogs"" USING btree (id)"
+public,VoyChats,VoyChats_job_id_unique_idx,"CREATE UNIQUE INDEX ""VoyChats_job_id_unique_idx"" ON public.""VoyChats"" USING btree (job_id)"
+public,VoyChats,VoyChats_pkey,"CREATE UNIQUE INDEX ""VoyChats_pkey"" ON public.""VoyChats"" USING btree (id)"
+public,VoyChats,idx_voychats_company,"CREATE INDEX idx_voychats_company ON public.""VoyChats"" USING btree (company_user_id)"
+public,VoyChats,idx_voychats_helper,"CREATE INDEX idx_voychats_helper ON public.""VoyChats"" USING btree (helper_user_id)"
+public,VoyChats,idx_voychats_job,"CREATE INDEX idx_voychats_job ON public.""VoyChats"" USING btree (job_id)"
+public,VoyChats,idx_voychats_last_message,"CREATE INDEX idx_voychats_last_message ON public.""VoyChats"" USING btree (last_message_at DESC)"
+public,VoyChats,unique_chat,"CREATE UNIQUE INDEX unique_chat ON public.""VoyChats"" USING btree (job_id, company_user_id, helper_user_id)"
+public,VoyCompanies,VoyCompanies_owner_idx,"CREATE INDEX ""VoyCompanies_owner_idx"" ON public.""VoyCompanies"" USING btree (owner_user_id)"
+public,VoyCompanies,VoyCompanies_pkey,"CREATE UNIQUE INDEX ""VoyCompanies_pkey"" ON public.""VoyCompanies"" USING btree (id)"
+public,VoyCompanySubscriptions,VoyCompanySubscriptions_pkey,"CREATE UNIQUE INDEX ""VoyCompanySubscriptions_pkey"" ON public.""VoyCompanySubscriptions"" USING btree (id)"
+public,VoyCompanySubscriptions,idx_subscriptions_company_user,"CREATE INDEX idx_subscriptions_company_user ON public.""VoyCompanySubscriptions"" USING btree (company_user_id)"
+public,VoyCompanySubscriptions,idx_subscriptions_dates,"CREATE INDEX idx_subscriptions_dates ON public.""VoyCompanySubscriptions"" USING btree (start_date, end_date)"
+public,VoyCompanySubscriptions,idx_subscriptions_status,"CREATE INDEX idx_subscriptions_status ON public.""VoyCompanySubscriptions"" USING btree (status)"
+public,VoyEmergencyAlertResponses,VoyEmergencyAlertResponses_pkey,"CREATE UNIQUE INDEX ""VoyEmergencyAlertResponses_pkey"" ON public.""VoyEmergencyAlertResponses"" USING btree (id)"
+public,VoyEmergencyAlertResponses,idx_emergency_responses_alert_id,"CREATE INDEX idx_emergency_responses_alert_id ON public.""VoyEmergencyAlertResponses"" USING btree (alert_id)"
+public,VoyEmergencyAlertResponses,idx_emergency_responses_contact_id,"CREATE INDEX idx_emergency_responses_contact_id ON public.""VoyEmergencyAlertResponses"" USING btree (contact_id)"
+public,VoyEmergencyAlerts,VoyEmergencyAlerts_pkey,"CREATE UNIQUE INDEX ""VoyEmergencyAlerts_pkey"" ON public.""VoyEmergencyAlerts"" USING btree (id)"
+public,VoyEmergencyAlerts,idx_emergency_alerts_created_at,"CREATE INDEX idx_emergency_alerts_created_at ON public.""VoyEmergencyAlerts"" USING btree (created_at DESC)"
+public,VoyEmergencyAlerts,idx_emergency_alerts_status,"CREATE INDEX idx_emergency_alerts_status ON public.""VoyEmergencyAlerts"" USING btree (status)"
+public,VoyEmergencyAlerts,idx_emergency_alerts_user_id,"CREATE INDEX idx_emergency_alerts_user_id ON public.""VoyEmergencyAlerts"" USING btree (user_id)"
+public,VoyEmergencyContacts,VoyEmergencyContacts_pkey,"CREATE UNIQUE INDEX ""VoyEmergencyContacts_pkey"" ON public.""VoyEmergencyContacts"" USING btree (id)"
+public,VoyEmergencyContacts,idx_emergency_contacts_user_id,"CREATE INDEX idx_emergency_contacts_user_id ON public.""VoyEmergencyContacts"" USING btree (user_id)"
+public,VoyHelpers,VoyHelpers_pkey,"CREATE UNIQUE INDEX ""VoyHelpers_pkey"" ON public.""VoyHelpers"" USING btree (id)"
+public,VoyInsurancePlans,VoyInsurancePlans_pkey,"CREATE UNIQUE INDEX ""VoyInsurancePlans_pkey"" ON public.""VoyInsurancePlans"" USING btree (id)"
+public,VoyInsurancePlans,VoyInsurancePlans_policy_id_risk_level_name_key,"CREATE UNIQUE INDEX ""VoyInsurancePlans_policy_id_risk_level_name_key"" ON public.""VoyInsurancePlans"" USING btree (policy_id, risk_level, name)"
+public,VoyInsurancePlans,idx_voy_ins_plans_risk,"CREATE INDEX idx_voy_ins_plans_risk ON public.""VoyInsurancePlans"" USING btree (risk_level, is_active)"
+public,VoyInsurancePolicies,VoyInsurancePolicies_pkey,"CREATE UNIQUE INDEX ""VoyInsurancePolicies_pkey"" ON public.""VoyInsurancePolicies"" USING btree (id)"
+public,VoyInsuranceProviders,VoyInsuranceProviders_pkey,"CREATE UNIQUE INDEX ""VoyInsuranceProviders_pkey"" ON public.""VoyInsuranceProviders"" USING btree (id)"
+public,VoyInvoices,VoyInvoices_issuer_idx,"CREATE INDEX ""VoyInvoices_issuer_idx"" ON public.""VoyInvoices"" USING btree (issuer_user_id)"
+public,VoyInvoices,VoyInvoices_payer_idx,"CREATE INDEX ""VoyInvoices_payer_idx"" ON public.""VoyInvoices"" USING btree (payer_user_id)"
+public,VoyInvoices,VoyInvoices_pkey,"CREATE UNIQUE INDEX ""VoyInvoices_pkey"" ON public.""VoyInvoices"" USING btree (id)"
+public,VoyJobApplications,VoyJobApplications_helper_idx,"CREATE INDEX ""VoyJobApplications_helper_idx"" ON public.""VoyJobApplications"" USING btree (helper_user_id)"
+public,VoyJobApplications,VoyJobApplications_job_helper_unique,"CREATE UNIQUE INDEX ""VoyJobApplications_job_helper_unique"" ON public.""VoyJobApplications"" USING btree (job_id, helper_user_id)"
+public,VoyJobApplications,VoyJobApplications_job_idx,"CREATE INDEX ""VoyJobApplications_job_idx"" ON public.""VoyJobApplications"" USING btree (job_id)"
+public,VoyJobApplications,VoyJobApplications_pkey,"CREATE UNIQUE INDEX ""VoyJobApplications_pkey"" ON public.""VoyJobApplications"" USING btree (id)"
+public,VoyJobAssignments,VoyJobAssignments_helper_idx,"CREATE INDEX ""VoyJobAssignments_helper_idx"" ON public.""VoyJobAssignments"" USING btree (helper_user_id)"
+public,VoyJobAssignments,VoyJobAssignments_job_id_key,"CREATE UNIQUE INDEX ""VoyJobAssignments_job_id_key"" ON public.""VoyJobAssignments"" USING btree (job_id)"
+public,VoyJobAssignments,VoyJobAssignments_pkey,"CREATE UNIQUE INDEX ""VoyJobAssignments_pkey"" ON public.""VoyJobAssignments"" USING btree (id)"
+public,VoyJobAssignments,VoyJobAssignments_requester_idx,"CREATE INDEX ""VoyJobAssignments_requester_idx"" ON public.""VoyJobAssignments"" USING btree (requester_user_id)"
+public,VoyJobInsurance,VoyJobInsurance_job_id_key,"CREATE UNIQUE INDEX ""VoyJobInsurance_job_id_key"" ON public.""VoyJobInsurance"" USING btree (job_id)"
+public,VoyJobInsurance,VoyJobInsurance_pkey,"CREATE UNIQUE INDEX ""VoyJobInsurance_pkey"" ON public.""VoyJobInsurance"" USING btree (id)"
+public,VoyJobInsurance,idx_voy_job_ins_status,"CREATE INDEX idx_voy_job_ins_status ON public.""VoyJobInsurance"" USING btree (status)"
+public,VoyJobs,VoyJobs_creator_idx,"CREATE INDEX ""VoyJobs_creator_idx"" ON public.""VoyJobs"" USING btree (creator_user_id)"
+public,VoyJobs,VoyJobs_location_idx,"CREATE INDEX ""VoyJobs_location_idx"" ON public.""VoyJobs"" USING btree (district, neighborhood)"
+public,VoyJobs,VoyJobs_pkey,"CREATE UNIQUE INDEX ""VoyJobs_pkey"" ON public.""VoyJobs"" USING btree (id)"
+public,VoyJobs,VoyJobs_status_idx,"CREATE INDEX ""VoyJobs_status_idx"" ON public.""VoyJobs"" USING btree (status)"
+public,VoyMessages,VoyMessages_chat_id_created_at_idx,"CREATE INDEX ""VoyMessages_chat_id_created_at_idx"" ON public.""VoyMessages"" USING btree (chat_id, created_at)"
+public,VoyMessages,VoyMessages_pkey,"CREATE UNIQUE INDEX ""VoyMessages_pkey"" ON public.""VoyMessages"" USING btree (id)"
+public,VoyMessages,idx_voymessages_chat,"CREATE INDEX idx_voymessages_chat ON public.""VoyMessages"" USING btree (chat_id)"
+public,VoyMessages,idx_voymessages_created,"CREATE INDEX idx_voymessages_created ON public.""VoyMessages"" USING btree (created_at DESC)"
+public,VoyMessages,idx_voymessages_read_at,"CREATE INDEX idx_voymessages_read_at ON public.""VoyMessages"" USING btree (chat_id, read_at) WHERE (read_at IS NULL)"
+public,VoyMessages,idx_voymessages_sender,"CREATE INDEX idx_voymessages_sender ON public.""VoyMessages"" USING btree (sender_user_id)"
+public,VoyMicroTasks,VoyMicroTasks_pkey,"CREATE UNIQUE INDEX ""VoyMicroTasks_pkey"" ON public.""VoyMicroTasks"" USING btree (id)"
+public,VoyNotifications,VoyNotifications_application_idx,"CREATE INDEX ""VoyNotifications_application_idx"" ON public.""VoyNotifications"" USING btree (related_application_id)"
+public,VoyNotifications,VoyNotifications_job_idx,"CREATE INDEX ""VoyNotifications_job_idx"" ON public.""VoyNotifications"" USING btree (related_job_id)"
+public,VoyNotifications,VoyNotifications_pkey,"CREATE UNIQUE INDEX ""VoyNotifications_pkey"" ON public.""VoyNotifications"" USING btree (id)"
+public,VoyNotifications,VoyNotifications_user_idx,"CREATE INDEX ""VoyNotifications_user_idx"" ON public.""VoyNotifications"" USING btree (user_id)"
+public,VoyNotifications,idx_notifications_created_at,"CREATE INDEX idx_notifications_created_at ON public.""VoyNotifications"" USING btree (created_at DESC)"
+public,VoyNotifications,idx_notifications_is_read,"CREATE INDEX idx_notifications_is_read ON public.""VoyNotifications"" USING btree (is_read)"
+public,VoyNotifications,idx_notifications_type,"CREATE INDEX idx_notifications_type ON public.""VoyNotifications"" USING btree (type)"
+public,VoyNotifications,idx_notifications_user_id,"CREATE INDEX idx_notifications_user_id ON public.""VoyNotifications"" USING btree (user_id)"
+public,VoyNotifications,idx_notifications_user_is_read,"CREATE INDEX idx_notifications_user_is_read ON public.""VoyNotifications"" USING btree (user_id, is_read, created_at DESC)"
+public,VoyPayments,VoyPayments_pkey,"CREATE UNIQUE INDEX ""VoyPayments_pkey"" ON public.""VoyPayments"" USING btree (id)"
+public,VoyPayments,idx_voypayments_application_id,"CREATE INDEX idx_voypayments_application_id ON public.""VoyPayments"" USING btree (application_id)"
+public,VoyPayments,idx_voypayments_created_at,"CREATE INDEX idx_voypayments_created_at ON public.""VoyPayments"" USING btree (created_at DESC)"
+public,VoyPayments,idx_voypayments_job_id,"CREATE INDEX idx_voypayments_job_id ON public.""VoyPayments"" USING btree (job_id)"
+public,VoyPayments,idx_voypayments_status,"CREATE INDEX idx_voypayments_status ON public.""VoyPayments"" USING btree (status)"
+public,VoyPayments,idx_voypayments_stripe_payment_intent,"CREATE INDEX idx_voypayments_stripe_payment_intent ON public.""VoyPayments"" USING btree (stripe_payment_intent_id)"
+public,VoyPayments,idx_voypayments_user_id,"CREATE INDEX idx_voypayments_user_id ON public.""VoyPayments"" USING btree (user_id)"
+public,VoyReferralCodes,VoyReferralCodes_code_key,"CREATE UNIQUE INDEX ""VoyReferralCodes_code_key"" ON public.""VoyReferralCodes"" USING btree (code)"
+public,VoyReferralCodes,VoyReferralCodes_pkey,"CREATE UNIQUE INDEX ""VoyReferralCodes_pkey"" ON public.""VoyReferralCodes"" USING btree (id)"
+public,VoyReferralCodes,idx_voyrefcodes_owner,"CREATE INDEX idx_voyrefcodes_owner ON public.""VoyReferralCodes"" USING btree (owner_user_id)"
+public,VoyReferralEvents,VoyReferralEvents_event_type_referred_user_id_key,"CREATE UNIQUE INDEX ""VoyReferralEvents_event_type_referred_user_id_key"" ON public.""VoyReferralEvents"" USING btree (event_type, referred_user_id)"
+public,VoyReferralEvents,VoyReferralEvents_pkey,"CREATE UNIQUE INDEX ""VoyReferralEvents_pkey"" ON public.""VoyReferralEvents"" USING btree (id)"
+public,VoyReferralEvents,idx_voyrefevents_referred,"CREATE INDEX idx_voyrefevents_referred ON public.""VoyReferralEvents"" USING btree (referred_user_id)"
+public,VoyReferralEvents,idx_voyrefevents_referrer,"CREATE INDEX idx_voyrefevents_referrer ON public.""VoyReferralEvents"" USING btree (referrer_user_id)"
+public,VoyReviews,VoyReviews_pkey,"CREATE UNIQUE INDEX ""VoyReviews_pkey"" ON public.""VoyReviews"" USING btree (id)"
+public,VoyReviews,VoyReviews_reviewed_idx,"CREATE INDEX ""VoyReviews_reviewed_idx"" ON public.""VoyReviews"" USING btree (reviewed_user_id)"
+public,VoyRewardCampaigns,VoyRewardCampaigns_pkey,"CREATE UNIQUE INDEX ""VoyRewardCampaigns_pkey"" ON public.""VoyRewardCampaigns"" USING btree (id)"
+public,VoyRewards,VoyRewards_pkey,"CREATE UNIQUE INDEX ""VoyRewards_pkey"" ON public.""VoyRewards"" USING btree (id)"
+public,VoyRewards,idx_voyrewards_expires,"CREATE INDEX idx_voyrewards_expires ON public.""VoyRewards"" USING btree (expires_at)"
+public,VoyRewards,idx_voyrewards_unlock,"CREATE INDEX idx_voyrewards_unlock ON public.""VoyRewards"" USING btree (status, unlock_at)"
+public,VoyRewards,idx_voyrewards_user,"CREATE INDEX idx_voyrewards_user ON public.""VoyRewards"" USING btree (user_id)"
+public,VoyRewards,idx_voyrewards_user_type,"CREATE INDEX idx_voyrewards_user_type ON public.""VoyRewards"" USING btree (user_id, reward_type, status)"
+public,VoySectors,VoySectors_pkey,"CREATE UNIQUE INDEX ""VoySectors_pkey"" ON public.""VoySectors"" USING btree (id)"
+public,VoyUsers,VoyUsers_auth_user_id_key,"CREATE UNIQUE INDEX ""VoyUsers_auth_user_id_key"" ON public.""VoyUsers"" USING btree (auth_user_id)"
+public,VoyUsers,VoyUsers_pkey,"CREATE UNIQUE INDEX ""VoyUsers_pkey"" ON public.""VoyUsers"" USING btree (id)"
+public,VoyWalletLedger,VoyWalletLedger_pkey,"CREATE UNIQUE INDEX ""VoyWalletLedger_pkey"" ON public.""VoyWalletLedger"" USING btree (id)"
+public,VoyWalletLedger,idx_voyledger_user,"CREATE INDEX idx_voyledger_user ON public.""VoyWalletLedger"" USING btree (user_id)"
+public,VoyWalletLedger,idx_voyledger_wallet,"CREATE INDEX idx_voyledger_wallet ON public.""VoyWalletLedger"" USING btree (wallet_id)"
+public,VoyWallets,VoyWallets_pkey,"CREATE UNIQUE INDEX ""VoyWallets_pkey"" ON public.""VoyWallets"" USING btree (id)"
+public,VoyWallets,VoyWallets_user_id_key,"CREATE UNIQUE INDEX ""VoyWallets_user_id_key"" ON public.""VoyWallets"" USING btree (user_id)"
+public,VoyWallets,idx_voywallets_user_id,"CREATE INDEX idx_voywallets_user_id ON public.""VoyWallets"" USING btree (user_id)"
+public,VoyWorkContracts,VoyWorkContracts_job_idx,"CREATE INDEX ""VoyWorkContracts_job_idx"" ON public.""VoyWorkContracts"" USING btree (job_id)"
+public,VoyWorkContracts,VoyWorkContracts_pkey,"CREATE UNIQUE INDEX ""VoyWorkContracts_pkey"" ON public.""VoyWorkContracts"" USING btree (id)"
+public,VoyWorkSchedules,VoyWorkSchedules_job_idx,"CREATE INDEX ""VoyWorkSchedules_job_idx"" ON public.""VoyWorkSchedules"" USING btree (job_id)"
+public,VoyWorkSchedules,VoyWorkSchedules_pkey,"CREATE UNIQUE INDEX ""VoyWorkSchedules_pkey"" ON public.""VoyWorkSchedules"" USING btree (id)"
+voy_marketplace,buyer_profiles,buyer_profiles_pkey,CREATE UNIQUE INDEX buyer_profiles_pkey ON voy_marketplace.buyer_profiles USING btree (user_id)
+voy_marketplace,buyer_profiles,idx_buyer_profiles_type,CREATE INDEX idx_buyer_profiles_type ON voy_marketplace.buyer_profiles USING btree (buyer_type)
+voy_marketplace,buyer_profiles,idx_buyer_profiles_verified,CREATE INDEX idx_buyer_profiles_verified ON voy_marketplace.buyer_profiles USING btree (is_verified)
+voy_marketplace,categories,categories_pkey,CREATE UNIQUE INDEX categories_pkey ON voy_marketplace.categories USING btree (id)
+voy_marketplace,categories,idx_categories_active,CREATE INDEX idx_categories_active ON voy_marketplace.categories USING btree (is_active)
+voy_marketplace,categories,idx_categories_parent,CREATE INDEX idx_categories_parent ON voy_marketplace.categories USING btree (parent_id)
+voy_marketplace,categories,idx_categories_slug,CREATE INDEX idx_categories_slug ON voy_marketplace.categories USING btree (slug)
+voy_marketplace,categories,uq_categories_parent_slug,"CREATE UNIQUE INDEX uq_categories_parent_slug ON voy_marketplace.categories USING btree (parent_id, slug)"
+voy_marketplace,credit_notes,credit_notes_pkey,CREATE UNIQUE INDEX credit_notes_pkey ON voy_marketplace.credit_notes USING btree (id)
+voy_marketplace,credit_notes,credit_notes_return_id_key,CREATE UNIQUE INDEX credit_notes_return_id_key ON voy_marketplace.credit_notes USING btree (return_id)
+voy_marketplace,inventory,inventory_pkey,CREATE UNIQUE INDEX inventory_pkey ON voy_marketplace.inventory USING btree (product_id)
+voy_marketplace,invoices,invoices_order_id_key,CREATE UNIQUE INDEX invoices_order_id_key ON voy_marketplace.invoices USING btree (order_id)
+voy_marketplace,invoices,invoices_pkey,CREATE UNIQUE INDEX invoices_pkey ON voy_marketplace.invoices USING btree (id)
+voy_marketplace,order_items,idx_order_items_order,CREATE INDEX idx_order_items_order ON voy_marketplace.order_items USING btree (order_id)
+voy_marketplace,order_items,order_items_pkey,CREATE UNIQUE INDEX order_items_pkey ON voy_marketplace.order_items USING btree (id)
+voy_marketplace,orders,idx_orders_buyer,CREATE INDEX idx_orders_buyer ON voy_marketplace.orders USING btree (buyer_user_id)
+voy_marketplace,orders,idx_orders_seller,CREATE INDEX idx_orders_seller ON voy_marketplace.orders USING btree (seller_id)
+voy_marketplace,orders,idx_orders_status,CREATE INDEX idx_orders_status ON voy_marketplace.orders USING btree (status)
+voy_marketplace,orders,orders_pkey,CREATE UNIQUE INDEX orders_pkey ON voy_marketplace.orders USING btree (id)
+voy_marketplace,product_images,idx_product_images_product,CREATE INDEX idx_product_images_product ON voy_marketplace.product_images USING btree (product_id)
+voy_marketplace,product_images,product_images_pkey,CREATE UNIQUE INDEX product_images_pkey ON voy_marketplace.product_images USING btree (id)
+voy_marketplace,product_prices,idx_product_prices_product,CREATE INDEX idx_product_prices_product ON voy_marketplace.product_prices USING btree (product_id)
+voy_marketplace,product_prices,product_prices_pkey,CREATE UNIQUE INDEX product_prices_pkey ON voy_marketplace.product_prices USING btree (product_id)
+voy_marketplace,products,idx_products_active,CREATE INDEX idx_products_active ON voy_marketplace.products USING btree (is_active)
+voy_marketplace,products,idx_products_category,CREATE INDEX idx_products_category ON voy_marketplace.products USING btree (category_id)
+voy_marketplace,products,idx_products_seller,CREATE INDEX idx_products_seller ON voy_marketplace.products USING btree (seller_id)
+voy_marketplace,products,products_pkey,CREATE UNIQUE INDEX products_pkey ON voy_marketplace.products USING btree (id)
+voy_marketplace,promotion_products,promotion_products_pkey,"CREATE UNIQUE INDEX promotion_products_pkey ON voy_marketplace.promotion_products USING btree (promotion_id, product_id)"
+voy_marketplace,promotions,promotions_pkey,CREATE UNIQUE INDEX promotions_pkey ON voy_marketplace.promotions USING btree (id)
+voy_marketplace,return_items,return_items_pkey,CREATE UNIQUE INDEX return_items_pkey ON voy_marketplace.return_items USING btree (id)
+voy_marketplace,returns,returns_pkey,CREATE UNIQUE INDEX returns_pkey ON voy_marketplace.returns USING btree (id)
+voy_marketplace,seller_plans,seller_plans_name_key,CREATE UNIQUE INDEX seller_plans_name_key ON voy_marketplace.seller_plans USING btree (name)
+voy_marketplace,seller_plans,seller_plans_pkey,CREATE UNIQUE INDEX seller_plans_pkey ON voy_marketplace.seller_plans USING btree (id)
+voy_marketplace,seller_profiles,idx_seller_active,CREATE INDEX idx_seller_active ON voy_marketplace.seller_profiles USING btree (is_active)
+voy_marketplace,seller_profiles,idx_seller_owner,CREATE INDEX idx_seller_owner ON voy_marketplace.seller_profiles USING btree (owner_user_id)
+voy_marketplace,seller_profiles,seller_profiles_pkey,CREATE UNIQUE INDEX seller_profiles_pkey ON voy_marketplace.seller_profiles USING btree (id)
+voy_marketplace,seller_profiles,seller_profiles_store_slug_key,CREATE UNIQUE INDEX seller_profiles_store_slug_key ON voy_marketplace.seller_profiles USING btree (store_slug)
+voy_marketplace,seller_staff,idx_seller_staff_seller,CREATE INDEX idx_seller_staff_seller ON voy_marketplace.seller_staff USING btree (seller_id)
+voy_marketplace,seller_staff,idx_seller_staff_user,CREATE INDEX idx_seller_staff_user ON voy_marketplace.seller_staff USING btree (user_id)
+voy_marketplace,seller_staff,seller_staff_pkey,"CREATE UNIQUE INDEX seller_staff_pkey ON voy_marketplace.seller_staff USING btree (seller_id, user_id)"
+voy_marketplace,seller_subscriptions,idx_seller_subscriptions_seller,CREATE INDEX idx_seller_subscriptions_seller ON voy_marketplace.seller_subscriptions USING btree (seller_id)
+voy_marketplace,seller_subscriptions,seller_subscriptions_pkey,CREATE UNIQUE INDEX seller_subscriptions_pkey ON voy_marketplace.seller_subscriptions USING btree (id)

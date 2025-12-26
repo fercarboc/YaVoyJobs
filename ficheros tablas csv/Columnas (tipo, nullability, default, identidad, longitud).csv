@@ -1,0 +1,491 @@
+table_schema,table_name,ordinal_position,column_name,data_type,udt_name,is_nullable,column_default,character_maximum_length,numeric_precision,numeric_scale,datetime_precision,is_identity,identity_generation
+public,VoyAdminLogs,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyAdminLogs,2,admin_user_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyAdminLogs,3,action,text,text,NO,null,null,null,null,null,NO,null
+public,VoyAdminLogs,4,details,jsonb,jsonb,YES,null,null,null,null,null,NO,null
+public,VoyAdminLogs,5,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyChats,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyChats,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyChats,3,company_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyChats,4,helper_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyChats,5,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyChats,6,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyChats,7,last_message_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyChats,8,status,text,text,NO,'ACTIVE'::text,null,null,null,null,NO,null
+public,VoyChats,9,readonly_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyChats,10,purge_after,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyChats,11,last_message_preview,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyCompanies,2,owner_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyCompanies,3,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyCompanies,4,cif,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,5,sector,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,6,phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,7,email,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,8,website,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,9,address,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,10,city,text,text,YES,'Madrid'::text,null,null,null,null,NO,null
+public,VoyCompanies,11,district,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,12,neighborhood,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanies,13,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyCompanies,14,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyCompanySubscriptions,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyCompanySubscriptions,2,company_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,3,subscription_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,4,amount,numeric,numeric,NO,null,null,10,2,null,NO,null
+public,VoyCompanySubscriptions,5,currency,text,text,YES,'EUR'::text,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,6,status,text,text,NO,'pending'::text,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,7,start_date,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyCompanySubscriptions,8,end_date,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyCompanySubscriptions,9,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyCompanySubscriptions,10,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyCompanySubscriptions,11,stripe_payment_intent_id,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,12,stripe_subscription_id,text,text,YES,null,null,null,null,null,NO,null
+public,VoyCompanySubscriptions,13,metadata,jsonb,jsonb,YES,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,1,id,uuid,uuid,NO,uuid_generate_v4(),null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,2,alert_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,3,contact_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,4,responder_name,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,5,responder_phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,6,response_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,7,response_time,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyEmergencyAlertResponses,8,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,9,location,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlertResponses,10,latitude,numeric,numeric,YES,null,null,10,8,null,NO,null
+public,VoyEmergencyAlertResponses,11,longitude,numeric,numeric,YES,null,null,11,8,null,NO,null
+public,VoyEmergencyAlerts,1,id,uuid,uuid,NO,uuid_generate_v4(),null,null,null,null,NO,null
+public,VoyEmergencyAlerts,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyAlerts,3,alert_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyAlerts,4,location,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlerts,5,latitude,numeric,numeric,YES,null,null,10,8,null,NO,null
+public,VoyEmergencyAlerts,6,longitude,numeric,numeric,YES,null,null,11,8,null,NO,null
+public,VoyEmergencyAlerts,7,status,text,text,NO,'ACTIVE'::text,null,null,null,null,NO,null
+public,VoyEmergencyAlerts,8,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyAlerts,9,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyEmergencyAlerts,10,resolved_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyEmergencyAlerts,11,resolved_by,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyContacts,1,id,uuid,uuid,NO,uuid_generate_v4(),null,null,null,null,NO,null
+public,VoyEmergencyContacts,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyContacts,3,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyContacts,4,phone,text,text,NO,null,null,null,null,null,NO,null
+public,VoyEmergencyContacts,5,relationship,text,text,YES,null,null,null,null,null,NO,null
+public,VoyEmergencyContacts,6,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyEmergencyContacts,7,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyHelpers,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyHelpers,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyHelpers,3,bio,text,text,YES,null,null,null,null,null,NO,null
+public,VoyHelpers,4,skills,ARRAY,_text,YES,null,null,null,null,null,NO,null
+public,VoyHelpers,5,min_hourly_rate,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyHelpers,6,max_distance_km,numeric,numeric,YES,null,null,5,2,null,NO,null
+public,VoyHelpers,7,rating_avg,numeric,numeric,YES,0,null,3,2,null,NO,null
+public,VoyHelpers,8,rating_count,integer,int4,YES,0,null,32,0,null,NO,null
+public,VoyHelpers,9,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyHelpers,10,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsurancePlans,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyInsurancePlans,2,policy_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyInsurancePlans,3,risk_level,smallint,int2,NO,null,null,16,0,null,NO,null
+public,VoyInsurancePlans,4,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyInsurancePlans,5,price_per_job,numeric,numeric,NO,0,null,12,2,null,NO,null
+public,VoyInsurancePlans,6,price_per_hour,numeric,numeric,YES,null,null,12,2,null,NO,null
+public,VoyInsurancePlans,7,coverage_amount,numeric,numeric,YES,null,null,12,2,null,NO,null
+public,VoyInsurancePlans,8,deductible,numeric,numeric,YES,null,null,12,2,null,NO,null
+public,VoyInsurancePlans,9,coverage_summary,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsurancePlans,10,exclusions,jsonb,jsonb,YES,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyInsurancePlans,11,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+public,VoyInsurancePlans,12,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsurancePlans,13,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsurancePolicies,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyInsurancePolicies,2,provider_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyInsurancePolicies,3,policy_number,text,text,NO,null,null,null,null,null,NO,null
+public,VoyInsurancePolicies,4,status,text,text,NO,'ACTIVE'::text,null,null,null,null,NO,null
+public,VoyInsurancePolicies,5,start_date,date,date,NO,null,null,null,null,0,NO,null
+public,VoyInsurancePolicies,6,end_date,date,date,NO,null,null,null,null,0,NO,null
+public,VoyInsurancePolicies,7,territory,text,text,YES,'España'::text,null,null,null,null,NO,null
+public,VoyInsurancePolicies,8,claims_instructions,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsurancePolicies,9,policy_document_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsurancePolicies,10,metadata,jsonb,jsonb,YES,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyInsurancePolicies,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsurancePolicies,12,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsuranceProviders,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyInsuranceProviders,2,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,3,legal_name,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,4,cif,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,5,website,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,6,claims_phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,7,claims_email,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,8,admin_contact_name,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,9,admin_contact_phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,10,admin_contact_email,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,11,broker_name,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,12,broker_phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,13,broker_email,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,14,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,15,documents_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInsuranceProviders,16,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInsuranceProviders,17,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInvoices,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyInvoices,2,assignment_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyInvoices,3,issuer_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyInvoices,4,payer_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyInvoices,5,amount,numeric,numeric,NO,null,null,10,2,null,NO,null
+public,VoyInvoices,6,currency,text,text,NO,'EUR'::text,null,null,null,null,NO,null
+public,VoyInvoices,7,status,USER-DEFINED,VoyInvoiceStatus,NO,"'DRAFT'::""VoyInvoiceStatus""",null,null,null,null,NO,null
+public,VoyInvoices,8,issued_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyInvoices,9,paid_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyInvoices,10,description,text,text,YES,null,null,null,null,null,NO,null
+public,VoyInvoices,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyInvoices,12,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobApplications,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyJobApplications,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobApplications,3,helper_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobApplications,4,message,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobApplications,5,proposed_price,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobApplications,6,proposed_hourly_rate,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobApplications,7,status,USER-DEFINED,VoyApplicationStatus,NO,"'PENDING'::""VoyApplicationStatus""",null,null,null,null,NO,null
+public,VoyJobApplications,8,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobApplications,9,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobAssignments,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyJobAssignments,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobAssignments,3,helper_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobAssignments,4,requester_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobAssignments,5,agreed_price,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobAssignments,6,agreed_hourly_rate,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobAssignments,7,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobAssignments,8,status,USER-DEFINED,VoyJobStatus,NO,"'ASSIGNED'::""VoyJobStatus""",null,null,null,null,NO,null
+public,VoyJobAssignments,9,started_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyJobAssignments,10,completed_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyJobAssignments,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobAssignments,12,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobInsurance,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyJobInsurance,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobInsurance,3,policy_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobInsurance,4,plan_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobInsurance,5,risk_level,smallint,int2,NO,null,null,16,0,null,NO,null
+public,VoyJobInsurance,6,insurance_fee,numeric,numeric,NO,0,null,12,2,null,NO,null
+public,VoyJobInsurance,7,currency,text,text,NO,'EUR'::text,null,null,null,null,NO,null
+public,VoyJobInsurance,8,status,text,text,NO,'APPLIED'::text,null,null,null,null,NO,null
+public,VoyJobInsurance,9,certificate_ref,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobInsurance,10,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobInsurance,11,metadata,jsonb,jsonb,YES,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyJobInsurance,12,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobInsurance,13,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobs,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyJobs,2,creator_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyJobs,3,company_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyJobs,4,title,text,text,NO,null,null,null,null,null,NO,null
+public,VoyJobs,5,description,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobs,6,category,text,text,NO,null,null,null,null,null,NO,null
+public,VoyJobs,7,job_type,USER-DEFINED,VoyJobType,NO,"'ONE_OFF'::""VoyJobType""",null,null,null,null,NO,null
+public,VoyJobs,8,price_fixed,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobs,9,price_hourly,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyJobs,10,price_negotiable,boolean,bool,NO,false,null,null,null,null,NO,null
+public,VoyJobs,11,city,text,text,YES,'Madrid'::text,null,null,null,null,NO,null
+public,VoyJobs,12,district,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobs,13,neighborhood,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobs,14,address_hint,text,text,YES,null,null,null,null,null,NO,null
+public,VoyJobs,15,start_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyJobs,16,end_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyJobs,17,status,USER-DEFINED,VoyJobStatus,NO,"'OPEN'::""VoyJobStatus""",null,null,null,null,NO,null
+public,VoyJobs,18,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobs,19,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyJobs,21,microtask_id,text,text,YES,null,null,null,null,null,NO,null
+public,VoyMessages,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyMessages,2,chat_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyMessages,3,sender_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyMessages,4,content,text,text,YES,null,null,null,null,null,NO,null
+public,VoyMessages,5,file_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyMessages,6,file_name,text,text,YES,null,null,null,null,null,NO,null
+public,VoyMessages,7,file_type,text,text,YES,null,null,null,null,null,NO,null
+public,VoyMessages,8,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyMessages,9,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyMessages,10,read_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyMicroTasks,1,id,text,text,NO,null,null,null,null,null,NO,null
+public,VoyMicroTasks,2,sector_id,text,text,NO,null,null,null,null,null,NO,null
+public,VoyMicroTasks,3,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyMicroTasks,4,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyMicroTasks,5,risk_level,smallint,int2,YES,null,null,16,0,null,NO,null
+public,VoyNotifications,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyNotifications,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyNotifications,3,title,text,text,NO,null,null,null,null,null,NO,null
+public,VoyNotifications,4,message,text,text,NO,null,null,null,null,null,NO,null
+public,VoyNotifications,5,type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyNotifications,6,related_job_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyNotifications,7,related_application_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyNotifications,8,is_read,boolean,bool,YES,false,null,null,null,null,NO,null
+public,VoyNotifications,9,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyPayments,1,id,uuid,uuid,NO,uuid_generate_v4(),null,null,null,null,NO,null
+public,VoyPayments,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyPayments,3,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyPayments,4,application_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyPayments,5,amount,numeric,numeric,NO,null,null,10,2,null,NO,null
+public,VoyPayments,6,currency,character varying,varchar,YES,'EUR'::character varying,3,null,null,null,NO,null
+public,VoyPayments,7,status,character varying,varchar,NO,'pending'::character varying,20,null,null,null,NO,null
+public,VoyPayments,8,stripe_payment_intent_id,character varying,varchar,YES,null,255,null,null,null,NO,null
+public,VoyPayments,9,stripe_charge_id,character varying,varchar,YES,null,255,null,null,null,NO,null
+public,VoyPayments,10,payment_method,character varying,varchar,YES,null,50,null,null,null,NO,null
+public,VoyPayments,11,error_message,text,text,YES,null,null,null,null,null,NO,null
+public,VoyPayments,12,metadata,jsonb,jsonb,YES,null,null,null,null,null,NO,null
+public,VoyPayments,13,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyPayments,14,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyPayments,15,description,text,text,YES,null,null,null,null,null,NO,null
+public,VoyPayments,16,payment_type,character varying,varchar,YES,null,20,null,null,null,NO,null
+public,VoyReferralCodes,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyReferralCodes,2,code,text,text,NO,null,null,null,null,null,NO,null
+public,VoyReferralCodes,3,owner_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReferralCodes,4,owner_role,text,text,NO,null,null,null,null,null,NO,null
+public,VoyReferralCodes,5,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyReferralEvents,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyReferralEvents,2,referrer_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReferralEvents,3,referred_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReferralEvents,4,event_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyReferralEvents,5,status,text,text,NO,'pending'::text,null,null,null,null,NO,null
+public,VoyReferralEvents,6,metadata,jsonb,jsonb,NO,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyReferralEvents,7,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyReferralEvents,8,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyReviews,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyReviews,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReviews,3,assignment_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyReviews,4,reviewer_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReviews,5,reviewed_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyReviews,6,review_type,USER-DEFINED,VoyReviewType,NO,"'HELPER'::""VoyReviewType""",null,null,null,null,NO,null
+public,VoyReviews,7,rating,integer,int4,NO,null,null,32,0,null,NO,null
+public,VoyReviews,8,comment,text,text,YES,null,null,null,null,null,NO,null
+public,VoyReviews,9,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyRewardCampaigns,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyRewardCampaigns,2,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyRewardCampaigns,3,city,text,text,NO,'Madrid'::text,null,null,null,null,NO,null
+public,VoyRewardCampaigns,4,district,text,text,YES,null,null,null,null,null,NO,null
+public,VoyRewardCampaigns,5,neighborhood,text,text,YES,null,null,null,null,null,NO,null
+public,VoyRewardCampaigns,6,start_at,timestamp with time zone,timestamptz,NO,null,null,null,null,6,NO,null
+public,VoyRewardCampaigns,7,end_at,timestamp with time zone,timestamptz,NO,null,null,null,null,6,NO,null
+public,VoyRewardCampaigns,8,rules,jsonb,jsonb,NO,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyRewardCampaigns,9,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyRewards,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyRewards,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyRewards,3,reward_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyRewards,4,amount,numeric,numeric,NO,null,null,12,2,null,NO,null
+public,VoyRewards,5,currency,text,text,NO,'EUR'::text,null,null,null,null,NO,null
+public,VoyRewards,6,status,text,text,NO,null,null,null,null,null,NO,null
+public,VoyRewards,7,unlock_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyRewards,8,expires_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyRewards,9,source_table,text,text,YES,null,null,null,null,null,NO,null
+public,VoyRewards,10,source_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyRewards,11,metadata,jsonb,jsonb,NO,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyRewards,12,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyRewards,13,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoySectors,1,id,text,text,NO,null,null,null,null,null,NO,null
+public,VoySectors,2,name,text,text,NO,null,null,null,null,null,NO,null
+public,VoySectors,3,emoji,text,text,NO,null,null,null,null,null,NO,null
+public,VoySectors,4,description,text,text,NO,null,null,null,null,null,NO,null
+public,VoySectors,5,is_primary,boolean,bool,NO,true,null,null,null,null,NO,null
+public,VoySectors,6,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoySectors,7,display_order,integer,int4,YES,null,null,32,0,null,NO,null
+public,VoySectors,8,risk_level,smallint,int2,YES,null,null,16,0,null,NO,null
+public,VoyUsers,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyUsers,2,auth_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyUsers,3,role,USER-DEFINED,VoyUserRole,NO,"'PARTICULAR'::""VoyUserRole""",null,null,null,null,NO,null
+public,VoyUsers,4,full_name,text,text,NO,null,null,null,null,null,NO,null
+public,VoyUsers,5,email,text,text,NO,null,null,null,null,null,NO,null
+public,VoyUsers,6,phone,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,7,birth_year,integer,int4,YES,null,null,32,0,null,NO,null
+public,VoyUsers,8,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+public,VoyUsers,9,city,text,text,YES,'Madrid'::text,null,null,null,null,NO,null
+public,VoyUsers,10,district,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,11,neighborhood,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,12,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyUsers,13,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyUsers,14,company_sector,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,15,document_type,character varying,varchar,YES,'NIF'::character varying,3,null,null,null,NO,null
+public,VoyUsers,16,document_number,character varying,varchar,YES,null,20,null,null,null,NO,null
+public,VoyUsers,17,address,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,18,postal_code,character varying,varchar,YES,null,10,null,null,null,NO,null
+public,VoyUsers,19,province,character varying,varchar,YES,null,100,null,null,null,NO,null
+public,VoyUsers,20,country,character varying,varchar,YES,'España'::character varying,100,null,null,null,NO,null
+public,VoyUsers,21,document_photo_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,22,selfie_photo_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,23,verification_document,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,24,verification_status,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,25,verification_type,text,text,YES,null,null,null,null,null,NO,null
+public,VoyUsers,26,verification_requested_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+public,VoyWalletLedger,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyWalletLedger,2,wallet_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyWalletLedger,3,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyWalletLedger,4,amount,numeric,numeric,NO,null,null,12,2,null,NO,null
+public,VoyWalletLedger,5,direction,text,text,NO,null,null,null,null,null,NO,null
+public,VoyWalletLedger,6,reason_code,text,text,NO,null,null,null,null,null,NO,null
+public,VoyWalletLedger,7,reward_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyWalletLedger,8,reference_table,text,text,YES,null,null,null,null,null,NO,null
+public,VoyWalletLedger,9,reference_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+public,VoyWalletLedger,10,metadata,jsonb,jsonb,NO,'{}'::jsonb,null,null,null,null,NO,null
+public,VoyWalletLedger,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyWallets,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyWallets,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyWallets,3,balance,numeric,numeric,NO,0,null,12,2,null,NO,null
+public,VoyWallets,4,currency,text,text,NO,'EUR'::text,null,null,null,null,NO,null
+public,VoyWallets,5,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyWallets,6,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+public,VoyWorkContracts,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyWorkContracts,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyWorkContracts,3,contract_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyWorkContracts,4,monthly_salary,numeric,numeric,YES,null,null,10,2,null,NO,null
+public,VoyWorkContracts,5,social_security,boolean,bool,YES,false,null,null,null,null,NO,null
+public,VoyWorkContracts,6,union_required,boolean,bool,YES,false,null,null,null,null,NO,null
+public,VoyWorkContracts,7,notes,text,text,YES,null,null,null,null,null,NO,null
+public,VoyWorkContracts,8,contract_document_url,text,text,YES,null,null,null,null,null,NO,null
+public,VoyWorkContracts,9,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyWorkContracts,10,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyWorkSchedules,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+public,VoyWorkSchedules,2,job_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+public,VoyWorkSchedules,3,period_type,text,text,NO,null,null,null,null,null,NO,null
+public,VoyWorkSchedules,4,day_of_week,ARRAY,_int4,YES,null,null,null,null,null,NO,null
+public,VoyWorkSchedules,5,start_time,time without time zone,time,YES,null,null,null,null,6,NO,null
+public,VoyWorkSchedules,6,end_time,time without time zone,time,YES,null,null,null,null,6,NO,null
+public,VoyWorkSchedules,7,start_date,date,date,YES,null,null,null,null,0,NO,null
+public,VoyWorkSchedules,8,end_date,date,date,YES,null,null,null,null,0,NO,null
+public,VoyWorkSchedules,9,created_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+public,VoyWorkSchedules,10,updated_at,timestamp with time zone,timestamptz,YES,now(),null,null,null,6,NO,null
+voy_marketplace,buyer_profiles,1,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,2,buyer_type,USER-DEFINED,buyer_type,NO,'PARTICULAR'::voy_marketplace.buyer_type,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,3,is_verified,boolean,bool,NO,false,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,4,verified_at,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+voy_marketplace,buyer_profiles,5,business_name,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,6,tax_id,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,7,billing_address,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,8,billing_city,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,9,billing_postcode,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,10,billing_province,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,11,billing_country,text,text,YES,'España'::text,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,12,sector,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,13,notes,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,buyer_profiles,14,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,buyer_profiles,15,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,categories,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,categories,2,name,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,categories,3,parent_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+voy_marketplace,categories,4,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,categories,5,slug,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,categories,6,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,categories,7,sort_order,integer,int4,NO,0,null,32,0,null,NO,null
+voy_marketplace,categories,8,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,credit_notes,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,credit_notes,2,return_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,credit_notes,3,credit_note_number,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,credit_notes,4,issued_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,credit_notes,5,pdf_url,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,credit_notes,6,amount,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,inventory,1,product_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,inventory,2,stock,integer,int4,NO,0,null,32,0,null,NO,null
+voy_marketplace,inventory,3,reserved,integer,int4,NO,0,null,32,0,null,NO,null
+voy_marketplace,inventory,4,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,invoices,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,invoices,2,order_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,invoices,3,invoice_number,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,invoices,4,issued_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,invoices,5,pdf_url,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,invoices,6,total,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,order_items,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,order_items,2,order_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,order_items,3,product_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,order_items,4,title_snapshot,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,order_items,5,unit_snapshot,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,order_items,6,price_channel_snapshot,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,order_items,7,unit_price_snapshot,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,order_items,8,qty,integer,int4,NO,1,null,32,0,null,NO,null
+voy_marketplace,order_items,9,vat_rate_snapshot,numeric,numeric,NO,0.21,null,4,2,null,NO,null
+voy_marketplace,order_items,10,line_total,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,orders,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,orders,2,buyer_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,orders,3,seller_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,orders,4,buyer_type_snapshot,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,orders,5,status,USER-DEFINED,order_status,NO,'draft'::voy_marketplace.order_status,null,null,null,null,NO,null
+voy_marketplace,orders,6,subtotal,numeric,numeric,NO,0,null,10,2,null,NO,null
+voy_marketplace,orders,7,vat_total,numeric,numeric,NO,0,null,10,2,null,NO,null
+voy_marketplace,orders,8,total,numeric,numeric,NO,0,null,10,2,null,NO,null
+voy_marketplace,orders,9,delivery_type,USER-DEFINED,delivery_type,NO,'delivery'::voy_marketplace.delivery_type,null,null,null,null,NO,null
+voy_marketplace,orders,10,delivery_address,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,orders,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,orders,12,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,product_images,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,product_images,2,product_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,product_images,3,image_url,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,product_images,4,sort_order,integer,int4,NO,0,null,32,0,null,NO,null
+voy_marketplace,product_images,5,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,product_prices,1,product_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,product_prices,2,currency,text,text,NO,'EUR'::text,null,null,null,null,NO,null
+voy_marketplace,product_prices,3,price_retail,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,product_prices,4,price_pro,numeric,numeric,YES,null,null,10,2,null,NO,null
+voy_marketplace,product_prices,5,price_horeca,numeric,numeric,YES,null,null,10,2,null,NO,null
+voy_marketplace,product_prices,6,min_qty_horeca,integer,int4,YES,null,null,32,0,null,NO,null
+voy_marketplace,product_prices,7,min_order_amount_horeca,numeric,numeric,YES,null,null,10,2,null,NO,null
+voy_marketplace,product_prices,8,pack_size,integer,int4,YES,null,null,32,0,null,NO,null
+voy_marketplace,product_prices,9,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,products,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,products,2,seller_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,products,3,title,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,products,4,description,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,products,5,category_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+voy_marketplace,products,6,sku,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,products,7,unit,USER-DEFINED,unit_type,NO,'unit'::voy_marketplace.unit_type,null,null,null,null,NO,null
+voy_marketplace,products,8,vat_rate,numeric,numeric,NO,0.21,null,4,2,null,NO,null
+voy_marketplace,products,9,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,products,10,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,products,11,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,promotion_products,1,promotion_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,promotion_products,2,product_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,promotions,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,promotions,2,seller_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,promotions,3,name,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,promotions,4,starts_at,timestamp with time zone,timestamptz,NO,null,null,null,null,6,NO,null
+voy_marketplace,promotions,5,ends_at,timestamp with time zone,timestamptz,NO,null,null,null,null,6,NO,null
+voy_marketplace,promotions,6,promo_type,USER-DEFINED,promotion_type,NO,null,null,null,null,null,NO,null
+voy_marketplace,promotions,7,value,numeric,numeric,NO,null,null,10,2,null,NO,null
+voy_marketplace,promotions,8,scope,USER-DEFINED,promotion_scope,NO,'ALL_PRODUCTS'::voy_marketplace.promotion_scope,null,null,null,null,NO,null
+voy_marketplace,promotions,9,channel_scope,USER-DEFINED,promotion_channel_scope,NO,'ALL'::voy_marketplace.promotion_channel_scope,null,null,null,null,NO,null
+voy_marketplace,promotions,10,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,promotions,11,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,return_items,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,return_items,2,return_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,return_items,3,order_item_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,return_items,4,qty,integer,int4,NO,1,null,32,0,null,NO,null
+voy_marketplace,return_items,5,refund_amount,numeric,numeric,NO,0,null,10,2,null,NO,null
+voy_marketplace,returns,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,returns,2,order_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,returns,3,status,USER-DEFINED,return_status,NO,'requested'::voy_marketplace.return_status,null,null,null,null,NO,null
+voy_marketplace,returns,4,reason,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,returns,5,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,returns,6,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,seller_plans,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,seller_plans,2,name,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_plans,3,monthly_fee,numeric,numeric,NO,0,null,10,2,null,NO,null
+voy_marketplace,seller_plans,4,features_json,jsonb,jsonb,NO,'{}'::jsonb,null,null,null,null,NO,null
+voy_marketplace,seller_plans,5,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,seller_plans,6,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,seller_profiles,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,seller_profiles,2,owner_user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,3,store_name,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,4,store_slug,text,text,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,5,tax_id,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,6,sector_principal,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,7,address,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,8,city,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,9,postcode,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,10,province,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,11,country,text,text,YES,'España'::text,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,12,email_orders,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,13,phone_orders,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,14,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,15,plan_id,uuid,uuid,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_profiles,16,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,seller_profiles,17,updated_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,seller_staff,1,seller_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_staff,2,user_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_staff,3,staff_role,USER-DEFINED,seller_staff_role,NO,'SALES'::voy_marketplace.seller_staff_role,null,null,null,null,NO,null
+voy_marketplace,seller_staff,4,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null
+voy_marketplace,seller_staff,5,is_active,boolean,bool,NO,true,null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,1,id,uuid,uuid,NO,gen_random_uuid(),null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,2,seller_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,3,plan_id,uuid,uuid,NO,null,null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,4,status,text,text,NO,'active'::text,null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,5,stripe_subscription_id,text,text,YES,null,null,null,null,null,NO,null
+voy_marketplace,seller_subscriptions,6,current_period_end,timestamp with time zone,timestamptz,YES,null,null,null,null,6,NO,null
+voy_marketplace,seller_subscriptions,7,created_at,timestamp with time zone,timestamptz,NO,now(),null,null,null,6,NO,null

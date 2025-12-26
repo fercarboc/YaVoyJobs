@@ -3,6 +3,7 @@ import { Input } from './common/Input';
 import { Button } from './common/Button';
 import { supabase } from '../services/supabase';
 import { Icons } from './Icons';
+import { COLORS } from "@/constants/colors";
 
 interface AdminStats {
   totalUsers: number;

@@ -30,6 +30,7 @@ import {
   Users,
   Trash,
   ChevronDown,
+  ChevronRight,
   FileText,
   Check,
   Info,
@@ -47,7 +48,10 @@ import {
   Store,
 } from 'lucide-react';
 
+import { Receipt, Settings } from 'lucide-react';
+
 export const Icons = {
+
   Menu,
   X,
   Heart,
@@ -79,6 +83,7 @@ export const Icons = {
   Users,
   Trash,
   ChevronDown,
+  ChevronRight,
   FileText,
   Check,
   Info,
@@ -92,7 +97,8 @@ export const Icons = {
   Wallet,
   Coffee,
   Package,
-  Store,
+  Store,Receipt,
+Settings,
 
   // ✅ ALIAS para compatibilidad con código existente
   Building2: Building, // lucide no tiene Building2

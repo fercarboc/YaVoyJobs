@@ -1,0 +1,6 @@
+Listado de rutas de carpetas para el volumen Windows
+El número de serie del volumen es EAD5-ABA6
+C:\YAVOY\WEB\WEB
+Ruta de acceso no válida: \YAVOY\WEB\WEB
+No existe ninguna subcarpeta 
+
