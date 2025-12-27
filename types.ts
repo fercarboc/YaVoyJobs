@@ -3,7 +3,8 @@ export enum UserRole {
   PARTICULAR = 'PARTICULAR',
   COMPANY = 'COMPANY',
   HELPER = 'HELPER',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
+  AGENCY = 'AGENCY'
 }
 
 export type CompanySectorSlug =

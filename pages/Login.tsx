@@ -21,6 +21,10 @@ const Login: React.FC<LoginProps> = ({ auth, onLoginSuccess }) => {
     switch (auth.user.role) {
       case UserRole.ADMIN:
         return "/admin";
+      case UserRole.HELPER:
+        return "/worker";
+      case UserRole.AGENCY:
+        return "/agency";
       default:
         return "/panel";
     }

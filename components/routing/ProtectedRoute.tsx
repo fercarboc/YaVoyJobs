@@ -31,6 +31,8 @@ export default function ProtectedRoute({ auth, roles, children }: Props) {
         ? "/admin"
         : auth.user.role === UserRole.HELPER
         ? "/worker"
+        : auth.user.role === UserRole.AGENCY
+        ? "/agency"
         : "/client";
 
     return <Navigate to={to} replace />;

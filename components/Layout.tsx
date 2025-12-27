@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { theme } from '../theme';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useLocation, Link, NavLink, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
 import { UserRole, AuthState, Notification } from '../types';
 import { supabase } from '../services/supabase';
@@ -38,6 +38,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
     phone: '',
     city: auth.user?.city || '',
   });
+  const [clientArea, setClientArea] = useState<'JOBS' | 'HOUSING'>('JOBS');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -55,6 +56,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
       return () => clearInterval(interval);
     }
   }, [auth.isAuthenticated, auth.user?.id]);
+
+  useEffect(() => {
+    if (auth.user?.role === UserRole.PARTICULAR) {
+      const stored = localStorage.getItem('yavoy:clientActiveArea');
+      setClientArea(stored === 'HOUSING' ? 'HOUSING' : 'JOBS');
+    }
+  }, [auth.user?.role]);
 
   const fetchNotifications = async () => {
     if (!auth.user?.id) return;
@@ -135,9 +143,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
     switch (auth.user.role) {
       case UserRole.ADMIN:
         return '/admin';
+      case UserRole.HELPER:
+        return '/worker';
+      case UserRole.AGENCY:
+        return '/agency';
       default:
         return '/panel';
     }
+  };
+
+  const handleLogoutAndHome = async () => {
+    await onLogout();
+    navigate('/');
   };
 
  const goToDashboard = () => {
@@ -218,12 +235,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
               >
                 Empresas
               </button>
-              <button
-                onClick={() => handleScrollTo('opiniones')}
+              <NavLink
+                to="/alquiler"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
-                Opiniones
-              </button>
+                Alquileres
+              </NavLink>
               <button
                 onClick={() => handleScrollTo('barrios')}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
@@ -257,6 +274,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
             {/* Desktop actions */}
             <div className="hidden lg:flex items-center gap-2 flex-none">
+              {auth.isAuthenticated && auth.user?.role === UserRole.PARTICULAR && (
+                <span className="text-[11px] px-3 py-1 rounded-full bg-white/15 text-white border border-white/20">
+                  Modo CLIENT: {clientArea === 'HOUSING' ? 'Alquiler' : 'Trabajos'}
+                </span>
+              )}
               {!auth.isAuthenticated && (
                 <>
                   <Link
@@ -396,7 +418,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
                         <button
                           onClick={() => {
-                            onLogout();
+                            handleLogoutAndHome();
                             setIsProfileOpen(false);
                           }}
                           className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition flex items-center"
@@ -454,12 +476,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                 Soy Particular
               </button>
 
-              <button
-                onClick={() => handleScrollTo('opiniones')}
+              <NavLink
+                to="/alquiler"
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
-                Opiniones
-              </button>
+                Alquileres
+              </NavLink>
 
               <button
                 onClick={() => handleScrollTo('empresas')}
@@ -528,7 +550,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
                   <button
                     onClick={() => {
-                      onLogout();
+                      handleLogoutAndHome();
                       setIsMenuOpen(false);
                     }}
                     className="w-full text-left px-3 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg"

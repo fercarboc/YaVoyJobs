@@ -1,6 +1,8 @@
 import React from 'react';
 import ClientDashboardShell from '../../components/client/ClientDashboardShell';
+import { useClientArea } from '../../components/client/ClientDashboardShell';
 import type { AuthState } from '../../types';
+import { Link } from 'react-router-dom';
 
 interface Props {
   auth: AuthState;
@@ -15,6 +17,40 @@ const StatCard = ({ title, value, hint }: { title: string; value: string; hint?:
 );
 
 const ClientHomePage: React.FC<Props> = ({ auth }) => {
+  const { activeArea } = useClientArea();
+
+  if (activeArea === 'HOUSING') {
+    return (
+      <ClientDashboardShell auth={auth}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Alquiler</h1>
+            <p className="text-sm text-slate-600 mt-1">
+              Explora inmuebles y guarda favoritos. Publicar trabajos está desactivado en este modo.
+            </p>
+          </div>
+          <Link
+            to="/alquiler"
+            className="px-4 py-2 rounded-full text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Ir a Alquiler
+          </Link>
+        </div>
+
+        <div className="mt-6 grid gap-4">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <h2 className="text-sm font-extrabold text-slate-900">Favoritos de alquiler</h2>
+            <p className="text-sm text-slate-600 mt-2">Aún no tienes favoritos guardados.</p>
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <h2 className="text-sm font-extrabold text-slate-900">Chats de alquiler</h2>
+            <p className="text-sm text-slate-600 mt-2">Aquí verás tus conversaciones de alquiler.</p>
+          </div>
+        </div>
+      </ClientDashboardShell>
+    );
+  }
+
   return (
     <ClientDashboardShell auth={auth}>
       <div className="flex items-start justify-between gap-4">

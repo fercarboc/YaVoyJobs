@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { Icons } from '../components/Icons';
 import { COMPANY_SECTORS } from '../types';
@@ -19,8 +19,30 @@ const Register = () => {
   const [error, setError] = useState('');
   const [emailConfirmationPending, setEmailConfirmationPending] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [inviteData, setInviteData] = useState<any | null>(null);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('invite');
+    if (token) {
+      setInviteToken(token);
+      supabase
+        .rpc('get_valid_invite', { token })
+        .then(({ data, error }) => {
+          if (error || !data) {
+            setError(error?.message || 'Invitación no válida o expirada');
+            return;
+          }
+          setInviteData(data);
+          setFormData((prev) => ({ ...prev, email: data.email || prev.email }));
+        })
+        .catch((err) => setError(err?.message || 'No se pudo validar la invitación'));
+    }
+  }, [location.search]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,7 +66,8 @@ const Register = () => {
       setLoading(true);
 
       const role =
-        activeTab === 'HELPER' ? 'HELPER' : activeTab === 'COMPANY' ? 'COMPANY' : 'PARTICULAR';
+        inviteData?.target_role ||
+        (activeTab === 'HELPER' ? 'HELPER' : activeTab === 'COMPANY' ? 'COMPANY' : 'PARTICULAR');
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
@@ -67,7 +90,7 @@ const Register = () => {
       }
 
       // Crear perfil en VoyUsers
-      const { error: profileError } = await supabase.from('VoyUsers').insert([
+      const { data: userRow, error: profileError } = await supabase.from('VoyUsers').insert([
         {
           auth_user_id: authUserId,
           full_name: formData.name,
@@ -77,9 +100,19 @@ const Register = () => {
           cif: activeTab === 'COMPANY' ? formData.cif : null,
           company_sector: activeTab === 'COMPANY' ? formData.companySector : null,
         },
-      ]);
+      ]).select().single();
 
       if (profileError) throw profileError;
+
+      if (inviteData && role === 'PROVIDER' && userRow?.id) {
+        await supabase.from('VoyProviderProfiles').upsert({
+          provider_user_id: userRow.id,
+          provider_type: inviteData.provider_type,
+          email: formData.email,
+          display_name: formData.name || formData.email,
+        });
+        await supabase.from('VoyInvites').update({ accepted_at: new Date().toISOString() }).eq('token', inviteToken);
+      }
 
       setEmailConfirmationPending(true);
       setRegisteredEmail(formData.email);
@@ -96,40 +129,48 @@ const Register = () => {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-slate-900">Crear cuenta</h2>
           <p className="text-slate-500">Elige tu tipo de cuenta</p>
+          {inviteData && (
+            <div className="mt-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm border border-blue-200">
+              Registro por invitación. Rol: PROVIDER ({inviteData.provider_type})
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <button
             type="button"
-            onClick={() => setActiveTab('PARTICULAR')}
+            onClick={() => !inviteData && setActiveTab('PARTICULAR')}
             className={`py-3 rounded-xl font-bold text-sm transition ${
               activeTab === 'PARTICULAR'
                 ? 'bg-brand-600 text-white shadow'
                 : 'bg-gray-100 text-slate-700 hover:bg-gray-200'
             }`}
+            disabled={!!inviteData}
           >
             Particular
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('COMPANY')}
+            onClick={() => !inviteData && setActiveTab('COMPANY')}
             className={`py-3 rounded-xl font-bold text-sm transition ${
               activeTab === 'COMPANY'
                 ? 'bg-brand-600 text-white shadow'
                 : 'bg-gray-100 text-slate-700 hover:bg-gray-200'
             }`}
+            disabled={!!inviteData}
           >
             Empresa
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('HELPER')}
+            onClick={() => !inviteData && setActiveTab('HELPER')}
             className={`py-3 rounded-xl font-bold text-sm transition ${
               activeTab === 'HELPER'
                 ? 'bg-brand-600 text-white shadow'
                 : 'bg-gray-100 text-slate-700 hover:bg-gray-200'
             }`}
+            disabled={!!inviteData}
           >
             Ayudante
           </button>
@@ -154,13 +195,14 @@ const Register = () => {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                 <input
-                  value={formData.email}
-                  onChange={e => handleChange('email', e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-brand-500 outline-none"
-                  placeholder="tu@email.com"
-                  required
-                />
-              </div>
+                value={formData.email}
+                onChange={e => handleChange('email', e.target.value)}
+                disabled={!!inviteData}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-brand-500 outline-none"
+                placeholder="tu@email.com"
+                required
+              />
+            </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
                 <input

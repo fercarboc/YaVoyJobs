@@ -34,7 +34,7 @@ export default function Landing() {
   const sectors: Sector[] = useMemo(
     () => [
       { id: "hogar", title: "Hogar", desc: "Montaje, pequenas reparaciones, limpieza puntual.", bullets: ["Montaje de muebles", "Pintura y arreglos", "Limpiezas y mudanzas"] },
-      { id: "recados", title: "Recados", desc: "Compras, entregas, ayuda a mayores.", bullets: ["Compras y recados", "Acompanamientos", "Entregas en el barrio"] },
+      { id: "recados", title: "Recados y Ayuda a Mayores", desc: "Compras, entregas, ayuda a mayores.", bullets: ["Compras y recados", "Acompañamientos a Mayores", "Entregas en el barrio"] },
       { id: "tecnologia", title: "Tecnologia", desc: "Instalacion, soporte, wifi, impresoras.", bullets: ["Soporte PC/movil", "Wi-Fi y routers", "Impresoras y TV"] },
       { id: "mascotas", title: "Mascotas", desc: "Paseos, cuidados y pequenas gestiones.", bullets: ["Paseos", "Cuidados puntuales", "Ir al veterinario"] },
       { id: "oficios", title: "Oficios", desc: "Profesionales de confianza para el dia a dia.", bullets: ["Electricista", "Fontanero", "Cerrajero"] },
