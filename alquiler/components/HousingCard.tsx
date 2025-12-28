@@ -1,7 +1,9 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { HousingListing } from '../types/housing.types';
+import React from "react";
+import { Link } from "react-router-dom";
+import { HousingListing } from "../types/housing.types";
+
+const PLACEHOLDER_IMG = "https://placehold.co/800x600?text=YaVoy+Housing";
 
 interface Props {
   listing: HousingListing;
@@ -9,12 +11,17 @@ interface Props {
 
 const HousingCard: React.FC<Props> = ({ listing }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img 
-          src={listing.images[0]} 
-          alt={listing.title} 
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group max-w-sm">
+      <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+        <img
+          src={listing.images[0] || PLACEHOLDER_IMG}
+          alt={listing.title}
           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (target.src !== PLACEHOLDER_IMG) target.src = PLACEHOLDER_IMG;
+          }}
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-1">
           {listing.furnished && (

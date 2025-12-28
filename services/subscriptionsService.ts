@@ -56,10 +56,22 @@ function addMonths(date: Date, months: number) {
   return copy;
 }
 
+async function sha256Hex(input: string) {
+  const data = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/** VoyUser actual (tabla VoyUsers) */
 export async function getCurrentVoyUser() {
-  const { data: auth } = await supabase.auth.getUser();
+  const { data: auth, error: authErr } = await supabase.auth.getUser();
+  if (authErr) throw authErr;
+
   const uid = auth.user?.id;
   if (!uid) throw new Error("No session");
+
   const { data, error } = await supabase.from("VoyUsers").select("*").eq("auth_user_id", uid).single();
   if (error) throw error;
   return data;
@@ -72,6 +84,7 @@ export async function listPlansByScope(scope: PlanScope): Promise<VoyPlan[]> {
     .eq("plan_scope", scope)
     .eq("is_active", true)
     .order("price", { ascending: true });
+
   if (error) throw error;
   return (data || []) as VoyPlan[];
 }
@@ -82,6 +95,7 @@ export async function listDiscountsByScope(scope: PlanScope): Promise<VoyPlanDis
     .select("*")
     .eq("plan_scope", scope)
     .eq("is_active", true);
+
   if (error) throw error;
   return (data || []) as VoyPlanDiscount[];
 }
@@ -104,6 +118,7 @@ export async function getActiveSubscription(scope: PlanScope): Promise<VoySubscr
     .gte("end_date", new Date().toISOString())
     .order("created_at", { ascending: false })
     .maybeSingle();
+
   if (error) throw error;
   return (data as VoySubscription | null) || null;
 }
@@ -111,29 +126,35 @@ export async function getActiveSubscription(scope: PlanScope): Promise<VoySubscr
 export async function cancelActiveSubscriptionsForScope(voyUserId: string, scope: PlanScope) {
   const planIds = await getPlanIdsForScope(scope);
   if (!planIds.length) return;
+
   const { error } = await supabase
     .from("VoyCompanySubscriptions")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })
     .eq("company_user_id", voyUserId)
     .eq("status", "active")
     .in("plan_id", planIds);
+
   if (error) throw error;
 }
 
 export async function activatePlan(params: { scope: PlanScope; planId: string; period: BillingPeriod }): Promise<VoySubscription> {
   const { scope, planId, period } = params;
+
   const [voyUser, discounts] = await Promise.all([getCurrentVoyUser(), listDiscountsByScope(scope)]);
+
   const { data: plan, error: planError } = await supabase
     .from("voyplans")
     .select("*")
     .eq("id", planId)
     .eq("plan_scope", scope)
     .single();
+
   if (planError) throw planError;
 
   const months = BILLING_MONTHS[period];
   const discount = period === "monthly" ? 0 : discounts.find((d) => d.commitment_months === months)?.discount_pct || 0;
   const total = roundAmount((plan.price || 0) * months * (1 - discount / 100));
+
   const startDate = new Date();
   const endDate = addMonths(startDate, months);
 
@@ -154,6 +175,123 @@ export async function activatePlan(params: { scope: PlanScope; planId: string; p
     })
     .select("*, plan:plan_id(id, plan_code, plan_scope, name, price, currency, billing_period, limits)")
     .single();
+
   if (error) throw error;
   return subscription as VoySubscription;
+}
+
+export type PaymentMethod = "card" | "iban";
+
+export async function saveBillingMandate(input: {
+  iban?: string;
+  holder?: string;
+  tax_id?: string;
+  bank?: string;
+  consent?: boolean;
+}) {
+  const user = await getCurrentVoyUser();
+
+  const payload = {
+    agency_user_id: user.id,
+    billing_iban: input.iban || null,
+    billing_holder: input.holder || null,
+    billing_tax_id: input.tax_id || null,
+    billing_bank: input.bank || null,
+    billing_consent: input.consent ?? true,
+  };
+
+  const { error } = await supabase.from("VoyAgencyProfiles").upsert(payload, { onConflict: "agency_user_id" });
+  if (error) throw error;
+}
+
+type CreateInvoiceInput = {
+  planId: string;
+  period: BillingPeriod;
+  total: number;
+  status: "PAID" | "PENDING";
+  payment_ref?: string;
+  currency?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  scope?: string; // opcional
+  description?: string;
+};
+
+export async function createInvoice(params: CreateInvoiceInput) {
+  const user = await getCurrentVoyUser();
+  const issuedAt = new Date().toISOString();
+
+  // 1) hash anterior (cadena legal)
+  const { data: prev, error: prevErr } = await supabase
+    .from("VoyInvoices")
+    .select("hash")
+    .eq("payer_user_id", user.id)
+    .order("issued_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (prevErr) throw prevErr;
+
+  const prevHash = prev?.hash || null;
+
+  // 2) nuevo hash
+  const invoiceId = crypto.randomUUID();
+  const hash = await sha256Hex(
+    `${invoiceId}${user.id}${params.total}${issuedAt}${prevHash || ""}`
+  );
+
+  // 3) INSERT REAL alineado con la tabla
+  const { error } = await supabase.from("VoyInvoices").insert({
+    id: invoiceId,
+
+    // Relaciones
+    payer_user_id: user.id,
+    company_user_id: user.id,
+    plan_id: params.planId,
+
+    // 🔴 CAMPOS OBLIGATORIOS
+    amount: params.total,              // ✅ CLAVE
+    currency: params.currency || "EUR", // ✅ CLAVE
+    status: params.status,
+
+    // Fechas
+    issued_at: issuedAt,
+    paid_at: params.status === "PAID" ? issuedAt : null,
+    created_at: issuedAt,
+
+    // Periodo
+    period: params.period,
+    period_start: params.periodStart || issuedAt,
+    period_end: params.periodEnd || null,
+
+    // Importes
+    subtotal: params.total,
+    vat: 0,
+    total: params.total,
+
+    // Hash legal
+    hash,
+    previous_invoice_hash: prevHash,
+    hash_algorithm: "SHA-256",
+    hash_payload: {
+      invoiceId,
+      payer_user_id: user.id,
+      total: params.total,
+      issued_at: issuedAt,
+      previous: prevHash,
+      period: params.period,
+      plan_id: params.planId,
+    },
+
+    // Extras
+    payment_ref: params.payment_ref || null,
+    metadata: {
+      scope: params.scope || null,
+      billing_period: params.period,
+    },
+  });
+
+  if (error) throw error;
+
+  return { id: invoiceId, hash };
 }

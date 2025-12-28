@@ -71,8 +71,9 @@ export type AgencySubscription = {
 
 export type CompanyProfile = {
   id?: string;
-  owner_user_id: string;
-  name: string;
+  agency_user_id: string;
+  brand_name?: string | null;
+  legal_name?: string | null;
   cif?: string | null;
   phone?: string | null;
   email?: string | null;
@@ -87,4 +88,14 @@ export type CompanyProfile = {
   contact_person?: string | null;
   contact_phone?: string | null;
   contact_email?: string | null;
+  billing_iban?: string | null;
+  billing_holder?: string | null;
+  billing_tax_id?: string | null;
+  billing_bank?: string | null;
+  billing_address?: string | null;
+  billing_city?: string | null;
+  billing_postal_code?: string | null;
+  billing_province?: string | null;
+  billing_country?: string | null;
+  billing_consent?: boolean | null;
 };

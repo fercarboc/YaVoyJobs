@@ -6,9 +6,11 @@ import {
   VoyPlanDiscount,
   VoySubscription,
   activatePlan,
+  createInvoice,
   getActiveSubscription,
   listDiscountsByScope,
   listPlansByScope,
+  saveBillingMandate,
 } from "@/services/subscriptionsService";
 
 type Props = {
@@ -53,6 +55,19 @@ const PlanSelector: React.FC<Props> = ({ scope, onActivated }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "iban">("card");
+  const [paymentData, setPaymentData] = useState({
+    cardholder: "",
+    last4: "",
+    exp_month: "",
+    exp_year: "",
+    iban: "",
+    holder: "",
+    tax_id: "",
+    bank: "",
+    consent: false,
+  });
 
   const selectedPlan = useMemo(() => plans.find((p) => p.id === selectedPlanId) || null, [plans, selectedPlanId]);
 
@@ -97,6 +112,10 @@ const PlanSelector: React.FC<Props> = ({ scope, onActivated }) => {
 
   const handleActivate = async () => {
     if (!selectedPlan) return;
+    if (scope === "AGENCY_HOUSING" && calculatedTotal > 0) {
+      setShowPayment(true);
+      return;
+    }
     setSubmitting(true);
     setFeedback(null);
     try {
@@ -107,6 +126,49 @@ const PlanSelector: React.FC<Props> = ({ scope, onActivated }) => {
       await loadData();
     } catch (err: any) {
       setFeedback({ type: "error", message: err?.message || "No se pudo activar el plan" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!selectedPlan) return;
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      if (paymentMethod === "iban") {
+        await saveBillingMandate({
+          iban: paymentData.iban,
+          holder: paymentData.holder,
+          tax_id: paymentData.tax_id,
+          bank: paymentData.bank,
+          consent: paymentData.consent,
+        });
+      }
+
+      const paymentRef =
+        paymentMethod === "card" ? `SIM_STRIPE_${Date.now()}` : `SIM_IBAN_${Date.now()}`;
+      if (paymentMethod === "card") {
+        await new Promise((res) => setTimeout(res, 600));
+      }
+
+      await createInvoice({
+        planId: selectedPlan.id,
+        period,
+        total: calculatedTotal,
+        status: paymentMethod === "card" ? "PAID" : "PENDING",
+        payment_ref: paymentRef,
+        currency: selectedPlan.currency,
+      });
+
+      const subscription = await activatePlan({ scope, planId: selectedPlan.id, period });
+      setActive(subscription);
+      setFeedback({ type: "success", message: "Plan actualizado y factura generada" });
+      setShowPayment(false);
+      onActivated?.(subscription);
+      await loadData();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err?.message || "No se pudo procesar el pago" });
     } finally {
       setSubmitting(false);
     }
@@ -252,6 +314,130 @@ const PlanSelector: React.FC<Props> = ({ scope, onActivated }) => {
           </button>
         </div>
       </div>
+
+      {showPayment && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Pago del plan</h3>
+                <p className="text-sm text-gray-600">
+                  Importe: {formatCurrency(calculatedTotal, selectedPlan?.currency || "EUR")} ({PERIOD_LABELS[period]})
+                </p>
+              </div>
+              <button onClick={() => setShowPayment(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">
+                ×
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              {["card", "iban"].map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setPaymentMethod(m as "card" | "iban")}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold border ${
+                    paymentMethod === m ? "border-blue-600 text-blue-700 bg-blue-50" : "border-gray-200 text-gray-700"
+                  }`}
+                >
+                  {m === "card" ? "Tarjeta (simulada)" : "Domiciliación (IBAN)"}
+                </button>
+              ))}
+            </div>
+
+            {paymentMethod === "card" ? (
+              <div className="grid gap-3">
+                <input
+                  placeholder="Titular"
+                  value={paymentData.cardholder}
+                  onChange={(e) => setPaymentData((p) => ({ ...p, cardholder: e.target.value }))}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    placeholder="Últimos 4"
+                    maxLength={4}
+                    value={paymentData.last4}
+                    onChange={(e) => setPaymentData((p) => ({ ...p, last4: e.target.value.replace(/\\D/g, "") }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      placeholder="MM"
+                      maxLength={2}
+                      value={paymentData.exp_month}
+                      onChange={(e) => setPaymentData((p) => ({ ...p, exp_month: e.target.value.replace(/\\D/g, "") }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-16"
+                    />
+                    <input
+                      placeholder="YY"
+                      maxLength={2}
+                      value={paymentData.exp_year}
+                      onChange={(e) => setPaymentData((p) => ({ ...p, exp_year: e.target.value.replace(/\\D/g, "") }))}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-16"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                <input
+                  placeholder="IBAN"
+                  value={paymentData.iban}
+                  onChange={(e) => setPaymentData((p) => ({ ...p, iban: e.target.value }))}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <input
+                  placeholder="Titular"
+                  value={paymentData.holder}
+                  onChange={(e) => setPaymentData((p) => ({ ...p, holder: e.target.value }))}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <input
+                  placeholder="DNI/CIF"
+                  value={paymentData.tax_id}
+                  onChange={(e) => setPaymentData((p) => ({ ...p, tax_id: e.target.value }))}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <input
+                  placeholder="Banco (opcional)"
+                  value={paymentData.bank}
+                  onChange={(e) => setPaymentData((p) => ({ ...p, bank: e.target.value }))}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={paymentData.consent}
+                    onChange={(e) => setPaymentData((p) => ({ ...p, consent: e.target.checked }))}
+                  />
+                  Autorizo la domiciliación del plan.
+                </label>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowPayment(false)}
+                type="button"
+                className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-semibold text-gray-700"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmPayment}
+                disabled={
+                  submitting ||
+                  (paymentMethod === "iban" && (!paymentData.iban || !paymentData.holder || !paymentData.tax_id || !paymentData.consent)) ||
+                  (paymentMethod === "card" && (!paymentData.cardholder || paymentData.last4.length !== 4))
+                }
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold disabled:opacity-50"
+              >
+                {submitting ? "Procesando..." : "Confirmar y facturar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

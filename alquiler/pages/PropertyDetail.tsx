@@ -6,6 +6,7 @@ import ContactButton from "../components/ContactButton";
 
 const IMG_MAIN_MOBILE = "h-[260px]";
 const IMG_MAIN_DESKTOP = "h-[340px]";
+const PLACEHOLDER_IMG = "https://placehold.co/800x600?text=YaVoy+Housing";
 
 const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -132,7 +133,15 @@ const PropertyDetail: React.FC = () => {
                     onClick={() => setIsLightboxOpen(true)}
                     className="w-full h-full block focus:outline-none"
                   >
-                    <img src={images[activeIndex]} alt={`Foto ${activeIndex + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={images[activeIndex]}
+                      alt={`Foto ${activeIndex + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.src !== PLACEHOLDER_IMG) target.src = PLACEHOLDER_IMG;
+                      }}
+                    />
                   </button>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sin fotos</div>
@@ -150,7 +159,15 @@ const PropertyDetail: React.FC = () => {
                         idx === activeIndex ? "border-blue-500 shadow" : "border-gray-200"
                       }`}
                     >
-                      <img src={img} alt={`Mini ${idx + 1}`} className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt={`Mini ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.src !== PLACEHOLDER_IMG) target.src = PLACEHOLDER_IMG;
+                        }}
+                      />
                       {idx === activeIndex && <span className="absolute inset-0 ring-2 ring-blue-500 rounded-xl" />}
                     </button>
                   ))}

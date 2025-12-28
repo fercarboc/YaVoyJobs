@@ -37,6 +37,11 @@ import {
   Gift,
   Plus,
   DollarSign,
+  Home,
+  Layers,
+  CreditCard,
+  PieChart,
+  Activity,
   BarChart,
   TrendingUp,
   Bell,
@@ -46,12 +51,11 @@ import {
   Package,
   Wrench,
   Store,
-} from 'lucide-react';
-
-import { Receipt, Settings } from 'lucide-react';
+  Receipt,
+  Settings,
+} from "lucide-react";
 
 export const Icons = {
-
   Menu,
   X,
   Heart,
@@ -90,6 +94,11 @@ export const Icons = {
   Gift,
   Plus,
   DollarSign,
+  Home,
+  Layers,
+  CreditCard,
+  PieChart,
+  Activity,
   BarChart,
   TrendingUp,
   Bell,
@@ -97,10 +106,12 @@ export const Icons = {
   Wallet,
   Coffee,
   Package,
-  Store,Receipt,
-Settings,
+  Store,
+  Receipt,
+  Settings,
 
-  // ✅ ALIAS para compatibilidad con código existente
-  Building2: Building, // lucide no tiene Building2
-  Tool: Wrench,        // lucide no tiene Tool
+  // alias para compatibilidad
+  Building2: Building,
+  Tool: Wrench,
+  BarChart2: BarChart,
 };

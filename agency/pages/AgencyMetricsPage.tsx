@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { listMyHousingAds, listMyHousingLeads } from "../services/agencyApi";
 
-type MetricRow = { ad: string; contacts: number; contacts7: number; views: number };
+type MetricRow = { ad_id: string; ad: string; contacts: number; contacts7: number; views: number };
 
 const AgencyMetricsPage: React.FC = () => {
   const [rows, setRows] = useState<MetricRow[]>([]);
@@ -15,6 +15,7 @@ const AgencyMetricsPage: React.FC = () => {
       const data: MetricRow[] = ads.map((ad) => {
         const byAd = leads.filter((l) => l.ad_id === ad.id);
         return {
+          ad_id: ad.id,
           ad: ad.title,
           contacts: byAd.length,
           contacts7: byAd.filter((l) => new Date(l.created_at || "").getTime() >= sevenDays).length,
@@ -56,7 +57,7 @@ const AgencyMetricsPage: React.FC = () => {
                 </tr>
               )}
               {rows.map((row) => (
-                <tr key={row.ad} className="hover:bg-gray-50">
+                <tr key={row.ad_id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-semibold text-gray-900">{row.ad}</td>
                   <td className="px-4 py-3 text-gray-700">{row.contacts}</td>
                   <td className="px-4 py-3 text-gray-700">{row.contacts7}</td>

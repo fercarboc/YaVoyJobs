@@ -44,6 +44,11 @@ import WorkerLayout from "@/pages/worker/WorkerLayout";
 import WorkerProfilePage from "@/pages/worker/WorkerProfilePage";
 import DashboardPerfiles from "@/dashboardperfiles/DashboardPerfiles";
 
+// Debug admin imports
+console.log("AdminLayout", AdminLayout);
+console.log("AdminHomePage", AdminHomePage);
+console.log("AdminUsersPage", AdminUsersPage);
+
 // Marketplace
 import Marketplace from "@/pages/marketplace";
 

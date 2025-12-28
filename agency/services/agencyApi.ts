@@ -27,20 +27,54 @@ export async function getCurrentVoyUser() {
   return data;
 }
 
-/* Company */
+/* Agency profile */
 export async function getMyCompany(): Promise<CompanyProfile | null> {
   const user = await getCurrentVoyUser();
-  const { data, error } = await supabase.from("VoyCompanies").select("*").eq("owner_user_id", user.id).maybeSingle();
+  const { data, error } = await supabase
+    .from("VoyAgencyProfiles")
+    .select("*")
+    .eq("agency_user_id", user.id)
+    .maybeSingle();
   if (error) throw error;
   return data as CompanyProfile | null;
 }
 
 export async function upsertMyCompany(input: CompanyProfile): Promise<CompanyProfile> {
   const user = await getCurrentVoyUser();
-  const payload = { ...input, owner_user_id: user.id };
-  const { data, error } = await supabase.from("VoyCompanies").upsert(payload, { onConflict: "owner_user_id" }).select().single();
+  const payload = { ...input, agency_user_id: user.id };
+  const { data, error } = await supabase
+    .from("VoyAgencyProfiles")
+    .upsert(payload, { onConflict: "agency_user_id" })
+    .select()
+    .single();
   if (error) throw error;
   return data as CompanyProfile;
+}
+
+/* Districts / Neighborhoods (MAESTRAS) */
+export type District = { id: string; name: string; city: string };
+export type Neighborhood = { id: string; district_id: string; name: string };
+
+export async function listDistricts(city = "MADRID"): Promise<District[]> {
+  const { data, error } = await supabase
+    .from("VoyDistricts")
+    .select("id, name, city")
+    .eq("city", city)
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data || []) as District[];
+}
+
+export async function listNeighborhoods(districtId: string): Promise<Neighborhood[]> {
+  const { data, error } = await supabase
+    .from("VoyNeighborhoods")
+    .select("id, district_id, name")
+    .eq("district_id", districtId)
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data || []) as Neighborhood[];
 }
 
 /* Ads */
@@ -72,10 +106,40 @@ export async function getHousingAdById(id: string) {
   return data as HousingAd & { images?: HousingImage[] };
 }
 
+const AD_FIELDS: (keyof HousingAd)[] = [
+  "title",
+  "description",
+  "ad_type",
+  "price",
+  "price_unit",
+  "deposit",
+  "min_stay",
+  "furnished",
+  "bills_included",
+  "available_from",
+  "city",
+  "district",
+  "neighborhood",
+  "address_hint",
+  "contact_phone",
+  "contact_email",
+  "status",
+];
+
+function sanitizeAdPayload(payload: Partial<HousingAd>) {
+  const cleaned: Record<string, any> = {};
+  AD_FIELDS.forEach((key) => {
+    const value = (payload as any)[key];
+    if (value === "" || value === undefined) return;
+    cleaned[key] = value;
+  });
+  return cleaned;
+}
+
 export async function createHousingAd(payload: Partial<HousingAd>) {
   const user = await getCurrentVoyUser();
   const insert = {
-    ...payload,
+    ...sanitizeAdPayload(payload),
     owner_user_id: user.id,
     owner_type: "AGENCY",
   };
@@ -88,7 +152,7 @@ export async function updateHousingAd(id: string, payload: Partial<HousingAd>) {
   const user = await getCurrentVoyUser();
   const { data, error } = await supabase
     .from("VoyHousingAds")
-    .update(payload)
+    .update(sanitizeAdPayload(payload))
     .eq("id", id)
     .eq("owner_user_id", user.id)
     .select()
@@ -146,11 +210,17 @@ export async function deleteHousingImage(image: HousingImage) {
 }
 
 export async function reorderHousingImages(ad_id: string, orderedIds: string[]) {
-  const updates = orderedIds.map((id, idx) => ({ id, sort_order: idx }));
-  const { error } = await supabase.from("VoyHousingImages").upsert(updates);
+  // upsert = INSERT + UPDATE => el INSERT evalúa WITH CHECK (necesita ad_id)
+  const updates = orderedIds.map((id, idx) => ({ id, ad_id, sort_order: idx }));
+
+  const { error } = await supabase
+    .from("VoyHousingImages")
+    .upsert(updates, { onConflict: "id" });
+
   if (error) throw error;
   return listHousingImages(ad_id);
 }
+
 
 /* Leads */
 export async function listMyHousingLeads(filters?: { status?: string }) {
