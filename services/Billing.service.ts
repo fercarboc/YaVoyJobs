@@ -70,48 +70,55 @@ export type VoyCompany = {
 
 export type VoyInvoice = {
   id: string;
+
+  // ids
   issuer_user_id?: string | null;
   payer_user_id: string;
   company_user_id?: string | null;
+  assignment_id?: string | null;
 
-  amount: number;                 // NOT NULL (según error que viste)
-  currency: string;               // NOT NULL
-
-  status: "PAID" | "PENDING" | "CANCELLED" | "REFUNDED" | string;
-  issued_at: string;
-  paid_at?: string | null;
-
-  description?: string | null;
-
-  scope?: string | null;
-  subscription_id?: string | null;
-
-  plan_id?: string | null;
-  period?: string | null;
-
+  // money
+  amount: number; // NOT NULL
+  currency: string; // NOT NULL
   subtotal?: number | null;
   vat?: number | null;
   total?: number | null;
 
-  payment_ref?: string | null;
+  // status/dates
+  status: "PAID" | "PENDING" | "CANCELLED" | "REFUNDED" | string;
+  issued_at: string;
+  paid_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
 
-  // hashes (tu tabla tiene varios campos)
+  // business
+  description?: string | null;
+  scope?: string | null;
+  subscription_id?: string | null;
+  plan_id?: string | null;
+  period?: string | null;
+  period_start?: string | null;
+  period_end?: string | null;
+
+  // payment
+  payment_ref?: string | null;        // tu referencia (SIM_STRIPE..., SEPA_..., etc)
+  stripe_invoice_id?: string | null;  // columna real en tabla
+  payment_method?: "CARD" | "SEPA" | "CASH" | "TRANSFER" | string | null; // simple, extensible
+
+  // invoice numbering
+  invoice_series?: string | null; // ej: "A-2025"
+  invoice_number?: number | null; // ej: 1
+
+  // hashes / signing
   invoice_hash?: string | null;
   previous_invoice_hash?: string | null;
   prev_hash?: string | null;
   hash?: string | null;
   hash_algorithm?: string | null;
   hash_payload?: any | null;
+  signed_at?: string | null;
+  signature?: string | null;
 
-  issuer_entity_id?: string | null;
-  invoice_series?: string | null;
-  invoice_number?: number | null;
-
-  period_start?: string | null;
-  period_end?: string | null;
-
-  created_at?: string;
-  updated_at?: string;
   metadata?: Record<string, any> | null;
 };
 
@@ -119,7 +126,7 @@ export type InvoiceWithDetails = {
   invoice: VoyInvoice;
   plan?: VoyPlan | null;
   subscription?: VoySubscription | null;
-  company?: VoyCompany | null; // datos del cliente (agencia/empresa) desde VoyCompanies
+  company?: VoyCompany | null;
 };
 
 const BILLING_MONTHS: Record<BillingPeriod, number> = {
@@ -154,6 +161,18 @@ function periodLabel(p?: string | null) {
   if (p === "semester") return "Semestral";
   if (p === "annual") return "Anual";
   return p;
+}
+
+function pad6(n: number) {
+  return String(n).padStart(6, "0");
+}
+
+export function formatInvoiceNumber(inv: Pick<VoyInvoice, "invoice_series" | "invoice_number" | "id">) {
+  if (inv.invoice_series && typeof inv.invoice_number === "number") {
+    return `${inv.invoice_series}-${pad6(inv.invoice_number)}`;
+  }
+  // fallback (solo si aún no hay numeración)
+  return inv.id;
 }
 
 async function sha256Hex(input: string) {
@@ -288,7 +307,7 @@ export async function activatePlan(params: { scope: PlanScope; planId: string; p
   return subscription as VoySubscription;
 }
 
-export type PaymentMethod = "card" | "iban";
+export type PaymentMethod = "CARD" | "SEPA";
 
 export async function saveBillingMandate(input: {
   iban?: string;
@@ -317,13 +336,36 @@ type CreateInvoiceInput = {
   period: BillingPeriod;
   total: number;
   status: "PAID" | "PENDING";
-  payment_ref?: string;
+
+  payment_ref?: string;          // tu referencia
+  stripe_invoice_id?: string;    // si lo tienes
+  payment_method?: PaymentMethod; // "CARD" | "SEPA"
+
   currency?: string;
   periodStart?: string;
   periodEnd?: string;
   scope?: PlanScope;
   subscriptionId?: string;
 };
+
+/**
+ * Devuelve el siguiente invoice_number para una serie.
+ * (Modo simple sin trigger; en producción ideal: trigger/sequence para evitar colisiones)
+ */
+async function getNextInvoiceNumber(invoiceSeries: string): Promise<number> {
+  const { data, error } = await supabase
+    .from("VoyInvoices")
+    .select("invoice_number")
+    .eq("invoice_series", invoiceSeries)
+    .order("invoice_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  const last = (data as any)?.invoice_number;
+  const lastNum = typeof last === "number" ? last : 0;
+  return lastNum + 1;
+}
 
 export async function createInvoice(params: CreateInvoiceInput) {
   const user = await getCurrentVoyUser();
@@ -340,12 +382,17 @@ export async function createInvoice(params: CreateInvoiceInput) {
   const pStart = params.periodStart || issuedAt;
   const pEnd = params.periodEnd || null;
 
+  // 1) series y número (A-YYYY-000001)
+  const year = new Date(issuedAt).getFullYear();
+  const invoiceSeries = `A-${year}`;
+  const invoiceNumber = await getNextInvoiceNumber(invoiceSeries);
+
   const description =
     `Plan: ${plan?.name || "Plan"}\n` +
     `Periodo: ${periodLabel(params.period)}\n` +
     `Vigencia: ${formatDateES(pStart)} - ${formatDateES(pEnd)}`;
 
-  // 1) hash anterior (cadena)
+  // 2) hash anterior (cadena)
   const { data: prev, error: prevErr } = await supabase
     .from("VoyInvoices")
     .select("hash, invoice_hash, prev_hash, previous_invoice_hash")
@@ -356,24 +403,23 @@ export async function createInvoice(params: CreateInvoiceInput) {
 
   if (prevErr) throw prevErr;
 
-  const prevHash =
-    prev?.hash || prev?.invoice_hash || prev?.prev_hash || prev?.previous_invoice_hash || null;
+  const prevHash = prev?.hash || prev?.invoice_hash || prev?.prev_hash || prev?.previous_invoice_hash || null;
 
-  // 2) nuevo hash
+  // 3) nuevo hash (encadenado)
   const invoiceId = crypto.randomUUID();
   const hash = await sha256Hex(`${invoiceId}${user.id}${params.total}${issuedAt}${prevHash || ""}`);
 
   const currency = params.currency || plan?.currency || "EUR";
 
-  // 3) insertar factura (columnas reales de tu tabla)
+  // 4) insertar factura (con numeración + forma de pago)
   const payload: Partial<VoyInvoice> = {
     id: invoiceId,
 
     payer_user_id: user.id,
     company_user_id: user.id,
 
-    amount: params.total,        // ✅ NOT NULL
-    currency,                   // ✅ NOT NULL
+    amount: params.total,
+    currency,
 
     status: params.status,
     issued_at: issuedAt,
@@ -392,8 +438,12 @@ export async function createInvoice(params: CreateInvoiceInput) {
     total: params.total,
 
     payment_ref: params.payment_ref || null,
+    stripe_invoice_id: params.stripe_invoice_id || null,
+    payment_method: params.payment_method || null,
 
-    // hashes: relleno en varios campos por compatibilidad con tu esquema
+    invoice_series: invoiceSeries,
+    invoice_number: invoiceNumber,
+
     invoice_hash: hash,
     hash,
     previous_invoice_hash: prevHash,
@@ -409,6 +459,10 @@ export async function createInvoice(params: CreateInvoiceInput) {
       plan_id: params.planId,
       scope: params.scope || null,
       subscription_id: params.subscriptionId || null,
+      invoice_series: invoiceSeries,
+      invoice_number: invoiceNumber,
+      payment_method: params.payment_method || null,
+      payment_ref: params.payment_ref || null,
     },
 
     period_start: pStart,
@@ -418,20 +472,23 @@ export async function createInvoice(params: CreateInvoiceInput) {
       period: params.period,
       scope: params.scope || null,
       subscription_id: params.subscriptionId || null,
+      invoice_series: invoiceSeries,
+      invoice_number: invoiceNumber,
+      payment_method: params.payment_method || null,
+      payment_ref: params.payment_ref || null,
     },
   };
 
   const { error } = await supabase.from("VoyInvoices").insert(payload);
   if (error) throw error;
 
-  return { id: invoiceId, hash };
+  return { id: invoiceId, hash, invoice_series: invoiceSeries, invoice_number: invoiceNumber };
 }
 
 /** Trae factura + plan + subscription + datos fiscales (VoyCompanies) */
 export async function getInvoiceWithDetails(invoiceId: string): Promise<InvoiceWithDetails> {
   const user = await getCurrentVoyUser();
 
-  // 1) factura
   const { data: invoice, error: invErr } = await supabase
     .from("VoyInvoices")
     .select("*")
@@ -441,36 +498,32 @@ export async function getInvoiceWithDetails(invoiceId: string): Promise<InvoiceW
   if (invErr) throw invErr;
   if (!invoice) throw new Error("Factura no encontrada");
 
-  // seguridad: si no eres admin, solo tus facturas
-  if (user.role !== "ADMIN" && invoice.payer_user_id !== user.id) {
+  if (user.role !== "ADMIN" && (invoice as any).payer_user_id !== user.id) {
     throw new Error("No autorizado");
   }
 
-  // 2) plan
   let plan: VoyPlan | null = null;
-  if (invoice.plan_id) {
-    const { data, error } = await supabase.from("voyplans").select("*").eq("id", invoice.plan_id).maybeSingle();
+  if ((invoice as any).plan_id) {
+    const { data, error } = await supabase.from("voyplans").select("*").eq("id", (invoice as any).plan_id).maybeSingle();
     if (error) throw error;
     plan = (data as VoyPlan | null) || null;
   }
 
-  // 3) subscription
   let subscription: VoySubscription | null = null;
-  if (invoice.subscription_id) {
+  if ((invoice as any).subscription_id) {
     const { data, error } = await supabase
       .from("VoyCompanySubscriptions")
       .select("*, plan:plan_id(id, plan_code, plan_scope, name, price, currency, billing_period, limits)")
-      .eq("id", invoice.subscription_id)
+      .eq("id", (invoice as any).subscription_id)
       .maybeSingle();
     if (error) throw error;
     subscription = (data as VoySubscription | null) || null;
   }
 
-  // 4) datos del cliente (VoyCompanies por owner_user_id = payer_user_id)
   const { data: company, error: cErr } = await supabase
     .from("VoyCompanies")
     .select("*")
-    .eq("owner_user_id", invoice.payer_user_id)
+    .eq("owner_user_id", (invoice as any).payer_user_id)
     .maybeSingle();
   if (cErr) throw cErr;
 
@@ -482,16 +535,25 @@ export async function getInvoiceWithDetails(invoiceId: string): Promise<InvoiceW
   };
 }
 
+function paymentMethodLabel(m?: string | null) {
+  if (!m) return "-";
+  const up = String(m).toUpperCase();
+  if (up === "CARD") return "Tarjeta";
+  if (up === "SEPA") return "Recibo SEPA";
+  if (up === "TRANSFER") return "Transferencia";
+  if (up === "CASH") return "Efectivo";
+  return m;
+}
+
 /** Genera un PDF profesional (frontend) */
 export function generateInvoicePdf(input: InvoiceWithDetails) {
   const { invoice, plan, subscription, company } = input;
 
   const doc = new jsPDF({ unit: "pt", format: "a4" });
-
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 40;
 
-  // === ENCABEZADO (EMISOR: YaVoy) ===
+  // === ENCABEZADO (EMISOR) ===
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text("YaVoyJobs Group, SL", margin, 55);
@@ -511,16 +573,13 @@ export function generateInvoicePdf(input: InvoiceWithDetails) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
 
-  const invoiceNumber =
-    invoice.invoice_series && invoice.invoice_number
-      ? `${invoice.invoice_series}-${invoice.invoice_number}`
-      : invoice.id;
+  const invoiceNumber = formatInvoiceNumber(invoice);
 
   doc.text(`Nº: ${invoiceNumber}`, pageWidth - margin, 74, { align: "right" });
   doc.text(`Fecha: ${formatDateES(invoice.issued_at)}`, pageWidth - margin, 88, { align: "right" });
   doc.text(`Estado: ${invoice.status}`, pageWidth - margin, 102, { align: "right" });
 
-  // === CLIENTE (VoyCompanies) ===
+  // === CLIENTE ===
   const clientY = 150;
   doc.setDrawColor(220);
   doc.line(margin, clientY - 18, pageWidth - margin, clientY - 18);
@@ -531,9 +590,8 @@ export function generateInvoicePdf(input: InvoiceWithDetails) {
   doc.setFont("helvetica", "normal");
   const clientName = company?.brand_name || company?.name || "Cliente";
   const clientCif = company?.billing_tax_id || company?.cif || "-";
- const clientEmail = company?.email || "-";
-const clientPhone = company?.phone || "-";
-
+  const clientEmail = company?.email || "-";
+  const clientPhone = company?.phone || "-";
 
   const billAddress = company?.billing_address || company?.address || "-";
   const billCity = company?.billing_city || company?.city || "-";
@@ -547,9 +605,15 @@ const clientPhone = company?.phone || "-";
   doc.text(`${billCP} · ${billCity} · ${billProv} · ${billCountry}`, margin, clientY + 64);
   doc.text(`Email: ${clientEmail}  ·  Tel: ${clientPhone}`, margin, clientY + 80);
 
-  // === DETALLE (líneas) ===
+  // forma de pago y referencia (debajo del cliente)
+  const payMethod = paymentMethodLabel(invoice.payment_method || null);
+  const payRef = invoice.payment_ref || invoice.stripe_invoice_id || "-";
+  doc.text(`Forma de pago: ${payMethod}`, margin, clientY + 98);
+  doc.text(`Ref: ${payRef}`, margin, clientY + 112);
+
+  // === DETALLE ===
   const itemPlan = plan?.name || "Plan";
-  const itemPeriod = subscription?.subscription_type || invoice.period || "monthly";
+  const itemPeriod = (subscription?.subscription_type || invoice.period || "monthly") as string;
   const itemStart = subscription?.start_date || invoice.period_start || invoice.issued_at;
   const itemEnd = subscription?.end_date || invoice.period_end || null;
 
@@ -558,12 +622,12 @@ const clientPhone = company?.phone || "-";
     `Periodo: ${periodLabel(itemPeriod)}\n` +
     `Vigencia: ${formatDateES(itemStart)} - ${formatDateES(itemEnd)}`;
 
-  const tableTop = clientY + 120;
+  const tableTop = clientY + 150;
 
   autoTable(doc, {
     startY: tableTop,
     head: [["Concepto", "Importe"]],
-    body: [[concept, formatMoney(invoice.amount ?? invoice.total ?? 0, invoice.currency)]],
+    body: [[concept, formatMoney(invoice.total ?? invoice.amount ?? 0, invoice.currency)]],
     styles: { font: "helvetica", fontSize: 10, cellPadding: 8 },
     headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
     columnStyles: {
@@ -574,21 +638,18 @@ const clientPhone = company?.phone || "-";
 
   const afterTableY = (doc as any).lastAutoTable.finalY + 20;
 
-  // === TOTALES ===
   const subtotal = invoice.subtotal ?? invoice.amount ?? 0;
   const vat = invoice.vat ?? 0;
   const total = invoice.total ?? invoice.amount ?? 0;
 
   doc.setFont("helvetica", "normal");
-  doc.text(`Subtotal: ${formatMoney(subtotal, invoice.currency)}`, pageWidth - margin, afterTableY + 10, {
-    align: "right",
-  });
+  doc.text(`Subtotal: ${formatMoney(subtotal, invoice.currency)}`, pageWidth - margin, afterTableY + 10, { align: "right" });
   doc.text(`IVA: ${formatMoney(vat, invoice.currency)}`, pageWidth - margin, afterTableY + 26, { align: "right" });
 
   doc.setFont("helvetica", "bold");
   doc.text(`TOTAL: ${formatMoney(total, invoice.currency)}`, pageWidth - margin, afterTableY + 46, { align: "right" });
 
-  // === HASH / FIRMA ===
+  // === HASH (abajo) ===
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   const hash = invoice.hash || invoice.invoice_hash || "-";
@@ -605,10 +666,6 @@ export async function downloadInvoicePdf(invoiceId: string) {
   const doc = generateInvoicePdf(details);
 
   const inv = details.invoice;
-  const filename =
-    inv.invoice_series && inv.invoice_number
-      ? `Factura_${inv.invoice_series}-${inv.invoice_number}.pdf`
-      : `Factura_${inv.id}.pdf`;
-
+  const filename = `Factura_${formatInvoiceNumber(inv)}.pdf`;
   doc.save(filename);
 }

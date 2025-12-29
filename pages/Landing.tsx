@@ -171,29 +171,29 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* COMO FUNCIONA (MODIFICADO) */}
-      <section id="como-funciona" className="bg-white">
+      {/* COMO FUNCIONA (OSCURA) */}
+      <section id="como-funciona" className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Proceso real</p>
-              <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Cómo funciona YaVoyJobs</h2>
-              <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                Publicas → eliges → pagas con protección → se hace el trabajo → confirmas → se libera el pago.
-                La plataforma retiene el importe y solo se suelta al finalizar.
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Proceso real</p>
+              <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Como funciona YaVoyJobs</h2>
+              <p className="mt-2 max-w-2xl text-sm text-blue-100">
+                Publicas - eliges - pagas con proteccion - se hace el trabajo - confirmas - se libera el pago. El
+                dinero queda retenido hasta finalizar.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/create-job"
-                className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:bg-emerald-300"
               >
                 Publicar tarea
               </Link>
               <Link
                 to="/jobs"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/10"
               >
                 Ver trabajos
               </Link>
@@ -208,31 +208,35 @@ export default function Landing() {
               desc="Describe la tarea, zona, fecha y presupuesto. (Particular o Empresa)"
               bullets={["Por horas o precio fijo", "Barrio y disponibilidad", "Opcional: urgencia y requisitos"]}
               icon={<ListIcon />}
+              variant="dark"
             />
             <FlowStep
               step="2"
               title="Candidatos + Chat"
-              desc="Recibes candidatos cercanos. Comparas reputación, precio y chateas."
+              desc="Recibes candidatos cercanos. Comparas reputacion, precio y chateas."
               bullets={["Filtros por disponibilidad", "Chat para acordar detalles", "Perfil verificado + valoraciones"]}
               icon={<UsersIcon />}
+              variant="dark"
             />
             <FlowStep
               step="3"
               title="Pago protegido"
-              desc="Pagas comisión + seguro + importe del trabajo. El dinero queda retenido."
-              bullets={["Cobro seguro tipo ‘reserva’", "Retención hasta finalizar", "Transparencia de costes"]}
+              desc="Pagas comision + seguro + importe del trabajo. El dinero queda retenido."
+              bullets={["Cobro seguro tipo 'reserva'", "Retencion hasta finalizar", "Transparencia de costes"]}
               icon={<LockIcon />}
+              variant="dark"
             />
             <FlowStep
               step="4"
               title="Finaliza + Libera"
               desc="El cliente confirma. Se libera el pago al trabajador y ambos se valoran."
-              bullets={["Confirmación de finalización", "Pago al trabajador (Stripe)", "Factura + histórico + reputación"]}
+              bullets={["Confirmacion de finalizacion", "Pago al trabajador (Stripe)", "Factura + historico + reputacion"]}
               icon={<StarIcon />}
+              variant="dark"
             />
           </div>
 
-          {/* Qué ve cada rol */}
+          {/* Que ve cada rol */}
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             <RoleHow
               title="Particular"
@@ -240,44 +244,47 @@ export default function Landing() {
               bullets={[
                 "Publicas una tarea en 1 minuto",
                 "Eliges candidato por precio y valoraciones",
-                "Pagas con protección y confirmas al terminar",
+                "Pagas con proteccion y confirmas al terminar",
               ]}
+              variant="dark"
             />
             <RoleHow
-              title="Empresa / Autónomo"
+              title="Empresa / Autonomo"
               icon={<BuildingIcon />}
               bullets={[
                 "Publicas por horas o servicio (con factura)",
                 "Filtras y gestionas varios candidatos",
-                "Histórico, facturas y control del gasto",
+                "Historico, facturas y control del gasto",
               ]}
+              variant="dark"
             />
             <RoleHow
               title="Trabajador"
               icon={<WrenchIcon />}
               bullets={[
                 "Te apuntas a tareas cercanas",
-                "Acordáis detalles por chat",
-                "Cobras cuando el cliente confirma + subes reputación",
+                "Acordais detalles por chat",
+                "Cobras cuando el cliente confirma + subes reputacion",
               ]}
+              variant="dark"
             />
           </div>
 
           {/* Nota de confianza */}
-          <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6">
+          <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-lg shadow-slate-900/20">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="max-w-3xl">
-                <div className="text-sm font-extrabold text-slate-900">Transparente y antifraude</div>
-                <p className="mt-1 text-sm text-slate-600">
-                  El pago queda retenido hasta que el cliente confirma la finalización. Si hay incidencia, se abre un
+                <div className="text-sm font-extrabold text-white">Transparente y antifraude</div>
+                <p className="mt-1 text-sm text-blue-100">
+                  El pago queda retenido hasta que el cliente confirma la finalizacion. Si hay incidencia, se abre un
                   ticket y el soporte revisa el caso antes de liberar el importe.
                 </p>
               </div>
               <div className="flex gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white shadow-sm">
                   <ShieldIcon /> Seguro incluido
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white shadow-sm">
                   <LockIcon /> Pago retenido
                 </span>
               </div>
@@ -286,110 +293,165 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* PERFILES DESTACADOS (MODIFICADO) */}
-      <section id="servicios" className="bg-slate-50/60">
+      {/* PERFILES DESTACADOS (OSCURA) */}
+      <section id="servicios" className="bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 text-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex flex-col gap-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Perfiles</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Perfiles</p>
             <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Para todos los vecinos</h2>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-blue-100">
               Tres roles, una sola plataforma: anuncios, chat, pagos protegidos, seguro e historial.
             </p>
           </div>
 
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             {personas.map((p) => (
-              <PersonaShowcaseCard key={p.title} persona={p} />
+              <PersonaShowcaseCard key={p.title} persona={p} dark />
             ))}
           </div>
 
-          <div className="mt-10 grid gap-6 rounded-3xl bg-white p-6 shadow-lg sm:grid-cols-2 lg:grid-cols-3">
-            <MiniCard title="Hogar" desc="Montaje, pintura, arreglos y limpiezas puntuales." />
-            <MiniCard title="Recados y acompañamientos" desc="Compras, entregas y apoyo a mayores." />
-            <MiniCard title="Tecnología" desc="Wi-Fi, soporte PC/móvil, televisores e impresoras." />
-            <MiniCard title="Mascotas" desc="Paseos, cuidados y pequeñas gestiones." />
-            <MiniCard title="Oficios" desc="Electricista, fontanero, cerrajero y más." />
-            <MiniCard title="Negocio y eventos" desc="Repartos de barrio, montajes y apoyo en tienda." />
+          <div className="mt-10 grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg sm:grid-cols-2 lg:grid-cols-3">
+            <MiniCard title="Hogar" desc="Montaje, pintura, arreglos y limpiezas puntuales." light />
+            <MiniCard title="Recados y acompanamientos" desc="Compras, entregas y apoyo a mayores." light />
+            <MiniCard title="Tecnologia" desc="Wi-Fi, soporte PC/movil, televisores e impresoras." light />
+            <MiniCard title="Mascotas" desc="Paseos, cuidados y pequenas gestiones." light />
+            <MiniCard title="Oficios" desc="Electricista, fontanero, cerrajero y mas." light />
+            <MiniCard title="Negocio y eventos" desc="Repartos de barrio, montajes y apoyo en tienda." light />
           </div>
         </div>
       </section>
 
-      {/* HERO CIUDAD */}
-      <section id="empresas" className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <div className="grid items-center gap-8 lg:grid-cols-2">
-            <div className="space-y-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Empresas y autonomos</p>
-              <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">
-                Contrata por barrio y acelera tus operaciones
-              </h2>
-              <p className="text-sm text-slate-600">
-                Publica ofertas por horas o por servicio, filtra candidatos, chatea y cierra con pagos seguros. Todo
-                queda registrado con factura y reputacion.
-              </p>
+      {/* EMPRESAS: ejemplos + bonos en oscuro */}
+      <section id="empresas" className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white">
+        <div className="mx-auto max-w-6xl px-4 py-14 space-y-10">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Empresas y comercios</p>
+            <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Contrata por barrio y acelera tus operaciones</h2>
+            <p className="text-sm text-blue-100">
+              Publica ofertas por horas o por servicio, filtra candidatos, chatea y cierra con pagos seguros. Todo queda registrado con factura y reputacion.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:bg-emerald-300"
+              >
+                Soy empresa
+              </Link>
+              <Link
+                to="/marketplace"
+                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                Ir al marketplace
+              </Link>
+            </div>
+          </div>
 
-              <div className="grid gap-3">
-                <FeatureCard title="Gestion simple" desc="Publicas, filtras candidatos, chateas y cierras." icon={<ListIcon />} />
-                <FeatureCard title="Marketplace local" desc="Vende productos con recogida o entrega en tu zona." icon={<StoreIcon />} />
-                <FeatureCard title="Atencion prioritaria" desc="Soporte cercano y verificacion para empresas." icon={<SparklesIcon />} />
+          <div className="grid gap-4 lg:grid-cols-3">
+            <JobExample
+              tag="Hosteleria"
+              rate="12€ / hora"
+              title="Camarero de Refuerzo"
+              desc="Turno viernes y sabados noche. Zona Legazpi."
+              bullets={["Alta en Seguridad Social", "10 horas/semana", "Turnos flexibles"]}
+              avatar="BR"
+            />
+            <JobExample
+              tag="Logistica"
+              rate="650€ / mes"
+              title="Repartidor 1/2 jornada"
+              desc="Reparto a pie/bici en barrio Arganzuela."
+              bullets={["Contrato indefinido", "Lunes a viernes", "Horario mananas"]}
+              avatar="PL"
+            />
+            <JobExample
+              tag="Admin"
+              rate="15€ / hora"
+              title="Auxiliar Administrativo"
+              desc="Apoyo puntual para cierre de trimestre."
+              bullets={["Trabajo por horas", "Presencial 3 dias", "Perfil verificado"]}
+              avatar="G"
+              ghost
+            />
+          </div>
+
+          <div className="rounded-3xl bg-gradient-to-br from-purple-800 via-purple-900 to-indigo-900 p-6 sm:p-8 shadow-2xl border border-white/10">
+            <div className="flex items-center gap-3 text-white">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-white">
+                <GiftIcon />
               </div>
-
-              <div className="flex flex-wrap gap-3 pt-2">
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
-                >
-                  Soy empresa
-                </Link>
-                <Link
-                  to="/marketplace"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
-                >
-                  Ir al marketplace
-                </Link>
+              <div>
+                <div className="text-2xl font-extrabold">Bonos de Contratacion</div>
+                <div className="text-sm text-purple-100">Ahorra dinero con nuestros planes mensuales</div>
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
-              <SafeImage src={CITY_IMAGE} alt="Ciudad con app YaVoyJobs" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+              <PlanCard title="Mensual" price="15€" suffix="/mes" desc="Contrataciones ilimitadas durante 30 dias" note="0€ por contratacion" />
+              <PlanCard
+                title="Semestral"
+                price="75€"
+                suffix="/6 meses"
+                desc="Contrataciones ilimitadas durante 180 dias"
+                note="Ahorras 15€ (12.5€/mes)"
+                highlight
+              />
+              <PlanCard title="Anual" price="120€" suffix="/año" desc="Contrataciones ilimitadas durante 365 dias" note="Ahorras 60€ (10€/mes)" />
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 text-sm text-purple-100">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="font-semibold text-white mb-2">Por que un bono?</div>
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>1 contratacion = 15€ de comision</li>
+                  <li>2 contrataciones = 30€</li>
+                  <li>5 contrataciones = 75€</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="font-semibold text-white mb-2">Con bono mensual (15€)</div>
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>Contrataciones ilimitadas sin comision</li>
+                  <li>Rentable desde la 2a contratacion</li>
+                  <li>Ideal si contratas regularmente</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTORES */}
-      <section id="sectores" className="bg-slate-50/60">
+      {/* SECTORES (OSCURA) */}
+      <section id="sectores" className="bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 text-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Sectores fuertes</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Sectores fuertes</p>
               <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Servicios mas demandados</h2>
-              <p className="mt-2 text-sm text-slate-600">Ajusta segun tu catalogo real cuando quieras.</p>
+              <p className="mt-2 text-sm text-blue-100">Ajusta segun tu catalogo real cuando quieras.</p>
             </div>
-            <Link to="/jobs" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <Link to="/jobs" className="text-sm font-semibold text-blue-200 hover:text-white">
               Ver anuncios →
             </Link>
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sectors.map((s) => (
-              <SectorCard key={s.id} sector={s} />
+              <SectorCard key={s.id} sector={s} variant="dark" />
             ))}
           </div>
         </div>
       </section>
 
-      {/* BARRIOS */}
-      <section id="barrios" className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
+      {/* BARRIOS (oscuro) */}
+      <section id="barrios" className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white">
+        <div className="mx-auto max-w-6xl px-4 py-14 space-y-6">
           <div className="flex flex-col gap-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Cobertura</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Cobertura</p>
             <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Empezamos por distritos</h2>
-            <p className="text-sm text-slate-600">Crecemos con control y densidad de oferta y demanda.</p>
+            <p className="text-sm text-blue-100">Crecemos con control y densidad de oferta y demanda.</p>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {(["Usera", "Arganzuela", "Carabanchel", "Chamberi (fase 2)", "Otros (fase 3)"] as District[]).map((d) => (
               <button
                 key={d}
@@ -397,8 +459,8 @@ export default function Landing() {
                 className={[
                   "rounded-full px-4 py-2 text-sm border transition",
                   d === selectedDistrict
-                    ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
-                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50",
+                    ? "bg-white/15 border-white/30 text-white shadow-sm"
+                    : "bg-white/5 border-white/15 text-blue-100 hover:bg-white/10",
                 ].join(" ")}
               >
                 {d}
@@ -406,14 +468,14 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3">
             <MiniCard
               title={`Foco actual: ${selectedDistrict}`}
               desc="Priorizamos rapidez de respuesta y verificacion de perfiles."
-              highlight
+              light
             />
-            <MiniCard title="Criterio de expansion" desc="Arrancamos donde hay demanda real y comercios activos." />
-            <MiniCard title="Marketplace por zona" desc="Recogidas y entregas optimizadas por cercania." />
+            <MiniCard title="Criterio de expansion" desc="Arrancamos donde hay demanda real y comercios activos." light />
+            <MiniCard title="Marketplace por zona" desc="Recogidas y entregas optimizadas por cercania." light />
           </div>
         </div>
       </section>
@@ -464,43 +526,43 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CONTACTO */}
-      <section id="contacto" className="bg-white">
+      {/* CONTACTO (oscuro) */}
+      <section id="contacto" className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex flex-col gap-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-600">Contacto</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Contacto</p>
             <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Hablemos</h2>
-            <p className="text-sm text-slate-600">Escribenos para colaboraciones, soporte o prensa.</p>
+            <p className="text-sm text-blue-100">Escribenos para colaboraciones, soporte o prensa.</p>
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm">
-              <div className="text-sm font-extrabold text-slate-900">YaVoyJobs</div>
-              <div className="mt-1 text-sm text-slate-600">Soporte y alianzas</div>
+            <div className="rounded-3xl border border-white/15 bg-white/5 p-6 shadow-lg shadow-slate-900/25">
+              <div className="text-sm font-extrabold text-white">YaVoyJobs</div>
+              <div className="mt-1 text-sm text-blue-100">Soporte y alianzas</div>
 
-              <div className="mt-6 grid gap-3 text-sm text-slate-700">
-                <ContactItem icon={<MailIcon />} label="soporte@yavoyjobs.com" />
-                <ContactItem icon={<PhoneIcon />} label="+34 600 000 000" />
-                <ContactItem icon={<PinIcon />} label="Madrid • Por barrios" />
+              <div className="mt-6 grid gap-3 text-sm text-blue-100">
+                <ContactItem icon={<MailIcon />} label="soporte@yavoyjobs.com" variant="dark" />
+                <ContactItem icon={<PhoneIcon />} label="+34 600 000 000" variant="dark" />
+                <ContactItem icon={<PinIcon />} label="Madrid • Por barrios" variant="dark" />
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
                   href="mailto:soporte@yavoyjobs.com"
-                  className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+                  className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:bg-emerald-300"
                 >
                   Contactar
                 </a>
                 <Link
                   to="/download"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+                  className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/10"
                 >
                   Descargar app
                 </Link>
               </div>
             </div>
 
-            <ContactForm />
+            <ContactForm variant="dark" />
           </div>
         </div>
       </section>
@@ -512,7 +574,7 @@ export default function Landing() {
 
 /* ------------------------ CONTACT FORM ------------------------ */
 
-function ContactForm() {
+function ContactForm({ variant = "light" }: { variant?: "light" | "dark" }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [form, setForm] = useState({
     name: "",
@@ -535,26 +597,35 @@ function ContactForm() {
     setForm({ name: "", email: "", subject: "", message: "" });
   };
 
+  const isDark = variant === "dark";
+
   return (
-    <form onSubmit={onSubmit} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="text-sm font-extrabold text-slate-900">Escribenos</div>
-      <div className="mt-1 text-sm text-slate-600">Te respondemos lo antes posible.</div>
+    <form
+      onSubmit={onSubmit}
+      className={`rounded-3xl border p-6 shadow-sm ${
+        isDark ? "border-white/15 bg-white/5 text-white shadow-lg shadow-slate-900/25" : "border-slate-200 bg-white"
+      }`}
+    >
+      <div className={`text-sm font-extrabold ${isDark ? "text-white" : "text-slate-900"}`}>Escribenos</div>
+      <div className={`mt-1 text-sm ${isDark ? "text-blue-100" : "text-slate-600"}`}>Te respondemos lo antes posible.</div>
 
       <div className="mt-6 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nombre" value={form.name} onChange={onChange("name")} placeholder="Tu nombre" />
-          <Field label="Email" value={form.email} onChange={onChange("email")} placeholder="tucorreo@..." type="email" />
+          <Field label="Nombre" value={form.name} onChange={onChange("name")} placeholder="Tu nombre" variant={variant} />
+          <Field label="Email" value={form.email} onChange={onChange("email")} placeholder="tucorreo@..." type="email" variant={variant} />
         </div>
 
-        <Field label="Asunto" value={form.subject} onChange={onChange("subject")} placeholder="Colaboracion / soporte" />
+        <Field label="Asunto" value={form.subject} onChange={onChange("subject")} placeholder="Colaboracion / soporte" variant={variant} />
 
         <div>
-          <label className="text-xs font-semibold text-slate-700">Mensaje</label>
+          <label className={`text-xs font-semibold ${isDark ? "text-blue-100" : "text-slate-700"}`}>Mensaje</label>
           <textarea
             value={form.message}
             onChange={onChange("message")}
             placeholder="Cuentanos en que podemos ayudarte..."
-            className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-300"
+            className={`mt-1 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:border-blue-300 ${
+              isDark ? "border-white/20 bg-white/10 text-white placeholder:text-blue-200" : "border-slate-200 bg-white text-slate-900"
+            }`}
             rows={5}
             required
           />
@@ -563,12 +634,18 @@ function ContactForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:opacity-60"
+          className={`inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 disabled:opacity-60 ${
+            isDark
+              ? "bg-emerald-400 text-slate-900 shadow-lg shadow-emerald-900/30 hover:bg-emerald-300"
+              : "bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700"
+          }`}
         >
           {status === "sending" ? "Enviando..." : status === "sent" ? "Enviado" : "Enviar mensaje"}
         </button>
 
-        <div className="text-xs text-slate-500">Al enviar aceptas que te contactemos para responder tu solicitud.</div>
+        <div className={`text-xs ${isDark ? "text-blue-100" : "text-slate-500"}`}>
+          Al enviar aceptas que te contactemos para responder tu solicitud.
+        </div>
       </div>
     </form>
   );
@@ -580,17 +657,21 @@ function Field(props: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   type?: string;
+  variant?: "light" | "dark";
 }) {
+  const isDark = props.variant === "dark";
   return (
     <div>
-      <label className="text-xs font-semibold text-slate-700">{props.label}</label>
+      <label className={`text-xs font-semibold ${isDark ? "text-blue-100" : "text-slate-700"}`}>{props.label}</label>
       <input
         value={props.value}
         onChange={props.onChange}
         placeholder={props.placeholder}
         type={props.type ?? "text"}
         required
-        className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-300"
+        className={`mt-1 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:border-blue-300 ${
+          isDark ? "border-white/20 bg-white/10 text-white placeholder:text-blue-200" : "border-slate-200 bg-white text-slate-900"
+        }`}
       />
     </div>
   );
@@ -665,26 +746,35 @@ function FlowStep(props: {
   desc: string;
   bullets: string[];
   icon: React.ReactNode;
+  variant?: "light" | "dark";
 }) {
+  const isDark = props.variant === "dark";
+  const container = isDark
+    ? "border-white/10 bg-white/5 text-white shadow-lg shadow-slate-900/25"
+    : "border-slate-200 bg-white text-slate-900 shadow-sm";
+  const chip = isDark ? "bg-white/10 text-white" : "bg-slate-100 text-slate-700";
+  const bullet = isDark ? "bg-emerald-300" : "bg-blue-600";
+  const muted = isDark ? "text-blue-100" : "text-slate-600";
+
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className={`rounded-3xl border p-6 ${container}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-700">{props.icon}</div>
+          <div className={`grid h-10 w-10 place-items-center rounded-2xl ${isDark ? "bg-white/10 text-white" : "bg-blue-50 text-blue-700"}`}>{props.icon}</div>
           <div>
-            <div className="text-xs font-extrabold text-blue-700">Paso {props.step}</div>
-            <div className="text-base font-extrabold text-slate-900">{props.title}</div>
+            <div className={`text-xs font-extrabold ${isDark ? "text-blue-100" : "text-blue-700"}`}>Paso {props.step}</div>
+            <div className="text-base font-extrabold">{props.title}</div>
           </div>
         </div>
-        <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">YaVoyFlow</div>
+        <div className={`rounded-full px-3 py-1 text-xs font-semibold ${chip}`}>YaVoyFlow</div>
       </div>
 
-      <p className="mt-3 text-sm text-slate-600">{props.desc}</p>
+      <p className={`mt-3 text-sm ${muted}`}>{props.desc}</p>
 
-      <ul className="mt-4 space-y-2 text-sm text-slate-600">
+      <ul className={`mt-4 space-y-2 text-sm ${muted}`}>
         {props.bullets.map((b, idx) => (
           <li key={`${props.title}-${idx}`} className="flex gap-2">
-            <span className="mt-[7px] h-2 w-2 rounded-full bg-blue-600" />
+            <span className={`mt-[7px] h-2 w-2 rounded-full ${bullet}`} />
             <span>{b}</span>
           </li>
         ))}
@@ -693,17 +783,24 @@ function FlowStep(props: {
   );
 }
 
-function RoleHow(props: { title: string; bullets: string[]; icon: React.ReactNode }) {
+function RoleHow(props: { title: string; bullets: string[]; icon: React.ReactNode; variant?: "light" | "dark" }) {
+  const isDark = props.variant === "dark";
+  const container = isDark
+    ? "border-white/10 bg-white/5 text-white shadow-lg shadow-slate-900/25"
+    : "border-slate-200 bg-white text-slate-900 shadow-sm";
+  const bullet = isDark ? "bg-emerald-300" : "bg-blue-600";
+  const muted = isDark ? "text-blue-100" : "text-slate-600";
+
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className={`rounded-3xl border p-6 ${container}`}>
       <div className="flex items-center gap-3">
-        <div className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-700">{props.icon}</div>
-        <div className="text-base font-extrabold text-slate-900">{props.title}</div>
+        <div className={`grid h-10 w-10 place-items-center rounded-2xl ${isDark ? "bg-white/10 text-white" : "bg-blue-50 text-blue-700"}`}>{props.icon}</div>
+        <div className="text-base font-extrabold">{props.title}</div>
       </div>
-      <ul className="mt-4 space-y-2 text-sm text-slate-600">
+      <ul className={`mt-4 space-y-2 text-sm ${muted}`}>
         {props.bullets.map((b, idx) => (
           <li key={`${props.title}-how-${idx}`} className="flex gap-2">
-            <span className="mt-[7px] h-2 w-2 rounded-full bg-blue-600" />
+            <span className={`mt-[7px] h-2 w-2 rounded-full ${bullet}`} />
             <span>{b}</span>
           </li>
         ))}
@@ -712,9 +809,13 @@ function RoleHow(props: { title: string; bullets: string[]; icon: React.ReactNod
   );
 }
 
-function PersonaShowcaseCard({ persona }: { persona: PersonaCard }) {
+function PersonaShowcaseCard({ persona, dark }: { persona: PersonaCard; dark?: boolean }) {
+  const border = dark ? "border-white/10 bg-white/5 text-white" : "border-slate-200 bg-white text-slate-900";
+  const bullet = dark ? "bg-emerald-300" : "bg-blue-600";
+  const muted = dark ? "text-blue-100" : "text-slate-600";
+
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className={`overflow-hidden rounded-3xl border shadow-sm ${border}`}>
       <div className="relative h-40 w-full">
         <SafeImage src={persona.image} alt={persona.title} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent" />
@@ -730,10 +831,10 @@ function PersonaShowcaseCard({ persona }: { persona: PersonaCard }) {
       </div>
 
       <div className="p-6">
-        <ul className="space-y-2 text-sm text-slate-600">
+        <ul className={`space-y-2 text-sm ${muted}`}>
           {persona.bullets.map((b, idx) => (
             <li key={`${persona.title}-bullet-${idx}`} className="flex gap-2">
-              <span className="mt-[7px] h-2 w-2 rounded-full bg-blue-600" />
+              <span className={`mt-[7px] h-2 w-2 rounded-full ${bullet}`} />
               <span>{b}</span>
             </li>
           ))}
@@ -747,10 +848,13 @@ function PersonaShowcaseCard({ persona }: { persona: PersonaCard }) {
             {persona.cta.label}
           </Link>
 
-          {/* Anchor para bajar a "Cómo funciona" sin depender de rutas */}
           <a
             href="#como-funciona"
-            className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+            className={`inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 ${
+              dark
+                ? "border-white/20 bg-white/5 text-white shadow-sm hover:bg-white/10"
+                : "border-slate-200 bg-white text-slate-900 shadow-sm hover:bg-slate-50"
+            }`}
           >
             Ver el flujo
           </a>
@@ -801,29 +905,96 @@ function MiniCard(props: {
   );
 }
 
-function SectorCard({ sector }: { sector: Sector }) {
+function SectorCard({ sector, variant }: { sector: Sector; variant?: "light" | "dark" }) {
+  const isDark = variant === "dark";
+  const bullet = isDark ? "bg-emerald-300" : "bg-blue-600";
+  const muted = isDark ? "text-blue-100" : "text-slate-600";
+
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="text-base font-extrabold text-slate-900">{sector.title}</div>
-      <p className="mt-2 text-sm text-slate-600">{sector.desc}</p>
-      <ul className="mt-4 space-y-2 text-sm text-slate-600">
+    <div
+      className={`rounded-3xl border p-6 ${
+        isDark ? "border-white/10 bg-white/5 text-white shadow-lg shadow-slate-900/25" : "border-slate-200 bg-white text-slate-900 shadow-sm"
+      }`}
+    >
+      <div className="text-base font-extrabold">{sector.title}</div>
+      <p className={`mt-2 text-sm ${muted}`}>{sector.desc}</p>
+      <ul className={`mt-4 space-y-2 text-sm ${muted}`}>
         {sector.bullets.map((b) => (
           <li key={`${sector.id}-${b}`} className="flex gap-2">
-            <span className="mt-[7px] h-2 w-2 rounded-full bg-blue-600" />
+            <span className={`mt-[7px] h-2 w-2 rounded-full ${bullet}`} />
             <span>{b}</span>
           </li>
         ))}
       </ul>
-      <div className="mt-4 text-sm font-semibold text-blue-600">Ver servicios →</div>
+      <div className={`mt-4 text-sm font-semibold ${isDark ? "text-emerald-200" : "text-blue-600"}`}>Ver servicios →</div>
     </div>
   );
 }
 
-function ContactItem(props: { icon: React.ReactNode; label: string }) {
+function JobExample(props: {
+  tag: string;
+  rate: string;
+  title: string;
+  desc: string;
+  bullets: string[];
+  avatar: string;
+  ghost?: boolean;
+}) {
+  return (
+    <div
+      className={[
+        "rounded-3xl border p-5 shadow-lg backdrop-blur",
+        props.ghost ? "border-white/10 bg-white/5" : "border-white/15 bg-white/8",
+      ].join(" ")}
+    >
+      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-blue-200">
+        <span className="inline-flex rounded-full bg-blue-500/20 px-3 py-1 text-blue-100">{props.tag}</span>
+        <span className="text-white">{props.rate}</span>
+      </div>
+      <div className="mt-3 text-lg font-extrabold text-white">{props.title}</div>
+      <p className="mt-1 text-sm text-blue-100">{props.desc}</p>
+      <ul className="mt-4 space-y-2 text-sm text-blue-100">
+        {props.bullets.map((b, idx) => (
+          <li key={`${props.title}-${idx}`} className="flex items-start gap-2">
+            <span className="mt-[6px] h-2 w-2 rounded-full bg-emerald-300" />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-5 flex items-center gap-2 text-sm text-blue-200">
+        <span className="grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-white/10 text-white">{props.avatar}</span>
+        <span>Perfil verificado</span>
+      </div>
+    </div>
+  );
+}
+
+function PlanCard(props: { title: string; price: string; suffix: string; desc: string; note: string; highlight?: boolean }) {
+  const base = "rounded-2xl border p-5 text-white";
+  const tone = props.highlight ? "border-purple-200/50 bg-white/10 shadow-xl" : "border-white/15 bg-white/5";
+  return (
+    <div className={[base, tone].join(" ")}>
+      <div className="text-sm font-semibold text-purple-100">{props.title}</div>
+      <div className="mt-2 flex items-baseline gap-1">
+        <div className="text-3xl font-extrabold">{props.price}</div>
+        <div className="text-sm text-purple-100">{props.suffix}</div>
+      </div>
+      <p className="mt-3 text-sm text-purple-50">{props.desc}</p>
+      <div className="mt-4 text-xs font-semibold text-emerald-200">{props.note}</div>
+    </div>
+  );
+}
+
+function ContactItem(props: { icon: React.ReactNode; label: string; variant?: "light" | "dark" }) {
+  const isDark = props.variant === "dark";
   return (
     <div className="flex items-center gap-2">
-      <span className="grid h-9 w-9 place-items-center rounded-2xl bg-blue-50 text-blue-700">{props.icon}</span>
-      <span>{props.label}</span>
+      <span
+        className={`grid h-9 w-9 place-items-center rounded-2xl ${isDark ? "bg-white/10 text-white" : "bg-blue-50 text-blue-700"}`}
+      >
+        {props.icon}
+      </span>
+      <span className={isDark ? "text-blue-100" : ""}>{props.label}</span>
     </div>
   );
 }
@@ -1035,6 +1206,17 @@ function SparklesIcon() {
       <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
       <path d="M6 16l.8 2.2L9 19l-2.2.8L6 22l-.8-2.2L3 19l2.2-.8L6 16z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
       <path d="M18 14l.7 1.8L20 16l-1.3.2L18 18l-.7-1.8L16 16l1.3-.2L18 14z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function GiftIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M20 7H4v13h16V7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 11h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 7v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 7c-2.8 0-4-.8-4-2s1.6-2 3.2-1.5C12.3 3.8 12 7 12 7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 7c2.8 0 4-.8 4-2s-1.6-2-3.2-1.5C11.7 3.8 12 7 12 7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
