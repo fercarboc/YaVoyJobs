@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { X, MapPin, Layers, Clock, Shield, Calendar as CalIcon, AlertCircle } from "lucide-react";
-import { JobPanel, JobStatus, JobType } from "../dashboardTypes";
+import { X, MapPin, Layers, Clock, Shield, AlertCircle } from "lucide-react";
+import { JobPanel, JobType } from "../dashboardTypes";
 
 const YA_VOY_BLUE = "#0056b3";
 
@@ -13,21 +13,40 @@ const NEIGHBORHOODS_BY_DISTRICT: Record<string, string[]> = {
   Tetuán: ["Bellas Vistas", "Cuatro Caminos", "Castillejos"],
   Salamanca: ["Goya", "Lista", "Recoletos"],
 };
+
 const CATEGORIES = ["Pasear mascota", "Limpieza", "Mudanza", "Fontanería", "Jardín", "Reparto", "Reparaciones"] as const;
+
+type Mode = "create" | "edit";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+
+  // create
   onCreate: (job: JobPanel) => void;
+
+  // edit (optional)
+  mode?: Mode;
+  initial?: JobPanel | null;
+  onUpdate?: (job: JobPanel) => void;
 };
 
 type Errors = Partial<Record<keyof JobPanel, string>> & { durationHours?: string; type?: string };
 
-export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => {
+export const CreateJobModal: React.FC<Props> = ({
+  open,
+  onClose,
+  onCreate,
+  mode = "create",
+  initial = null,
+  onUpdate,
+}) => {
+  const isEdit = mode === "edit";
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<typeof CATEGORIES[number] | "">("");
-  const [district, setDistrict] = useState<typeof DISTRICTS[number] | "">("");
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number] | "">("");
+  const [district, setDistrict] = useState<(typeof DISTRICTS)[number] | "">("");
   const [neighborhood, setNeighborhood] = useState<string>("");
   const [address, setAddress] = useState("");
   const [type, setType] = useState<JobType | "">("");
@@ -48,6 +67,42 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
     if (open) document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
+
+  // Prefill form when editing (or when initial changes)
+  useEffect(() => {
+    if (!open) return;
+
+    if (isEdit && initial) {
+      setTitle(initial.title ?? "");
+      setDescription(initial.description ?? "");
+      setCategory((initial.category as any) ?? "");
+      setDistrict((initial.district as any) ?? "");
+      setNeighborhood(initial.neighborhood ?? "");
+      setAddress(initial.address ?? "");
+      setType((initial.type as any) ?? "");
+      setPrice(typeof initial.price === "number" ? initial.price : "");
+      setDurationHours(typeof initial.durationHours === "number" ? initial.durationHours : "");
+      setInsuranceRequired(Boolean(initial.insuranceRequired));
+      setUrgent(Boolean(initial.urgent));
+
+      // flexible logic (if no date/time -> assume flexible)
+      const hasDate = Boolean(initial.startDate);
+      const hasTime = Boolean(initial.startTime);
+      const isFlex = !hasDate && !hasTime;
+      setFlexible(isFlex);
+      setStartDate(initial.startDate ?? "");
+      setStartTime(initial.startTime ?? "");
+
+      setErrors({});
+      return;
+    }
+
+    // Create mode -> reset clean each open
+    if (!isEdit) {
+      reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isEdit, initial?.id]);
 
   const neighborhoods = useMemo(() => {
     if (!district) return [];
@@ -96,10 +151,13 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
     setErrors({});
   };
 
-  const handleCreate = () => {
-    if (!validate()) return;
+  const buildPayload = () => {
     const now = new Date();
-    const id = "YV-" + Math.floor(10000 + Math.random() * 90000);
+    const id =
+      isEdit && initial?.id
+        ? initial.id
+        : "YV-" + Math.floor(10000 + Math.random() * 90000);
+
     const job: JobPanel = {
       id,
       title: title.trim(),
@@ -115,13 +173,31 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
       price: Number(price),
       insuranceRequired,
       urgent,
-      status: "Abierto",
-      createdAt: now.toISOString(),
-      applicantsCount: 0,
-      assignedTo: undefined,
+      status: isEdit ? (initial?.status ?? "Abierto") : "Abierto",
+      createdAt: isEdit ? (initial?.createdAt ?? now.toISOString()) : now.toISOString(),
+      applicantsCount: isEdit ? (initial?.applicantsCount ?? 0) : 0,
+      assignedTo: isEdit ? initial?.assignedTo : undefined,
     };
+
+    return job;
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) return;
+
+    const job = buildPayload();
+
+    if (isEdit) {
+      if (!onUpdate) {
+        console.warn("CreateJobModal in edit mode but no onUpdate provided");
+        return;
+      }
+      onUpdate(job);
+      onClose();
+      return;
+    }
+
     onCreate(job);
-    // TODO: call API/Supabase insert job
     reset();
     onClose();
   };
@@ -133,8 +209,8 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
       <div className="bg-white rounded-2xl w-full max-w-4xl p-6 border border-gray-200 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs text-slate-500">Nuevo anuncio</p>
-            <h3 className="text-xl font-bold text-slate-900">Publicar trabajo</h3>
+            <p className="text-xs text-slate-500">{isEdit ? "Editar anuncio" : "Nuevo anuncio"}</p>
+            <h3 className="text-xl font-bold text-slate-900">{isEdit ? "Modificar trabajo" : "Publicar trabajo"}</h3>
           </div>
           <button onClick={onClose}>
             <X size={18} className="text-gray-500" />
@@ -171,13 +247,14 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
               <Toggle label="Urgente" checked={urgent} onChange={setUrgent} />
             </Section>
 
-            {/* Ubicacion */}
+            {/* Ubicación */}
             <Section title="Ubicación">
               <SelectField
                 label="Distrito"
                 value={district}
                 onChange={(v) => {
                   setDistrict(v as any);
+                  // Si cambia distrito, resetea barrio si no coincide
                   setNeighborhood("");
                 }}
                 options={DISTRICTS}
@@ -259,23 +336,35 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
                   {type || "Tipo"}
                 </span>
               </div>
+
               <p className="text-xs text-slate-500 line-clamp-3">{description || "Descripción corta..."}</p>
+
               <div className="flex items-center gap-2 text-xs text-slate-600">
                 <MapPin size={12} /> {district || "Distrito"} · {neighborhood || "Barrio"}
               </div>
+
               <div className="flex items-center gap-2 text-xs text-slate-600">
                 <Layers size={12} /> {category || "Categoría"}
               </div>
+
               <div className="flex items-center gap-2 text-xs text-slate-600">
-                <Clock size={12} /> {type === "horas" && durationHours ? `${durationHours}h` : type === "fijo" ? "Precio fijo" : "Duración"}
+                <Clock size={12} />{" "}
+                {type === "horas" && durationHours
+                  ? `${durationHours}h`
+                  : type === "fijo"
+                  ? "Precio fijo"
+                  : "Duración"}
               </div>
+
               <div className="flex items-center gap-2 text-xs text-slate-600">
                 <Shield size={12} className={insuranceRequired ? "text-emerald-600" : "text-gray-400"} />{" "}
                 {insuranceRequired ? "Requiere seguro" : "Seguro opcional"}
               </div>
+
               <div className="text-sm font-extrabold text-slate-900">
                 {price ? `€${price}${type === "horas" ? "/h" : ""}` : "Precio"}
               </div>
+
               {urgent && (
                 <div className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-2 py-1 inline-block">
                   Urgente
@@ -298,13 +387,23 @@ export const CreateJobModal: React.FC<Props> = ({ open, onClose, onCreate }) => 
           >
             Cancelar
           </button>
+
           <button
-            onClick={handleCreate}
-            disabled={!title || !description || !category || !district || !neighborhood || !type || !price || (type === "horas" && !durationHours)}
+            onClick={handleSubmit}
+            disabled={
+              !title ||
+              !description ||
+              !category ||
+              !district ||
+              !neighborhood ||
+              !type ||
+              !price ||
+              (type === "horas" && !durationHours)
+            }
             className="px-5 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-60"
             style={{ background: YA_VOY_BLUE }}
           >
-            Publicar anuncio
+            {isEdit ? "Guardar cambios" : "Publicar anuncio"}
           </button>
         </div>
       </div>
@@ -336,7 +435,9 @@ const Field: React.FC<{
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={4}
-        className={`border rounded-xl px-3 py-2 text-sm ${error ? "border-red-300" : "border-gray-200"} focus:ring-2 focus:ring-blue-100`}
+        className={`border rounded-xl px-3 py-2 text-sm ${
+          error ? "border-red-300" : "border-gray-200"
+        } focus:ring-2 focus:ring-blue-100`}
       />
     ) : (
       <input
@@ -344,7 +445,9 @@ const Field: React.FC<{
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`border rounded-xl px-3 py-2 text-sm ${error ? "border-red-300" : "border-gray-200"} focus:ring-2 focus:ring-blue-100`}
+        className={`border rounded-xl px-3 py-2 text-sm ${
+          error ? "border-red-300" : "border-gray-200"
+        } focus:ring-2 focus:ring-blue-100`}
       />
     )}
     {error && <span className="text-[11px] text-red-600">{error}</span>}
@@ -366,7 +469,9 @@ const SelectField: React.FC<{
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className={`border rounded-xl px-3 py-2 text-sm bg-white ${error ? "border-red-300" : "border-gray-200"} ${disabled ? "bg-gray-50" : ""}`}
+      className={`border rounded-xl px-3 py-2 text-sm bg-white ${
+        error ? "border-red-300" : "border-gray-200"
+      } ${disabled ? "bg-gray-50" : ""}`}
     >
       <option value="">{placeholder || "Selecciona"}</option>
       {options.map((opt) => (
@@ -379,9 +484,18 @@ const SelectField: React.FC<{
   </label>
 );
 
-const Toggle: React.FC<{ label: string; checked: boolean; onChange: (v: boolean) => void }> = ({ label, checked, onChange }) => (
+const Toggle: React.FC<{ label: string; checked: boolean; onChange: (v: boolean) => void }> = ({
+  label,
+  checked,
+  onChange,
+}) => (
   <label className="flex items-center gap-2 text-sm text-slate-700">
-    <input type="checkbox" className="h-4 w-4" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+    <input
+      type="checkbox"
+      className="h-4 w-4"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+    />
     {label}
   </label>
 );

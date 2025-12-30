@@ -62,38 +62,49 @@ const AgencyProfilePage: React.FC = () => {
 
   if (loading) return <div className="p-4 text-sm text-gray-500">Cargando...</div>;
 
-  const fields: Array<[keyof CompanyProfile, string]> = [
-    ["brand_name", "Nombre comercial"],
-    ["legal_name", "Razón social"],
-    ["cif", "CIF"],
-    ["phone", "Teléfono"],
-    ["email", "Email"],
-    ["website", "Web"],
-    ["address", "Domicilio"],
-    ["city", "Localidad"],
-    ["postal_code", "Código Postal"],
-    ["province", "Provincia"],
-    ["country", "País"],
-    ["contact_person", "Persona de contacto"],
-    ["contact_phone", "Tel. contacto"],
-    ["contact_email", "Email contacto"],
-    ["billing_iban", "IBAN (domiciliación)"],
-    ["billing_holder", "Titular"],
-    ["billing_tax_id", "DNI/CIF"],
-    ["billing_bank", "Banco"],
-    ["billing_address", "Dirección facturación"],
-    ["billing_city", "Ciudad facturación"],
-    ["billing_postal_code", "CP facturación"],
-    ["billing_province", "Provincia facturación"],
-    ["billing_country", "País facturación"],
+  const fields: Array<{
+    key: keyof CompanyProfile;
+    label: string;
+    uppercase?: boolean;
+    numeric?: boolean;
+    type?: string;
+    placeholder?: string;
+    span?: "wide";
+  }> = [
+    { key: "brand_name", label: "Nombre comercial", uppercase: true },
+    { key: "legal_name", label: "Razón social", uppercase: true },
+    { key: "cif", label: "CIF", uppercase: true },
+    { key: "phone", label: "Teléfono", numeric: true, placeholder: "Solo números" },
+    { key: "email", label: "Email", type: "email" },
+    { key: "website", label: "Web", type: "url" },
+    { key: "address", label: "Domicilio", uppercase: true, span: "wide" },
+    { key: "city", label: "Localidad", uppercase: true },
+    { key: "postal_code", label: "Código Postal", numeric: true },
+    { key: "province", label: "Provincia", uppercase: true },
+    { key: "country", label: "País", uppercase: true },
+    { key: "contact_person", label: "Persona de contacto", uppercase: true },
+    { key: "contact_phone", label: "Tel. contacto", numeric: true },
+    { key: "contact_email", label: "Email contacto", type: "email" },
+    { key: "billing_iban", label: "IBAN (domiciliación)", uppercase: true },
+    { key: "billing_holder", label: "Titular", uppercase: true },
+    { key: "billing_tax_id", label: "DNI/CIF", uppercase: true },
+    { key: "billing_bank", label: "Banco", uppercase: true },
+    { key: "billing_address", label: "Dirección facturación", uppercase: true, span: "wide" },
+    { key: "billing_city", label: "Ciudad facturación", uppercase: true },
+    { key: "billing_postal_code", label: "CP facturación", numeric: true },
+    { key: "billing_province", label: "Provincia facturación", uppercase: true },
+    { key: "billing_country", label: "País facturación", uppercase: true },
   ];
+
+  const normalize = (val: string, cfg: { uppercase?: boolean; numeric?: boolean }) => {
+    let v = val;
+    if (cfg.numeric) v = v.replace(/\D+/g, "");
+    if (cfg.uppercase) v = v.toUpperCase();
+    return v;
+  };
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Perfil de inmobiliaria</h1>
-        <p className="text-sm text-gray-600">Actualiza los datos de tu empresa.</p>
-      </div>
 
       {error && (
         <div className="px-4 py-3 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200">
@@ -103,15 +114,26 @@ const AgencyProfilePage: React.FC = () => {
 
       <form
         onSubmit={onSubmit}
-        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 grid md:grid-cols-2 gap-4"
+        className="bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-xl shadow-slate-900/40 p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"
       >
-        {fields.map(([key, label]) => (
-          <label key={String(key)} className="space-y-1 block">
-            <span className="text-sm font-semibold text-gray-700">{label}</span>
+        {fields.map((cfg) => (
+          <label
+            key={String(cfg.key)}
+            className={`space-y-1 block col-span-1 ${cfg.span === "wide" ? "xl:col-span-2" : ""}`}
+          >
+            <span className="text-[13px] font-semibold text-blue-100">{cfg.label}</span>
             <input
-              value={(form as any)[key] || ""}
-              onChange={(e) => onChange(key, e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+              value={(form as any)[cfg.key] || ""}
+              onChange={(e) => onChange(cfg.key, normalize(e.target.value, cfg))}
+              className={`w-full border border-slate-700 bg-slate-800 text-[13px] text-white rounded-xl px-3 py-2 h-10 placeholder:text-slate-300 focus:border-blue-400 focus:ring-0 ${
+                cfg.uppercase ? "uppercase tracking-[0.01em]" : ""
+              }`}
+              inputMode={cfg.numeric ? "numeric" : undefined}
+              type={cfg.type || "text"}
+              placeholder={cfg.placeholder}
+              maxLength={
+                cfg.key === "postal_code" || cfg.key === "billing_postal_code" ? 6 : undefined
+              }
               disabled={saving}
             />
           </label>

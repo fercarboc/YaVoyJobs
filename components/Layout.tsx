@@ -223,12 +223,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 >
   Sectores
 </button>
-              <button
-                onClick={() => handleScrollTo('servicios')}
+              <NavLink
+                to="/informacion/particulares"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Particulares
-              </button>
+              </NavLink>
               <button
                 onClick={() => handleScrollTo('empresas')}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"

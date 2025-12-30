@@ -9,6 +9,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Landing from "@/pages/Landing";
 import SectorsPage from "@/pages/SectorsPage";
 import DownloadPage from "@/pages/DownloadPage";
+import ParticularesInfoPage from "@/pages/informacion/particulares";
 
 
 // Auth
@@ -84,6 +85,7 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       {/* Públicos */}
       <Route path="/" element={<Landing />} />
       <Route path="/sectores" element={<SectorsPage />} />
+      <Route path="/informacion/particulares" element={<ParticularesInfoPage />} />
       <Route path="/download" element={<DownloadPage />} />
       <Route path="/alquiler/*" element={<AlquilerRoutes />} />
 

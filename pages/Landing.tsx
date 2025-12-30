@@ -480,48 +480,149 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* HERO APP DESCARGAS */}
-      <section id="incentivos" className="bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16">
+      {/* INCENTIVOS (mockup dark) */}
+      <section id="incentivos" className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+        <div className="mx-auto max-w-6xl px-4 py-16 space-y-12">
           <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div className="space-y-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-100">Activa tu cuenta</p>
-              <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Incentivos de lanzamiento por perfil</h2>
+            <div className="space-y-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Para trabajadores</p>
+              <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">
+                Tu meta es simple:<br />5 trabajos = <span className="text-emerald-300">25€ Extra</span>
+              </h2>
               <p className="text-sm text-blue-100">
-                Disenados para activar la comunidad rapido y generar reputacion desde el primer dia.
+                Recompensamos tu arranque en la plataforma. Completa tus primeros 5 encargos con valoración positiva y el bono es tuyo.
               </p>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <MiniCard title="Trabajadores" desc="Incentivo de alta + bonus por referidos." light />
-                <MiniCard title="Particulares" desc="Primer anuncio promocionado o descuento." light />
-                <MiniCard title="Empresas" desc="Prueba inicial y descuento por primera contratacion." light />
-                <MiniCard title="Marketplace" desc="Visibilidad local y ayuda con logistica de barrio." light />
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 shadow-lg shadow-slate-900/30">
+                  <span className="text-3xl font-black text-slate-600 w-8 text-center">1</span>
+                  <div>
+                    <p className="font-semibold text-white">Regístrate y verifica perfil</p>
+                    <p className="text-xs text-blue-100">Validación rápida en tu zona</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 shadow-lg shadow-slate-900/30">
+                  <span className="text-3xl font-black text-slate-600 w-8 text-center">5</span>
+                  <div>
+                    <p className="font-semibold text-white">Completa 5 microtrabajos</p>
+                    <p className="text-xs text-blue-100">Jardinería, limpieza, recados...</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-blue-900/60 to-blue-800/20 border border-blue-400/30 shadow-lg shadow-blue-900/40">
+                  <span className="text-4xl font-black text-emerald-300 w-12 text-center">25€</span>
+                  <div>
+                    <p className="font-bold text-white text-lg">Bono desbloqueado</p>
+                    <p className="text-xs text-blue-100">Ingreso directo a tu cuenta</p>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/create-job"
-                  className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-blue-800 shadow-lg shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-slate-50"
+                  className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:bg-emerald-300"
                 >
                   Publicar tarea gratis
                 </Link>
                 <Link
                   to="/download"
-                  className="inline-flex items-center justify-center rounded-full border border-white/50 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
+                  className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/5 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/10"
                 >
                   Descargar app
                 </Link>
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-3xl border border-blue-200/30 bg-white shadow-2xl shadow-blue-950/20">
+            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/30">
               <SafeImage src={APP_IMAGE} alt="Aplicacion YaVoyJobs" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
               <div className="absolute inset-x-6 bottom-6 flex flex-wrap gap-3">
                 <StoreBadge label="Google Play" />
                 <StoreBadge label="App Store" />
               </div>
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Oportunidades para todos</p>
+              <p className="text-sm text-blue-100">Tanto si buscas ayuda puntual como si ofreces empleo local</p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="group relative rounded-3xl bg-white/5 border border-white/10 p-6 shadow-xl shadow-slate-900/40">
+                <div className="absolute top-4 right-4 text-slate-600 group-hover:text-purple-300 transition-colors">↗</div>
+                <div className="flex flex-col gap-4 text-left">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-300 grid place-items-center text-lg font-bold">👤</div>
+                  <div>
+                    <div className="text-xl font-extrabold text-white">Particulares</div>
+                    <p className="mt-2 text-sm text-blue-100">
+                      ¿Necesitas una mano en casa? Te regalamos hasta 20€ de descuento en tu primer servicio contratado.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <div className="text-3xl font-black text-white leading-tight">Gratis</div>
+                    <div className="text-xs uppercase tracking-wide text-purple-300">Tu primera tarea (hasta 20€)</div>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative rounded-3xl bg-white/5 border border-white/10 p-6 shadow-xl shadow-slate-900/40">
+                <div className="absolute top-4 right-4 text-slate-600 group-hover:text-emerald-300 transition-colors">↗</div>
+                <div className="flex flex-col gap-4 text-left">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-300 grid place-items-center text-lg font-bold">🏪</div>
+                  <div>
+                    <div className="text-xl font-extrabold text-white">Empresas</div>
+                    <p className="mt-2 text-sm text-blue-100">
+                      Encuentra talento en el barrio sin costes. Publica ofertas ilimitadas gratis durante tu primer mes de prueba.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <div className="text-3xl font-black text-white leading-tight">30 Días</div>
+                    <div className="text-xs uppercase tracking-wide text-emerald-300">Publicación gratuita</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3 text-sm text-blue-100">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="font-semibold text-white">100% Local</div>
+              <p className="text-blue-100 mt-1">Priorizamos conexiones en tu código postal para cero desplazamientos.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="font-semibold text-white">Totalmente Seguro</div>
+              <p className="text-blue-100 mt-1">El dinero se custodia hasta finalizar el trabajo. Sin sorpresas.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="font-semibold text-white">Rápido y Directo</div>
+              <p className="text-blue-100 mt-1">Sin esperas ni burocracia. Acuerda, trabaja y cobra.</p>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center space-y-4 shadow-lg shadow-slate-900/30">
+            <div className="inline-flex items-center px-4 py-1 rounded-full bg-rose-500/20 text-rose-200 text-xs font-semibold">
+              Oferta limitada
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold">Quedan pocas plazas</h3>
+            <p className="text-sm text-blue-100">
+              El incentivo de 25€ está limitado a los primeros registros. ¡Asegura tu bono antes de que se agote!
+            </p>
+            <div className="mx-auto max-w-xl text-left">
+              <div className="flex justify-between text-xs text-blue-100 mb-1">
+                <span>Plazas asignadas</span>
+                <span className="font-semibold text-white">84%</span>
+              </div>
+              <div className="h-3 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-full w-[84%] bg-gradient-to-r from-blue-500 to-emerald-400" />
+              </div>
+              <div className="text-[11px] text-blue-200 mt-1">* Basado en registros de esta semana.</div>
+            </div>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-full bg-white text-slate-900 px-6 py-3 text-sm font-semibold shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-100"
+            >
+              Registrarme Ya
+            </Link>
           </div>
         </div>
       </section>

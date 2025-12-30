@@ -15,6 +15,7 @@ export enum AppSection {
   MIS_TRABAJOS = "Mis Trabajos",
   EXPLORAR_TRABAJOS = "Explorar Trabajos",
   MARKETPLACE = "Marketplace",
+  MENSAJES = "Mensajes",          
   PEDIDOS = "Pedidos",
   PAGOS = "Pagos",
   FACTURACION = "Facturación",

@@ -55,7 +55,8 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
       case AppSection.EXPLORAR_TRABAJOS:
         return <ExplorarTrabajos />;
       case AppSection.MIS_TRABAJOS:
-        return <JobsManager role={currentRole} />;
+  return <JobsManager role={currentRole} currentUserId={userId} />;
+
       case AppSection.MARKETPLACE:
         return <MarketplaceManager />;
         case AppSection.MENSAJES:
