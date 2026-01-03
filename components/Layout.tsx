@@ -218,35 +218,35 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                 Cómo funciona
               </button>
               <button
-  onClick={() => handleScrollTo('sectores')}
-  className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
->
-  Sectores
-</button>
+                onClick={() => handleScrollTo('sectores')}
+                className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
+              >
+                Servicios
+              </button>
               <NavLink
                 to="/informacion/particulares"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Particulares
               </NavLink>
-              <button
-                onClick={() => handleScrollTo('empresas')}
+              <NavLink
+                to="/informacion/infoempresas"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Empresas
-              </button>
+              </NavLink>
               <NavLink
                 to="/alquiler"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Alquileres
               </NavLink>
-              <button
-                onClick={() => handleScrollTo('barrios')}
+              <NavLink
+                to="/informacion/Empleo"
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
-                Barrios
-              </button>
+                Empleo
+              </NavLink>
               <button
                 onClick={() => handleScrollTo('incentivos')}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
@@ -466,14 +466,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
   onClick={() => handleScrollTo('sectores')}
   className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
 >
-  Sectores
+  Servicios
 </button>
 
               <button
-                onClick={() => handleScrollTo('servicios')}
+                onClick={() => handleScrollTo('sectores')}
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
-                Soy Particular
+                Servicios
               </button>
 
               <NavLink
@@ -483,19 +483,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                 Alquileres
               </NavLink>
 
-              <button
-                onClick={() => handleScrollTo('empresas')}
+              <NavLink
+                to="/informacion/infoempresas"
+                onClick={() => setIsMenuOpen(false)}
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
                 Soy Empresa
-              </button>
+              </NavLink>
 
-              <button
-                onClick={() => handleScrollTo('barrios')}
+              <NavLink
+                to="/informacion/Empleo"
+                onClick={() => setIsMenuOpen(false)}
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
-                Dónde Ayudamos
-              </button>
+                Empleo
+              </NavLink>
 
               <button
                 onClick={() => handleScrollTo('incentivos')}

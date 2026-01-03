@@ -47,7 +47,7 @@ export default function Landing() {
   const personas: PersonaCard[] = useMemo(
     () => [
       {
-        title: "Trabajador",
+        title: "Colaborador",
         subtitle: "Gana dinero cerca de ti. Cobro protegido y reputación.",
         icon: <BadgeIcon />,
         image: PROFILE_WORKER,
@@ -99,12 +99,14 @@ export default function Landing() {
         <div className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-8 pt-8 lg:flex-row lg:items-start lg:pb-12 lg:pt-3">
           <div className="flex-1 space-y-6 text-white">
             <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.2em] text-blue-100">Trabajos y servicios locales</p>
-              <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
-                Trabajos y servicios del barrio, al momento
-              </h1>
+              <p className="text-sm uppercase tracking-[0.2em] text-blue-100">Comprar, Alquilar, Ayudar con servicios locales</p>
+             <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
+              Colabora y Cobra.  
+              Alquila, vende o encuentra ayuda en <span className="text-[#2b8cee]">YaVoy</span>.
+            </h1>
+
               <p className="max-w-xl text-base text-blue-50 sm:text-lg">
-                Publica una tarea y recibe vecinos verificados. O trabaja cuando quieras con pagos seguros y seguro
+                Publica una tarea y recibe vecinos verificados. O colabora cuando quieras y recibe pagos con seguro
                 incluido. Tambien puedes comprar en el marketplace local.
               </p>
             </div>
@@ -788,15 +790,26 @@ function TopNav() {
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700">
             <LightningIcon />
           </span>
-          YaVoyJobs • Beta activa en Madrid (Usera, Arganzuela, Carabanchel)
+          YaVoyJobs • Informacion Centro Ayuda →
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
-          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-700">
-            <ShieldIcon /> Pagos seguros
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700">
-            <CheckIcon /> Seguro incluido
-          </span>
+         <Link
+            to="/informacion/infoempresas"
+            className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+          >
+            Empresas →
+          </Link>
+        <Link to="/informacion/infomarketplace"
+         className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+          >
+            Info MarketPlace →
+          </Link>
+          <Link to="/informacion/seguro" 
+           className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+          >
+            Seguro RC →
+          </Link>
+         
           <Link to="/download" className="font-semibold text-blue-700 hover:text-blue-800">
             Descargar app →
           </Link>

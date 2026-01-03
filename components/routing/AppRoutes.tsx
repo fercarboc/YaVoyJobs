@@ -10,6 +10,11 @@ import Landing from "@/pages/Landing";
 import SectorsPage from "@/pages/SectorsPage";
 import DownloadPage from "@/pages/DownloadPage";
 import ParticularesInfoPage from "@/pages/informacion/particulares";
+import InfoMarketplace from "@/pages/informacion/infomarketplace";
+import Seguro from "@/pages/informacion/seguro";
+import InfoEmpresas from "@/pages/informacion/empresas";
+import EmpleoInfo from "@/pages/informacion/Empleo";
+import Colaborador from "@/pages/Colaborador/colaborador";
 
 
 // Auth
@@ -44,6 +49,15 @@ import WorkerDashboard from "@/pages/worker/WorkerDashboard";
 import WorkerLayout from "@/pages/worker/WorkerLayout";
 import WorkerProfilePage from "@/pages/worker/WorkerProfilePage";
 import DashboardPerfiles from "@/dashboardperfiles/DashboardPerfiles";
+
+
+
+
+
+
+
+
+
 
 // Debug admin imports
 console.log("AdminLayout", AdminLayout);
@@ -86,6 +100,10 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       <Route path="/" element={<Landing />} />
       <Route path="/sectores" element={<SectorsPage />} />
       <Route path="/informacion/particulares" element={<ParticularesInfoPage />} />
+      <Route path="/informacion/infomarketplace" element={<InfoMarketplace />} />
+      <Route path="/informacion/infoempresas" element={<InfoEmpresas />} />
+      <Route path="/informacion/Empleo" element={<EmpleoInfo />} />
+      <Route path="/informacion/seguro" element={<Seguro />} />
       <Route path="/download" element={<DownloadPage />} />
       <Route path="/alquiler/*" element={<AlquilerRoutes />} />
 
