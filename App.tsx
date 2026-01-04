@@ -5,6 +5,7 @@ import { supabase } from "./services/supabase";
 import { Layout } from "./components/Layout";
 import AppRoutes from "./components/routing/AppRoutes";
 import type { AuthState } from "./types";
+import { mapLegacyRoleToBase, UserRole } from "./types";
 
 const INITIAL_AUTH: AuthState = {
   isAuthenticated: false,
@@ -26,6 +27,7 @@ export default function App() {
       if (error) throw error;
 
       if (data) {
+        const mapped = mapLegacyRoleToBase(data.role as UserRole);
         setAuth({
           isAuthenticated: true,
           loading: false,
@@ -35,6 +37,8 @@ export default function App() {
             full_name: data.full_name,
             email: data.email,
             role: data.role,
+            baseRole: mapped.baseRole,
+            clientType: mapped.clientType,
             city: data.city,
             district: data.district,
             company_sector: data.company_sector,

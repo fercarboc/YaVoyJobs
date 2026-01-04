@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const YaVoyMark: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -57,8 +59,14 @@ const Step: React.FC<StepProps> = ({ icon, title, desc }) => (
 );
 
 export default function Empleo() {
+  const navigate = useNavigate();
+  const { auth } = useAuth?.() || { auth: undefined as any };
+
   React.useEffect(() => {
     document.title = "Empleo - YaVoy";
+    if (auth?.isAuthenticated) {
+      navigate("/panel", { replace: true });
+    }
   }, []);
 
   return (

@@ -6,12 +6,13 @@ export type VoyJobRow = {
   title: string;
   description: string | null;
   category: string;
-  job_type: string; // enum VoyJobType
+  job_type: string;
   price_fixed: number | null;
   price_hourly: number | null;
   district: string | null;
   neighborhood: string | null;
-  status: string; // enum VoyJobStatus
+  city: string | null;
+  status: string;
   created_at: string;
 };
 
@@ -21,7 +22,7 @@ export async function getCurrentVoyUserId() {
   return data as string; // uuid VoyUsers.id
 }
 
-export async function listMyJobs() {
+export async function listMyJobs(): Promise<VoyJobRow[]> {
   const me = await getCurrentVoyUserId();
   const { data, error } = await supabase
     .from('VoyJobs')
@@ -33,7 +34,33 @@ export async function listMyJobs() {
   return (data ?? []) as VoyJobRow[];
 }
 
-export async function listOpenJobs(filters?: { district?: string; categoryIn?: string[] }) {
+export async function listMyJobsEmployment(): Promise<VoyJobRow[]> {
+  const me = await getCurrentVoyUserId();
+  const { data, error } = await supabase
+    .from('VoyJobs')
+    .select('*')
+    .eq('creator_user_id', me)
+    .neq('job_type', 'ONE_OFF')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as VoyJobRow[];
+}
+
+export async function listMyJobsOneOff(): Promise<VoyJobRow[]> {
+  const me = await getCurrentVoyUserId();
+  const { data, error } = await supabase
+    .from('VoyJobs')
+    .select('*')
+    .eq('creator_user_id', me)
+    .eq('job_type', 'ONE_OFF')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as VoyJobRow[];
+}
+
+export async function listOpenJobs(filters?: { district?: string; categoryIn?: string[] }): Promise<VoyJobRow[]> {
   let q = supabase
     .from('VoyJobs')
     .select('*')
@@ -46,6 +73,35 @@ export async function listOpenJobs(filters?: { district?: string; categoryIn?: s
   const { data, error } = await q;
   if (error) throw error;
   return (data ?? []) as VoyJobRow[];
+}
+
+export async function listOpenJobsEmployment(
+  filters?: { district?: string; categoryIn?: string[] }
+): Promise<VoyJobRow[]> {
+  let q = supabase
+    .from('VoyJobs')
+    .select('*')
+    .eq('status', 'OPEN')
+    .neq('job_type', 'ONE_OFF')
+    .order('created_at', { ascending: false });
+
+  if (filters?.district) q = q.eq('district', filters.district);
+  if (filters?.categoryIn?.length) q = q.in('category', filters.categoryIn);
+
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as VoyJobRow[];
+}
+
+// Nombres solicitados (alias) para evitar confusión con ONE_OFF vs Empleo
+export const listMyOneOffJobs = listMyJobsOneOff;
+export const listMyEmploymentJobs = listMyJobsEmployment;
+export const listOpenEmploymentJobs = listOpenJobsEmployment;
+
+export async function getJobById(id: string): Promise<VoyJobRow | null> {
+  const { data, error } = await supabase.from('VoyJobs').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return (data as VoyJobRow) || null;
 }
 
 export async function createJob(payload: {

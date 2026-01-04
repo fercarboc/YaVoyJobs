@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import VerificationUploader from "@/components/VerificationUploader";
+import LogoUploader from "@/components/LogoUploader";
 import { getMyCompany, upsertMyCompany } from "../services/agencyApi";
 import { CompanyProfile } from "../types/agency";
 
@@ -159,6 +161,11 @@ const AgencyProfilePage: React.FC = () => {
           </button>
         </div>
       </form>
+
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <VerificationUploader defaultVerificationType="agency" showTypeSelector={false} />
+      </div>
+      <LogoUploader />
     </div>
   );
 };

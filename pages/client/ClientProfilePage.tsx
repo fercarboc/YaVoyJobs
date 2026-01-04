@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
-import ClientDashboardShell from '../../components/client/ClientDashboardShell';
-import type { AuthState } from '../../types';
+import { useAuth } from '@/hooks/useAuth';
+import VerificationUploader from '@/components/VerificationUploader';
+import AvatarFromSelfieCard from '@/components/AvatarFromSelfieCard';
 
-interface Props {
-  auth: AuthState;
-}
-
-const ClientProfilePage: React.FC<Props> = ({ auth }) => {
+const ClientProfilePage: React.FC = () => {
+  const { auth } = useAuth();
   const [fullName, setFullName] = useState(auth.user?.full_name || '');
   const [city, setCity] = useState(auth.user?.city || '');
+  const isParticular = auth.user?.role === 'PARTICULAR';
 
   return (
-    <ClientDashboardShell auth={auth}>
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Perfil</h1>
           <p className="text-sm text-slate-600 mt-1">
-            Aquí luego conectamos “Editar Perfil” con Supabase (ya lo tienes en tu Layout).
+            Aquí luego conectamos "Editar Perfil" con Supabase (ya lo tienes en tu Layout).
           </p>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <div className="rounded-2xl border border-gray-100 p-4">
           <div className="text-sm font-extrabold text-slate-900">Datos básicos</div>
 
@@ -72,11 +71,19 @@ const ClientProfilePage: React.FC<Props> = ({ auth }) => {
         <div className="rounded-2xl border border-gray-100 p-4">
           <div className="text-sm font-extrabold text-slate-900">Seguridad</div>
           <div className="text-sm text-slate-600 mt-2">
-            La contraseña ya la gestionas en tu Layout (“Cambiar Contraseña”).
+            La contraseña ya la gestionas en tu Layout ("Cambiar Contraseña").
           </div>
         </div>
       </div>
-    </ClientDashboardShell>
+
+      <div className="rounded-2xl border border-gray-100 p-4 space-y-3">
+        <VerificationUploader
+          defaultVerificationType={auth.user?.role === 'COMPANY' ? 'company' : 'particular'}
+          showTypeSelector={false}
+        />
+        {isParticular && <AvatarFromSelfieCard />}
+      </div>
+    </div>
   );
 };
 

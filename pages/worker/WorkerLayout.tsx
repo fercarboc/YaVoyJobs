@@ -46,6 +46,10 @@ console.log("ROLE:", auth.user?.role);
             Trabajos
           </NavLink>
 
+          <NavLink to="jobs" className={tabClass}>
+            Ofertas empleo
+          </NavLink>
+
           <NavLink to="perfil" className={tabClass}>
             Mi perfil
           </NavLink>

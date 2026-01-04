@@ -1,14 +1,8 @@
 import React from 'react';
-import ClientDashboardShell from '../../components/client/ClientDashboardShell';
-import type { AuthState } from '../../types';
 
-interface Props {
-  auth: AuthState;
-}
-
-const ClientInvoicesPage: React.FC<Props> = ({ auth }) => {
+const ClientInvoicesPage: React.FC = () => {
   return (
-    <ClientDashboardShell auth={auth}>
+    <div>
       <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Facturas y Pagos</h1>
       <p className="text-sm text-slate-600 mt-1">
         Aquí irá la parte de pagos (Stripe) y facturación de anuncios/comisiones/seguro.
@@ -36,7 +30,7 @@ const ClientInvoicesPage: React.FC<Props> = ({ auth }) => {
           </div>
         </div>
       </div>
-    </ClientDashboardShell>
+    </div>
   );
 };
 

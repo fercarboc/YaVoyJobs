@@ -1,52 +1,54 @@
-import React, { useEffect } from 'react';
-import ClientDashboardShell from '../../components/client/ClientDashboardShell';
-import { useClientArea } from '../../components/client/ClientDashboardShell';
-import type { AuthState } from '../../types';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useClientArea } from '../../components/client/ClientDashboardShell';
+import { listMyOneOffJobs, VoyJobRow } from '@/services/jobs.service';
 
-interface Props {
-  auth: AuthState;
-}
-
-const ClientAdsPage: React.FC<Props> = ({ auth }) => {
+const ClientAdsPage: React.FC = () => {
   const { activeArea } = useClientArea();
   const navigate = useNavigate();
+  const [ads, setAds] = useState<VoyJobRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeArea === 'HOUSING') {
       alert("Cambia a la pestaña 'Trabajos' para publicar.");
       navigate('/client', { replace: true });
+      return;
     }
+
+    let mounted = true;
+    setLoading(true);
+    listMyOneOffJobs()
+      .then((data) => {
+        if (!mounted) return;
+        setAds(data);
+      })
+      .catch((err: any) => {
+        console.error(err);
+        if (!mounted) return;
+        setError(err?.message || 'No se pudieron cargar tus anuncios');
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [activeArea, navigate]);
 
   if (activeArea === 'HOUSING') {
-    return (
-      <ClientDashboardShell auth={auth}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Anuncios (trabajos)</h1>
-            <p className="text-sm text-slate-600 mt-1">
-              Estás en modo Alquiler. Cambia a la pestaña Trabajos para publicar o gestionar.
-            </p>
-          </div>
-        </div>
-        <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-          <div className="text-sm font-bold text-slate-900">Acción no disponible</div>
-          <div className="text-sm text-slate-600 mt-2">
-            Cambia arriba a “Trabajos” para crear, editar o ver tus anuncios de servicios.
-          </div>
-        </div>
-      </ClientDashboardShell>
-    );
+    return null;
   }
 
   return (
-    <ClientDashboardShell auth={auth}>
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Mis Anuncios</h1>
           <p className="text-sm text-slate-600 mt-1">
-            Aquí irá el listado de anuncios del particular, estados, candidatos y acciones.
+            Anuncios de servicios puntuales (job_type = ONE_OFF) publicados por ti.
           </p>
         </div>
 
@@ -54,25 +56,46 @@ const ClientAdsPage: React.FC<Props> = ({ auth }) => {
           type="button"
           className="px-4 py-2 rounded-xl text-sm font-extrabold text-white shadow hover:opacity-95 transition"
           style={{ background: '#16a34a' }}
-          onClick={() => alert('Luego conectamos: Crear Anuncio')}
+          onClick={() => alert('Conectar con formulario de anuncio')}
         >
           + Publicar
         </button>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-        <div className="text-sm font-bold text-slate-900">Listado (placeholder)</div>
-        <div className="text-sm text-slate-600 mt-2">
-          Todavía no hay anuncios. En el siguiente paso conectamos Supabase/tu API para:
-          <ul className="list-disc pl-6 mt-2 space-y-1 text-sm">
-            <li>Crear anuncio</li>
-            <li>Ver candidatos</li>
-            <li>Chat</li>
-            <li>Finalizar y valorar</li>
-          </ul>
+      {loading ? (
+        <div className="p-3 text-sm text-gray-600">Cargando anuncios...</div>
+      ) : error ? (
+        <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl">{error}</div>
+      ) : ads.length === 0 ? (
+        <div className="p-3 text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl">
+          Todavía no has publicado anuncios ONE_OFF.
         </div>
-      </div>
-    </ClientDashboardShell>
+      ) : (
+        <div className="grid gap-3">
+          {ads.map((job) => (
+            <div
+              key={job.id}
+              className="border rounded-xl bg-white shadow-sm p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{job.title}</p>
+                <p className="text-xs text-gray-500">
+                  {job.job_type} · {job.city || 'Sin ciudad'}
+                  {job.status ? ` · ${job.status}` : ''}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate(`/client/jobs/${job.id}`)}
+                className="mt-3 sm:mt-0 px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700"
+              >
+                Ver detalle
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

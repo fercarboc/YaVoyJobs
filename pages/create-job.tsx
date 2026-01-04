@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getSectorsOrdered, Sector } from '../services/sectorsService';
 import { getMicrotasksBySector, MicroTask } from '../services/microtasksService';
-import { createJob } from '../services/jobsService';
+import { createMicrotaskJob } from '../services/microtasksJobs.service';
 import { getJobTicket } from '../services/jobTicketService';
 import { JobTicketCard } from '../components/JobTicket';
 import { startCommissionPayment } from '../services/commissionPaymentService';
@@ -40,7 +40,7 @@ export default function CreateJobScreen() {
     setError('');
     setLoading(true);
     try {
-      const job = await createJob({ title, description, microtask_id: selectedMicrotask });
+      const job = await createMicrotaskJob({ title, description, microtask_id: selectedMicrotask });
       setJobId(job.id);
       const ticketData = await getJobTicket(job.id);
       setTicket(ticketData);

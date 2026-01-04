@@ -89,6 +89,20 @@ const ClientDashboardShell: React.FC<ClientDashboardShellProps> = ({ auth, child
                   </NavLink>
 
                   <NavLink
+                    to="/client/jobs"
+                    className={({ isActive }) =>
+                      `${linkBase} ${
+                        isActive
+                          ? 'bg-blue-50 border-blue-200 text-slate-900'
+                          : 'bg-white border-gray-100 text-slate-700 hover:bg-gray-50'
+                      }`
+                    }
+                  >
+                    <Icons.Briefcase size={16} />
+                    Empleo
+                  </NavLink>
+
+                  <NavLink
                     to="/client/facturas"
                     className={({ isActive }) =>
                       `${linkBase} ${

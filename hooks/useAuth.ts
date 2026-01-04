@@ -1,7 +1,13 @@
 // src/hooks/useAuth.ts
 import { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase'; // <-- ajusta si tu path es otro
-import { AuthState, INITIAL_AUTH, UserRole } from '../types/auth';
+import { AuthState, UserRole, mapLegacyRoleToBase } from '../types';
+
+const INITIAL_AUTH: AuthState = {
+  isAuthenticated: false,
+  user: null,
+  loading: true,
+};
 
 export function useAuth() {
   const [auth, setAuth] = useState<AuthState>(INITIAL_AUTH);
@@ -62,6 +68,7 @@ export function useAuth() {
       if (error) throw error;
 
       if (data) {
+        const mapped = mapLegacyRoleToBase(data.role as UserRole);
         setAuth({
           isAuthenticated: true,
           loading: false,
@@ -71,6 +78,8 @@ export function useAuth() {
             full_name: data.full_name,
             email: data.email,
             role: data.role as UserRole,
+            baseRole: mapped.baseRole,
+            clientType: mapped.clientType,
             city: data.city,
             district: data.district,
             company_sector: data.company_sector,

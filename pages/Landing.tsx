@@ -513,8 +513,8 @@ export default function Landing() {
                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-blue-900/60 to-blue-800/20 border border-blue-400/30 shadow-lg shadow-blue-900/40">
                   <span className="text-4xl font-black text-emerald-300 w-12 text-center">25€</span>
                   <div>
-                    <p className="font-bold text-white text-lg">Bono desbloqueado</p>
-                    <p className="text-xs text-blue-100">Ingreso directo a tu cuenta</p>
+                    <p className="font-bold text-white text-lg"> Bono desbloqueado</p>
+                    <p className="text-xs text-blue-100"> Ingreso directo a tu cuenta</p>
                   </div>
                 </div>
               </div>
@@ -536,7 +536,7 @@ export default function Landing() {
             </div>
 
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/30">
-              <SafeImage src={APP_IMAGE} alt="Aplicacion YaVoyJobs" className="h-full w-full object-cover" />
+              <SafeImage src="/assets/incentivo.png" alt="Aplicacion YaVoyJobs" className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
               <div className="absolute inset-x-6 bottom-6 flex flex-wrap gap-3">
                 <StoreBadge label="Google Play" />

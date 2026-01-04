@@ -15,6 +15,9 @@ import Seguro from "@/pages/informacion/seguro";
 import InfoEmpresas from "@/pages/informacion/empresas";
 import EmpleoInfo from "@/pages/informacion/Empleo";
 import Colaborador from "@/pages/Colaborador/colaborador";
+// Ejemplo de uso futuro:
+// import RequireBaseRole from "./RequireBaseRole";
+// import RequireModule from "./RequireModule";
 
 
 // Auth
@@ -32,6 +35,10 @@ import ClientHomePage from "@/pages/client/ClientHomePage";
 import ClientAdsPage from "@/pages/client/ClientAdsPage";
 import ClientInvoicesPage from "@/pages/client/ClientInvoicesPage";
 import ClientProfilePage from "@/pages/client/ClientProfilePage";
+import ClientJobs from "@/pages/client/ClientJobs";
+import ClientJobNew from "@/pages/client/ClientJobNew";
+import ClientJobDetail from "@/pages/client/ClientJobDetail";
+import ClientDashboardShell from "@/components/client/ClientDashboardShell";
 
 // Admin / Worker
 import AdminLayout from "@/admin/layout/AdminLayout";
@@ -46,9 +53,11 @@ import AdminMetricsPage from "@/admin/pages/AdminMetricsPage";
 import AdminFinancePage from "@/admin/pages/AdminFinancePage";
 import AdminLogsPage from "@/admin/pages/AdminLogsPage";
 import WorkerDashboard from "@/pages/worker/WorkerDashboard";
-import WorkerLayout from "@/pages/worker/WorkerLayout";
 import WorkerProfilePage from "@/pages/worker/WorkerProfilePage";
 import DashboardPerfiles from "@/dashboardperfiles/DashboardPerfiles";
+import WorkerJobs from "@/pages/worker/WorkerJobs";
+import WorkerJobDetail from "@/pages/worker/WorkerJobDetail";
+import WorkerDashboardShell from "@/pages/worker/WorkerDashboardShell";
 
 
 
@@ -106,6 +115,24 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       <Route path="/informacion/seguro" element={<Seguro />} />
       <Route path="/download" element={<DownloadPage />} />
       <Route path="/alquiler/*" element={<AlquilerRoutes />} />
+      {/* Ejemplo de uso:
+        <Route
+          path="/empleo/ofertas"
+          element={
+            <RequireBaseRole auth={auth} allowed={['CLIENT']}>
+              <OfertasPage />
+            </RequireBaseRole>
+          }
+        />
+        <Route
+          path="/empleo/publicar"
+          element={
+            <RequireModule auth={auth} module="services">
+              <PublicarOfertaPage />
+            </RequireModule>
+          }
+        />
+      */}
 
       {/* Marketplace (público) */}
       <Route path="/marketplace" element={<Marketplace />} />
@@ -163,13 +190,23 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       </Route>
 
       {/* Client (IMPORTANTE: Outlet) */}
-      <Route element={<ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY]} />}>
-        <Route path="/client" element={<Outlet />}>
-          <Route index element={<ClientHomePage auth={auth} />} />
-          <Route path="anuncios" element={<ClientAdsPage auth={auth} />} />
-          <Route path="facturas" element={<ClientInvoicesPage auth={auth} />} />
-          <Route path="perfil" element={<ClientProfilePage auth={auth} />} />
-        </Route>
+      <Route
+        path="/client"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY]}>
+            <ClientDashboardShell auth={auth}>
+              <Outlet />
+            </ClientDashboardShell>
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<ClientHomePage />} />
+        <Route path="anuncios" element={<ClientAdsPage />} />
+        <Route path="facturas" element={<ClientInvoicesPage />} />
+        <Route path="perfil" element={<ClientProfilePage />} />
+        <Route path="jobs" element={<ClientJobs />} />
+        <Route path="jobs/new" element={<ClientJobNew />} />
+        <Route path="jobs/:id" element={<ClientJobDetail />} />
       </Route>
 
       {/* Dashboard unificado (worker/particular/company) */}
@@ -183,13 +220,21 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       />
 
       {/* Worker */}
-      <Route element={<ProtectedRoute auth={auth} roles={[UserRole.HELPER]} />}>
-        <Route path="/worker" element={<WorkerLayout auth={auth} />}>
-          <Route index element={<WorkerDashboard auth={auth} />} />
-          <Route path="perfil" element={<WorkerProfilePage auth={auth} />} />
-          <Route path="pagos" element={<div className="p-4 text-sm">Pagos (pendiente)</div>} />
-          <Route path="seguridad" element={<div className="p-4 text-sm">Seguridad (pendiente)</div>} />
-        </Route>
+      <Route
+        path="/worker"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.HELPER]}>
+            <WorkerDashboardShell auth={auth} />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<WorkerDashboard auth={auth} />} />
+        <Route path="perfil" element={<WorkerProfilePage auth={auth} />} />
+        <Route path="trabajos" element={<WorkerDashboard auth={auth} />} />
+        <Route path="jobs" element={<WorkerJobs />} />
+        <Route path="jobs/:id" element={<WorkerJobDetail />} />
+        <Route path="pagos" element={<div className="p-4 text-sm">Pagos (pendiente)</div>} />
+        <Route path="seguridad" element={<div className="p-4 text-sm">Seguridad (pendiente)</div>} />
       </Route>
 
       {/* Chat */}

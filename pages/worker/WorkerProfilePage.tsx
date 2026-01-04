@@ -6,6 +6,8 @@ import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import PhotoUploader from "@/components/profile/PhotoUploader";
 import VerificationStatusCard from "@/components/verification/VerificationStatusCard";
+import VerificationUploader from "@/components/VerificationUploader";
+import AvatarFromSelfieCard from "@/components/AvatarFromSelfieCard";
 
 type Props = {
   auth: AuthState;
@@ -185,8 +187,10 @@ export default function WorkerProfilePage({ auth }: Props) {
         </div>
       </div>
 
-      {/* VERIFICACIÓN */}
-      <div className="mt-4">
+      {/* VERIFICACION */}
+      <div className="mt-4 space-y-3">
+        <VerificationUploader defaultVerificationType="helper" showTypeSelector={false} />
+        <AvatarFromSelfieCard />
         <VerificationStatusCard auth={auth} />
       </div>
 

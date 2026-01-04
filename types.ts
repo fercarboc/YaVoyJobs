@@ -7,6 +7,10 @@ export enum UserRole {
   AGENCY = 'AGENCY'
 }
 
+export type BaseRole = 'ADMIN' | 'CLIENT' | 'HELPER' | 'AGENCY';
+export type ClientType = 'PERSON' | 'BUSINESS';
+export type ModuleKey = 'services' | 'real_estate' | 'marketplace_provider';
+
 export type CompanySectorSlug =
   | 'tecnologia-digital'
   | 'hogar-mantenimiento'
@@ -78,6 +82,8 @@ export interface User {
   full_name: string;
   last_name?: string;
   role: UserRole;
+  baseRole?: BaseRole;
+  clientType?: ClientType;
   email: string;
   city?: string;
   address?: string;
@@ -216,3 +222,20 @@ export const COMPANY_SECTORS: {
   { id: 'MARKETING_PUBLICIDAD', label: 'Marketing y Publicidad', short: 'Marketing' },
   { id: 'TRANSPORTE_MOVILIDAD', label: 'Transporte y Movilidad', short: 'Transporte' },
 ];
+
+export function mapLegacyRoleToBase(role?: UserRole | string | null): { baseRole: BaseRole; clientType?: ClientType } {
+  switch (role) {
+    case UserRole.PARTICULAR:
+      return { baseRole: 'CLIENT', clientType: 'PERSON' };
+    case UserRole.COMPANY:
+      return { baseRole: 'CLIENT', clientType: 'BUSINESS' };
+    case UserRole.HELPER:
+      return { baseRole: 'HELPER' };
+    case UserRole.ADMIN:
+      return { baseRole: 'ADMIN' };
+    case UserRole.AGENCY:
+      return { baseRole: 'AGENCY' };
+    default:
+      return { baseRole: 'CLIENT' };
+  }
+}

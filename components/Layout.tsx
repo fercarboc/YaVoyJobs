@@ -95,6 +95,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
     }
   };
 
+  const scrollToTopSmooth = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
@@ -225,12 +227,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
               </button>
               <NavLink
                 to="/informacion/particulares"
+                onClick={scrollToTopSmooth}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Particulares
               </NavLink>
               <NavLink
                 to="/informacion/infoempresas"
+                onClick={scrollToTopSmooth}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Empresas
@@ -243,6 +247,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
               </NavLink>
               <NavLink
                 to="/informacion/Empleo"
+                onClick={scrollToTopSmooth}
                 className="text-white hover:text-blue-100 font-medium transition text-xs px-2 py-1 whitespace-nowrap"
               >
                 Empleo
@@ -485,7 +490,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
               <NavLink
                 to="/informacion/infoempresas"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  scrollToTopSmooth();
+                }}
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
                 Soy Empresa
@@ -493,7 +501,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
 
               <NavLink
                 to="/informacion/Empleo"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  scrollToTopSmooth();
+                }}
                 className="block w-full text-left px-3 py-3 text-slate-600 font-medium hover:bg-brand-50 rounded-lg"
               >
                 Empleo
