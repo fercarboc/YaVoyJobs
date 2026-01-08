@@ -6,6 +6,7 @@ const navItems = [
   { to: "/admin", label: "Home", icon: <Icons.Home size={16} /> },
   { to: "/admin/users", label: "Usuarios", icon: <Icons.Users size={16} /> },
   { to: "/admin/providers", label: "Proveedores", icon: <Icons.Briefcase size={16} /> },
+  { to: "/admin/marketplace", label: "Marketplace", icon: <Icons.ShoppingCart size={16} /> },
   { to: "/admin/plans", label: "Planes", icon: <Icons.Layers size={16} /> },
   { to: "/admin/subscriptions", label: "Suscripciones", icon: <Icons.CreditCard size={16} /> },
   { to: "/admin/invoices", label: "Facturas", icon: <Icons.FileText size={16} /> },

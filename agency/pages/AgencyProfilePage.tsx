@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import VerificationUploader from "@/components/VerificationUploader";
 import LogoUploader from "@/components/LogoUploader";
 import { getMyCompany, upsertMyCompany } from "../services/agencyApi";
 import { CompanyProfile } from "../types/agency";
+import MyJobsList from "@/components/jobs/MyJobsList";
 
 const emptyProfile = (): CompanyProfile =>
   ({
@@ -11,6 +13,7 @@ const emptyProfile = (): CompanyProfile =>
   } as any);
 
 const AgencyProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState<CompanyProfile>(emptyProfile());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -166,6 +169,9 @@ const AgencyProfilePage: React.FC = () => {
         <VerificationUploader defaultVerificationType="agency" showTypeSelector={false} />
       </div>
       <LogoUploader />
+      <div className="space-y-3">
+        <MyJobsList mode="oneoff" showCreateButton onCreate={() => navigate("/jobs/oneoff/new")} />
+      </div>
     </div>
   );
 };

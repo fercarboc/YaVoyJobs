@@ -13,6 +13,7 @@ const AvatarFromSelfieCard: React.FC = () => {
     try {
       const path = await setAvatarFromSelfie();
       setMessage("Avatar actualizado con tu selfie.");
+      window.dispatchEvent(new Event("voy:user-updated"));
       console.log("Avatar path:", path);
     } catch (e: any) {
       setError(e?.message || "No se pudo actualizar el avatar.");

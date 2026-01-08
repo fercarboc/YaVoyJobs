@@ -1,94 +1,71 @@
 
 import React from 'react';
-import { MapPin, Tag, Truck, Package } from 'lucide-react';
-import { Product, UserRole } from '../types';
-import { useApp } from '../AppContext';
+import { Link } from 'react-router-dom';
+import { Product } from '../types/marketplace.types';
+import { ShoppingCart } from 'lucide-react';
+import { useCart } from '../hooks/useCart';
 
 interface ProductCardProps {
   product: Product;
-  onClick: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
-  const { userRole } = useApp();
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { addItem } = useCart();
+  const hasOffer = !!product.offer_price;
 
-  const getPrice = () => {
-    switch(userRole) {
-      case UserRole.REGISTERED: return product.prices.registered;
-      case UserRole.HORECA: return product.prices.horeca;
-      default: return product.prices.guest;
-    }
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product);
   };
 
-  const currentPrice = getPrice();
-  const hasOffer = product.offer && userRole !== UserRole.HORECA; // HORECA usually has fixed net prices
-
   return (
-    <div 
-      className="group bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-xl hover:border-indigo-200 transition-all cursor-pointer flex flex-col h-full"
-      onClick={() => onClick(product)}
-    >
-      {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-slate-100">
+    <div className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+      <Link to={`/marketplace/product/${product.id}`} className="block relative group">
         <img 
           src={product.images[0]} 
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          alt={product.name} 
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {hasOffer && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center shadow-md">
-            <Tag className="w-3 h-3 mr-1" />
-            OFERTA
-          </div>
-        )}
-        <div className="absolute bottom-2 left-2 flex space-x-1">
-          {product.deliveryOptions.shipping && <div className="bg-white/90 p-1.5 rounded-lg shadow-sm"><Truck className="w-3.5 h-3.5 text-slate-600" /></div>}
-          {product.deliveryOptions.pickup && <div className="bg-white/90 p-1.5 rounded-lg shadow-sm"><Package className="w-3.5 h-3.5 text-slate-600" /></div>}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 flex-1 flex flex-col">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
-            {product.category}
+        {product.is_promoted && (
+          <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+            Destacado
           </span>
-          <div className="flex items-center text-slate-400 text-xs">
-            <MapPin className="w-3 h-3 mr-1" />
-            {product.neighborhood}
-          </div>
-        </div>
-
-        <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
-          {product.name}
-        </h3>
+        )}
+        {hasOffer && (
+          <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+            Oferta
+          </span>
+        )}
+      </Link>
+      
+      <div className="p-4 flex flex-col flex-grow">
+        <div className="text-xs text-blue-600 font-semibold mb-1 uppercase">{product.category}</div>
+        <Link to={`/marketplace/product/${product.id}`}>
+          <h3 className="font-semibold text-gray-900 mb-1 truncate">{product.name}</h3>
+        </Link>
         
-        <p className="text-xs text-slate-500 mb-4 line-clamp-1">{product.commerce}</p>
-
-        <div className="mt-auto flex items-end justify-between">
-          <div>
-            <span className="text-xs text-slate-400 font-medium">Desde</span>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-xl font-bold text-slate-900">{currentPrice.toFixed(2)}€</span>
-              {userRole === UserRole.GUEST && (
-                <span className="text-[10px] text-green-600 font-semibold bg-green-50 px-1.5 py-0.5 rounded">
-                  -{((1 - product.prices.registered / product.prices.guest) * 100).toFixed(0)}% reg
-                </span>
-              )}
-            </div>
-          </div>
-          
-          <button className="bg-slate-900 text-white p-2 rounded-lg hover:bg-indigo-600 transition-colors">
-            <ShoppingCart className="w-4 h-4" />
-          </button>
+        <div className="flex items-center space-x-2 mb-3">
+          {hasOffer ? (
+            <>
+              <span className="text-lg font-bold text-gray-900">{product.offer_price}€</span>
+              <span className="text-sm text-gray-400 line-through">{product.price}€</span>
+            </>
+          ) : (
+            <span className="text-lg font-bold text-gray-900">{product.price}€</span>
+          )}
         </div>
+
+        <button 
+          onClick={handleAddToCart}
+          className="mt-auto w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors"
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" />
+          Añadir al carrito
+        </button>
       </div>
     </div>
   );
 };
-
-const ShoppingCart: React.FC<{className?: string}> = ({className}) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-);
 
 export default ProductCard;

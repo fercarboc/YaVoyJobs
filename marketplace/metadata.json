@@ -1,7 +1,0 @@
-{
-  "name": "YaVoyJobs Marketplace",
-  "description": "A hyperlocal neighborhood marketplace for consumers and HORECA professionals with multi-tier pricing, seller dashboards, and comprehensive order management.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}

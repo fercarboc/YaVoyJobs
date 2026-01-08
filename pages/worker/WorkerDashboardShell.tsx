@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { AuthState } from "@/types";
+import { listUnreadNotificationsForWorker } from "@/services/notifications.service";
 
 type Props = {
   auth: AuthState;
@@ -11,6 +12,33 @@ const linkBase =
 
 const WorkerDashboardShell: React.FC<Props> = ({ auth }) => {
   const userName = auth.user?.full_name || auth.user?.email || "Trabajador";
+
+  const [unreadApplications, setUnreadApplications] = useState(0);
+
+  const fetchUnread = useCallback(async () => {
+    try {
+      const notifications = await listUnreadNotificationsForWorker();
+      setUnreadApplications(notifications.length);
+    } catch (err) {
+      console.error("[WorkerDashboardShell] unread notifications", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUnread();
+    const handler = () => fetchUnread();
+    window.addEventListener("voy:notifications-updated", handler);
+    return () => window.removeEventListener("voy:notifications-updated", handler);
+  }, [fetchUnread]);
+
+  const badge = useMemo(() => {
+    if (unreadApplications <= 0) return null;
+    return (
+      <span className="ml-auto text-[10px] font-bold text-white bg-rose-500 rounded-full w-5 h-5 flex items-center justify-center">
+        {unreadApplications > 9 ? "9+" : unreadApplications}
+      </span>
+    );
+  }, [unreadApplications]);
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50">
@@ -45,8 +73,23 @@ const WorkerDashboardShell: React.FC<Props> = ({ auth }) => {
                         : "bg-white border-gray-100 text-slate-700 hover:bg-gray-50"
                     }`
                   }
+                  >
+                    Empleo
+                  </NavLink>
+                <NavLink
+                  to="/worker/solicitudes"
+                  className={({ isActive }) =>
+                    `${linkBase} ${
+                      isActive
+                        ? "bg-blue-50 border-blue-200 text-slate-900"
+                        : "bg-white border-gray-100 text-slate-700 hover:bg-gray-50"
+                    }`
+                  }
                 >
-                  Empleo
+                  <span className="flex items-center gap-2">
+                    Mis solicitudes
+                    {badge}
+                  </span>
                 </NavLink>
                 <NavLink
                   to="/worker/perfil"

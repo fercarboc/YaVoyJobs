@@ -799,6 +799,11 @@ function TopNav() {
           >
             Empresas →
           </Link>
+          <Link to="/informacion/Inmobiliarias"
+         className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+          >
+            Info Inmobiliarias →
+          </Link>
         <Link to="/informacion/infomarketplace"
          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
           >

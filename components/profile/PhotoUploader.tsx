@@ -5,7 +5,7 @@ import { theme } from "@/theme";
 type Props = {
   userId: string;
   label: string;
-  field: "selfie_photo_url" | "document_photo_url";
+  field: string;
   currentUrl: string | null;
   onUploaded: (url: string) => void;
 };
@@ -59,9 +59,9 @@ export default function PhotoUploader({
 
       // Guardamos en BD
       const { error: dbErr } = await supabase
-        .from("VoyUsers")
-        .update({ [field]: finalUrl })
-        .eq("id", userId);
+      .from("VoyUsers")
+      .update({ [field]: finalUrl })
+      .eq("id", userId);
 
       if (dbErr) throw dbErr;
 

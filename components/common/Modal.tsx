@@ -1,5 +1,5 @@
 // Modal reutilizable con theme
-import React from 'react';
+import React, { useEffect } from 'react';
 import { theme } from '../../theme';
 
 interface ModalProps {
@@ -29,36 +29,58 @@ export const Modal: React.FC<ModalProps> = ({
   maxHeight = '90vh',
   padding = theme.spacing.lg,
 }) => {
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
   if (!open) return null;
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      background: 'rgba(0,0,0,0.5)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <div style={{
-        background: theme.colors.surface,
-        borderRadius: theme.borderRadius,
-        boxShadow: theme.boxShadow,
-        minWidth,
-        maxWidth,
-        width,
-        height,
-        minHeight,
-        maxHeight,
-        padding,
-        position: 'relative',
-        overflow: 'hidden',
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0,0,0,0.5)',
+        zIndex: 1000,
         display: 'flex',
-        flexDirection: 'column',
-      }}>
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+      }}
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          background: theme.colors.surface,
+          borderRadius: theme.borderRadius,
+          boxShadow: theme.boxShadow,
+          minWidth,
+          maxWidth,
+          width,
+          height,
+          minHeight,
+          maxHeight,
+          padding,
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {title && <h2 style={{ marginBottom: theme.spacing.md, color: theme.colors.text }}>{title}</h2>}
         <button
           onClick={onClose}

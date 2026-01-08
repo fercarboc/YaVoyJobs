@@ -27,8 +27,9 @@ export default function ChatListPage({ auth }: Props) {
       setError(null);
 
       try {
+        const userId = auth.user.auth_user_id ?? auth.user.id;
         const chats = await listMyChats({
-          userId: auth.user.id,
+          userId,
           role: auth.user.role,
         });
 

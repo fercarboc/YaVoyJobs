@@ -14,6 +14,7 @@ export type VoyJobChat = {
   job_id: string;
   client_user_id: string;
   helper_user_id: string;
+  application_id?: string | null;
   created_at: string;
 };
 
@@ -33,8 +34,30 @@ export type VoyMessage = VoyJobMessage;
 export async function getChatByJobId(jobId: string) {
   const { data, error } = await supabase
     .from("VoyJobChats")
-    .select("id, job_id, client_user_id, helper_user_id, created_at")
+    .select("id, job_id, client_user_id, helper_user_id, application_id, created_at")
     .eq("job_id", jobId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return (data ?? null) as VoyJobChat | null;
+}
+
+export async function getChatById(chatId: string) {
+  const { data, error } = await supabase
+    .from("VoyJobChats")
+    .select("id, job_id, client_user_id, helper_user_id, application_id, created_at")
+    .eq("id", chatId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return (data ?? null) as VoyJobChat | null;
+}
+
+export async function getChatByApplicationId(applicationId: string) {
+  const { data, error } = await supabase
+    .from("VoyJobChats")
+    .select("id, job_id, client_user_id, helper_user_id, application_id, created_at")
+    .eq("application_id", applicationId)
     .maybeSingle();
 
   if (error) throw error;
@@ -62,6 +85,34 @@ export async function ensureChatForJob(params: {
       },
     ])
     .select("id, job_id, client_user_id, helper_user_id, created_at")
+    .single();
+
+  if (error) throw error;
+  return data as VoyJobChat;
+}
+
+export async function ensureChatForApplication(params: {
+  applicationId: string;
+  jobId: string;
+  clientUserId: string;
+  helperUserId: string;
+}) {
+  const { applicationId, jobId, clientUserId, helperUserId } = params;
+
+  const existing = await getChatByApplicationId(applicationId);
+  if (existing) return existing;
+
+  const { data, error } = await supabase
+    .from("VoyJobChats")
+    .insert([
+      {
+        application_id: applicationId,
+        job_id: jobId,
+        client_user_id: clientUserId,
+        helper_user_id: helperUserId,
+      },
+    ])
+    .select("id, job_id, client_user_id, helper_user_id, application_id, created_at")
     .single();
 
   if (error) throw error;

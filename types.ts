@@ -4,7 +4,14 @@ export enum UserRole {
   COMPANY = 'COMPANY',
   HELPER = 'HELPER',
   ADMIN = 'ADMIN',
-  AGENCY = 'AGENCY'
+  AGENCY = 'AGENCY',
+  PROVIDER = 'PROVIDER',
+  // Legacy identifiers (for compatibility)
+  WORKER = 'WORKER',
+  CLIENT = 'CLIENT',
+  REAL_ESTATE = 'REAL_ESTATE',
+  INMO = 'INMO',
+  MARKET_PROVIDER = 'MARKET_PROVIDER'
 }
 
 export type BaseRole = 'ADMIN' | 'CLIENT' | 'HELPER' | 'AGENCY';
@@ -39,7 +46,8 @@ export enum JobStatus {
   ASSIGNED = 'ASSIGNED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED'
+  CANCELLED = 'CANCELLED',
+  DRAFT = 'DRAFT'
 }
 
 export enum PeriodType {
@@ -235,7 +243,194 @@ export function mapLegacyRoleToBase(role?: UserRole | string | null): { baseRole
       return { baseRole: 'ADMIN' };
     case UserRole.AGENCY:
       return { baseRole: 'AGENCY' };
+    case UserRole.PROVIDER:
+      return { baseRole: 'CLIENT', clientType: 'BUSINESS' };
     default:
       return { baseRole: 'CLIENT' };
   }
+}
+
+
+
+
+
+export type Category = 
+  | 'Acompañamiento' 
+  | 'Limpieza' 
+  | 'Mudanza' 
+  | 'Recados' 
+  | 'Mascotas' 
+  | 'Montaje' 
+  | 'Jardín' 
+  | 'Otros';
+
+export type DurationOption = '1h' | '2h' | '3h' | 'media_jornada' | 'jornada';
+export type BudgetType = 'total' | 'hora';
+export type ContactPref = 'chat' | 'call';
+
+export type HelperStatus = 'available' | 'busy' | 'away';
+
+export interface HelperCard {
+  helper_user_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  verified: boolean;
+  has_vehicle: boolean;
+  fast_responder: boolean;
+  status: HelperStatus;
+  last_active_min_ago: number;
+  categories: Category[];
+  skills: string[];
+  rating: number;
+  lat: number | null;
+  lng: number | null;
+  location_consent: boolean;
+  distanceKm?: number;
+}
+
+export interface JobPayload {
+  id?: string;
+  category: Category;
+  zone_text: string;
+  lat: number | null;
+  lng: number | null;
+  scheduled_date: string;
+  scheduled_time: string;
+  flexible: boolean;
+  duration_option: DurationOption;
+  budget_amount: number;
+  budget_type: BudgetType;
+  requirements: string[];
+  description: string;
+  contact_pref: ContactPref;
+  status: JobStatus;
+}
+
+export interface Invite {
+  id: string;
+  job_id: string;
+  helper_user_id: string;
+  client_user_id: string;
+  status: 'sent' | 'accepted' | 'declined';
+  created_at: string;
+}
+
+
+
+
+// =======================
+// EXTRA TYPES (sin colisiones)
+// =======================
+
+// Marketplace / Provider
+export interface ProductPromotion {
+  active: boolean;
+  startDate: string; // ISO
+  endDate: string;   // ISO
+  type: "percent" | "fixed";
+  value: number;
+  status: string;
+}
+
+export interface Product {
+  id: string;
+  providerId: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  status: "active" | "archived";
+  images: string[];
+  isStar?: boolean;
+  promotion?: ProductPromotion;
+}
+
+export interface Campaign {
+  id: string;
+  productId: string;
+  productName: string;
+  placement: string;
+  duration: number; // days
+  startDate: string; // ISO
+  status: "Activa" | "Programada";
+  price: number;
+}
+
+export enum OrderStatus {
+  NEW = "NEW",
+  PREPARING = "PREPARING",
+  DELIVERED = "DELIVERED",
+}
+
+// RealEstate / Business (ads)
+export enum AdType {
+  REAL_STATE = "REAL_STATE",
+  BUSINESS = "BUSINESS",
+}
+
+export enum AdStatus {
+  AVAILABLE = "AVAILABLE",
+  RESERVED = "RESERVED",
+  NEGOTIATING = "NEGOTIATING",
+}
+
+export enum RealEstateOperation {
+  RENT = "RENT",
+  SALE = "SALE",
+}
+
+export enum RealEstateCategory {
+  FLAT = "FLAT",
+  LOCAL = "LOCAL",
+  OTHER = "OTHER",
+}
+
+// Visitas (Agencia)
+export enum VisitStatus {
+  SCHEDULED = "SCHEDULED",
+  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  NOSHOW = "NOSHOW",
+}
+
+export interface Visit {
+  id: string;
+  propertyTitle: string;
+  address: string;
+  date: string; // ISO
+  time: string; // HH:mm
+  clientName: string;
+  clientPhone: string;
+  clientEmail: string;
+  status: VisitStatus;
+  agentName: string;
+}
+
+// Incidencias / devoluciones
+export enum IssueStatus {
+  NEW = "NEW",
+  REVIEWING = "REVIEWING",
+  RESOLVED = "RESOLVED",
+}
+
+export enum IssuePriority {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+export interface Issue {
+  id: string;
+  clientId: string;
+  clientName: string;
+  orderId: string;
+  productName: string;
+  reason: string;
+  status: IssueStatus;
+  priority: IssuePriority;
+  date: string; // ISO
+  description: string;
+  type: "incidencia" | "devolucion";
 }

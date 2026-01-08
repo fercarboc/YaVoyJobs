@@ -83,6 +83,7 @@ const ClientProfilePage: React.FC = () => {
         />
         {isParticular && <AvatarFromSelfieCard />}
       </div>
+
     </div>
   );
 };

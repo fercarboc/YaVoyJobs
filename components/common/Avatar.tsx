@@ -1,7 +1,7 @@
 import React from 'react';
 
 export function UserAvatar({ user, size = 48 }: { user: any, size?: number }) {
-  const photoUrl = user.selfie_photo_url || user.logo_url || null;
+  const photoUrl = user.avatar_url || user.selfie_photo_url || user.logo_url || null;
   return photoUrl ? (
     <img
       src={photoUrl}

@@ -146,9 +146,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
       case UserRole.ADMIN:
         return '/admin';
       case UserRole.HELPER:
-        return '/worker';
+      case UserRole.PARTICULAR:
+      case UserRole.COMPANY:
       case UserRole.AGENCY:
-        return '/agency';
+      case UserRole.PROVIDER:
+        return '/perfil';
       default:
         return '/panel';
     }
@@ -197,7 +199,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
         color: theme.colors.text,
       }}
     >
-      <nav className="sticky top-0 z-50 shadow-lg" style={{ background: theme.colors.primary }}>
+      <nav className="sticky top-0 z-[900] shadow-lg" style={{ background: theme.colors.primary }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 gap-4">
             {/* Logo */}
@@ -386,7 +388,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                           <p className="text-xs text-gray-500">{auth.user.email}</p>
                         </div>
 
-                        {/* ✅ Mi Panel (aquí, no en el header) */}
+                        {/* ✅ Mi Panel */}
                         <button
                           onClick={() => {
                             setIsProfileOpen(false);
@@ -395,30 +397,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, auth, onLogout, onOpen
                           className="w-full text-left px-4 py-3 text-slate-700 hover:bg-gray-50 transition flex items-center"
                         >
                           <Icons.Tool size={16} className="mr-2 text-brand-500" />
-
                           Mi Panel
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsEditProfileOpen(true);
-                            setIsProfileOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-3 text-slate-700 hover:bg-gray-50 transition flex items-center"
-                        >
-                          <Icons.Edit3 size={16} className="mr-2 text-brand-500" />
-                          Editar Perfil
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsChangePasswordOpen(true);
-                            setIsProfileOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-3 text-slate-700 hover:bg-gray-50 transition flex items-center border-b border-gray-100"
-                        >
-                          <Icons.Shield size={16} className="mr-2 text-brand-500" />
-                          Cambiar Contraseña
                         </button>
 
                         <button

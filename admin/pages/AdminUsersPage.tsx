@@ -1,75 +1,168 @@
-import React, { useEffect, useState } from "react";
-import { AdminRole, AdminUser, listUsers, updateUserActive, updateUserRole } from "@/services/adminApi";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminRole, AdminUser, listAdminUsers } from "@/services/adminApi";
 
-const roles: AdminRole[] = ["PARTICULAR", "COMPANY", "HELPER", "ADMIN", "PROVIDER"];
+const roleOptions: ("ALL" | AdminRole)[] = ["ALL", "ADMIN", "HELPER", "PARTICULAR", "COMPANY", "PROVIDER"];
+const statusOptions = ["ALL", "ACTIVE", "INACTIVE"];
+const pageSize = 25;
+
+const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString() : "-");
 
 const AdminUsersPage: React.FC = () => {
-  const [data, setData] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [roleFilter, setRoleFilter] = useState<"ALL" | AdminRole>("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [roleFilter, setRoleFilter] = useState<AdminRole | "">("");
   const [error, setError] = useState<string | null>(null);
 
-  const load = async (role?: AdminRole) => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const res = await listUsers(role);
-      setData(res);
-    } catch (err: any) {
-      setError(err?.message || "No se pudieron cargar los usuarios");
-    } finally {
-      setLoading(false);
+    const params = {
+      role: roleFilter === "ALL" ? undefined : roleFilter,
+      status: statusFilter === "ALL" ? undefined : statusFilter,
+      q: search ? search.trim() : undefined,
+      page,
+      pageSize,
+    };
+    const result = await listAdminUsers(params);
+    if (result.error) {
+      const message = result.error.message.includes("RLS")
+        ? "Sin permisos por RLS para consultar VoyUsers"
+        : result.error.message || "No se pudieron cargar los usuarios";
+      setError(message);
+      setUsers([]);
+      setCount(0);
+    } else {
+      setUsers(result.data);
+      setCount(result.count);
     }
-  };
+    setLoading(false);
+  }, [roleFilter, statusFilter, search, page]);
 
   useEffect(() => {
-    load();
-  }, []);
+    loadUsers();
+  }, [loadUsers]);
 
-  const handleRoleChange = async (user: AdminUser, role: AdminRole) => {
-    try {
-      await updateUserRole(user.id, role);
-      load(roleFilter || undefined);
-    } catch (err: any) {
-      alert(err?.message || "Error actualizando rol");
-    }
+  const handleOpenAgencyForm = (type: "HOUSING_AGENCY" | "MARKET_VENDOR") => {
+    window.dispatchEvent(
+      new CustomEvent("admin:open-agency-form", {
+        detail: { type },
+      })
+    );
   };
 
-  const handleActive = async (user: AdminUser, active: boolean) => {
-    try {
-      await updateUserActive(user.id, active);
-      load(roleFilter || undefined);
-    } catch (err: any) {
-      alert(err?.message || "Error actualizando estado");
-    }
-  };
+  const startIndex = useMemo(() => (count === 0 ? 0 : (page - 1) * pageSize + 1), [count, page]);
+  const endIndex = useMemo(() => Math.min(count, page * pageSize), [count, page]);
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
-          <p className="text-sm text-gray-600">Listado y gestión de roles y actividad.</p>
+          <p className="text-sm text-gray-600">Gestión de cuentas y permisos.</p>
         </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => handleOpenAgencyForm("HOUSING_AGENCY")}
+            className="px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Alta Agencia
+          </button>
+          <button
+            onClick={() => handleOpenAgencyForm("MARKET_VENDOR")}
+            className="px-3 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Alta Vendor
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
         <select
           value={roleFilter}
           onChange={(e) => {
-            const value = e.target.value as AdminRole | "";
-            setRoleFilter(value);
-            load(value || undefined);
+            setRoleFilter(e.target.value as typeof roleFilter);
+            setPage(1);
           }}
-          className="px-3 py-2 rounded-xl border text-sm"
+          className="px-3 py-2 border rounded-xl text-sm"
         >
-          <option value="">Todos los roles</option>
-          {roles.map((r) => (
-            <option key={r} value={r}>
-              {r}
+          {roleOptions.map((role) => (
+            <option key={role} value={role}>
+              {role === "ALL" ? "Todos los roles" : role}
             </option>
           ))}
         </select>
+
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value as typeof statusFilter);
+            setPage(1);
+          }}
+          className="px-3 py-2 border rounded-xl text-sm"
+        >
+          {statusOptions.map((status) => (
+            <option key={status} value={status}>
+              {status === "ALL" ? "Todos los estados" : status}
+            </option>
+          ))}
+        </select>
+
+        <div className="flex items-center gap-2">
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Buscar por nombre, email o teléfono"
+            className="px-3 py-2 border rounded-xl text-sm"
+          />
+          <button
+            onClick={() => {
+              setSearch("");
+              setPage(1);
+            }}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            Limpiar
+          </button>
+        </div>
+
+        <div className="text-xs text-gray-500">
+          Mostrando {startIndex || "-"}-{endIndex} de {count}
+        </div>
       </div>
 
-      {error && <div className="p-3 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">{error}</div>}
+      <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+        <div>
+          {loading ? "Actualizando..." : `${totalPages} páginas disponibles`}
+        </div>
+        <div className="flex gap-2">
+          <button
+            disabled={page <= 1 || loading}
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            className="px-3 py-1 rounded-xl border text-xs disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <button
+            disabled={page >= totalPages || loading}
+            onClick={() => setPage((prev) => prev + 1)}
+            className="px-3 py-1 rounded-xl border text-xs disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-3 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">{error}</div>
+      )}
 
       {loading ? (
         <div className="p-4 text-sm text-gray-500">Cargando usuarios...</div>
@@ -80,42 +173,25 @@ const AdminUsersPage: React.FC = () => {
               <tr>
                 <th className="text-left px-4 py-3">Nombre</th>
                 <th className="text-left px-4 py-3">Email</th>
+                <th className="text-left px-4 py-3">Teléfono</th>
                 <th className="text-left px-4 py-3">Rol</th>
-                <th className="text-left px-4 py-3">Estado</th>
+                <th className="text-left px-4 py-3">Ciudad</th>
                 <th className="text-left px-4 py-3">Creado</th>
-                <th className="text-left px-4 py-3">Acciones</th>
+                <th className="text-left px-4 py-3">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {data.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">{u.full_name || "—"}</td>
-                  <td className="px-4 py-3 text-gray-700">{u.email}</td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={u.role}
-                      onChange={(e) => handleRoleChange(u, e.target.value as AdminRole)}
-                      className="text-sm border rounded-lg px-2 py-1"
-                    >
-                      {roles.map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-semibold text-gray-900">{user.full_name || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{user.email || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{user.phone || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{user.role}</td>
+                  <td className="px-4 py-3 text-gray-700">{user.city || "-"}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatDate(user.created_at)}</td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {user.is_active ? "Activo" : user.is_active === false ? "Inactivo" : "Sin dato"}
                   </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleActive(u, !(u.is_active ?? true))}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        u.is_active ?? true ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {u.is_active ?? true ? "Activo" : "Inactivo"}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</td>
-                  <td className="px-4 py-3 text-gray-600">—</td>
                 </tr>
               ))}
             </tbody>

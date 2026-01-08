@@ -1,8 +1,9 @@
 // src/pages/chat/ChatRoomPage.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { AuthState } from "@/types";
 import {
+  getChatById,
   getChatByJobId,
   getJobTitle,
   listMessages,
@@ -18,6 +19,11 @@ type Props = { auth: AuthState };
 
 export default function ChatRoomPage({ auth }: Props) {
   const { jobId } = useParams();
+  const location = useLocation();
+  const queryChatId = useMemo(
+    () => new URLSearchParams(location.search).get("chatId"),
+    [location.search]
+  );
   const userId = auth.user?.id ?? "";
 
   const [loading, setLoading] = useState(true);
@@ -30,15 +36,23 @@ export default function ChatRoomPage({ auth }: Props) {
 
   useEffect(() => {
     const run = async () => {
-      if (!jobId) return;
+      if (!jobId && !queryChatId) return;
       setLoading(true);
       setError(null);
 
       try {
-        const title = await getJobTitle(jobId);
-        setJobTitle(title);
+        if (jobId) {
+          const title = await getJobTitle(jobId);
+          setJobTitle(title);
+        }
 
-        const chat = await getChatByJobId(jobId);
+        const chat =
+          queryChatId != null
+            ? await getChatById(queryChatId)
+            : jobId
+            ? await getChatByJobId(jobId)
+            : null;
+
         if (!chat) {
           setChatId(null);
           setMessages([]);
@@ -58,7 +72,7 @@ export default function ChatRoomPage({ auth }: Props) {
     };
 
     run();
-  }, [jobId]);
+  }, [jobId, queryChatId]);
 
   // Realtime
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/services/supabase";
-import { AuthState } from "@/types";
+import { AuthState, UserRole } from "@/types";
 import { theme } from "@/theme";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
@@ -27,6 +27,17 @@ type ProfileForm = {
   document_number: string;
   selfie_photo_url: string | null;
   document_photo_url: string | null;
+  company_logo_url: string | null;
+  company_name: string;
+  cif: string | null;
+  company_sector: string | null;
+  primary_district: string | null;
+  primary_neighborhood: string | null;
+  adjacent_districts: string;
+  adjacent_neighborhoods: string;
+  availability_days: string;
+  availability_time_from: string;
+  availability_time_to: string;
 };
 
 export default function WorkerProfilePage({ auth }: Props) {
@@ -49,6 +60,17 @@ export default function WorkerProfilePage({ auth }: Props) {
     document_number: auth.user?.document_number ?? "",
     selfie_photo_url: auth.user?.selfie_photo_url ?? null,
     document_photo_url: auth.user?.document_photo_url ?? null,
+    company_logo_url: auth.user?.company_logo_url ?? null,
+    company_name: auth.user?.company_name ?? "",
+    cif: auth.user?.cif ?? null,
+    company_sector: auth.user?.company_sector ?? null,
+    primary_district: auth.user?.primary_district ?? null,
+    primary_neighborhood: auth.user?.primary_neighborhood ?? null,
+    adjacent_districts: (auth.user?.adjacent_districts ?? []).join(", "),
+    adjacent_neighborhoods: (auth.user?.adjacent_neighborhoods ?? []).join(", "),
+    availability_days: JSON.stringify(auth.user?.availability_days ?? {}),
+    availability_time_from: auth.user?.availability_time_from ?? "",
+    availability_time_to: auth.user?.availability_time_to ?? "",
   });
 
   // contraseña
@@ -59,6 +81,11 @@ export default function WorkerProfilePage({ auth }: Props) {
     return pwd.newPassword.length >= 6 && pwd.newPassword === pwd.confirm;
   }, [pwd]);
 
+  const userRole = auth.user?.role ?? UserRole.HELPER;
+  const isCompanyRole = [UserRole.COMPANY, UserRole.AGENCY, UserRole.PROVIDER].includes(userRole);
+  const headerTitle =
+    isCompanyRole ? "Perfil empresarial" : userRole === UserRole.HELPER ? "Mi Perfil (Trabajador)" : "Mi perfil";
+
   useEffect(() => {
     const load = async () => {
       if (!userId) return;
@@ -67,7 +94,7 @@ export default function WorkerProfilePage({ auth }: Props) {
         const { data, error } = await supabase
           .from("VoyUsers")
           .select(
-            "full_name, phone, city, district, neighborhood, address, postal_code, province, country, document_type, document_number, selfie_photo_url, document_photo_url"
+            "full_name, phone, city, district, neighborhood, address, postal_code, province, country, document_type, document_number, selfie_photo_url, document_photo_url, company_logo_url, company_name, cif, company_sector, primary_district, primary_neighborhood, adjacent_districts, adjacent_neighborhoods, availability_days, availability_time_from, availability_time_to"
           )
           .eq("id", userId)
           .single();
@@ -81,6 +108,21 @@ export default function WorkerProfilePage({ auth }: Props) {
           document_type: data?.document_type ?? "NIF",
           selfie_photo_url: data?.selfie_photo_url ?? null,
           document_photo_url: data?.document_photo_url ?? null,
+          company_logo_url: data?.company_logo_url ?? null,
+          company_name: data?.company_name ?? "",
+          cif: data?.cif ?? null,
+          company_sector: data?.company_sector ?? null,
+          primary_district: data?.primary_district ?? null,
+          primary_neighborhood: data?.primary_neighborhood ?? null,
+          adjacent_districts: Array.isArray(data?.adjacent_districts)
+            ? data.adjacent_districts.join(", ")
+            : data?.adjacent_districts ?? "",
+          adjacent_neighborhoods: Array.isArray(data?.adjacent_neighborhoods)
+            ? data.adjacent_neighborhoods.join(", ")
+            : data?.adjacent_neighborhoods ?? "",
+          availability_days: JSON.stringify(data?.availability_days ?? {}),
+          availability_time_from: data?.availability_time_from ?? "",
+          availability_time_to: data?.availability_time_to ?? "",
         }));
       } catch (e) {
         console.error(e);
@@ -110,6 +152,29 @@ export default function WorkerProfilePage({ auth }: Props) {
           country: form.country || "España",
           document_type: form.document_type || "NIF",
           document_number: form.document_number || null,
+          company_logo_url: form.company_logo_url ?? null,
+          company_name: form.company_name || null,
+          cif: form.cif ?? null,
+          company_sector: form.company_sector ?? null,
+          primary_district: form.primary_district ?? null,
+          primary_neighborhood: form.primary_neighborhood ?? null,
+          adjacent_districts: form.adjacent_districts
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
+          adjacent_neighborhoods: form.adjacent_neighborhoods
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
+          availability_days: (() => {
+            try {
+              return JSON.parse(form.availability_days);
+            } catch {
+              return {};
+            }
+          })(),
+          availability_time_from: form.availability_time_from || null,
+          availability_time_to: form.availability_time_to || null,
           // selfie_photo_url y document_photo_url los gestiona PhotoUploader
           // aquí no los tocamos para no pisarlos
         })
@@ -150,46 +215,14 @@ export default function WorkerProfilePage({ auth }: Props) {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-lg font-bold text-slate-900">Mi Perfil (Trabajador)</h1>
+      <h1 className="text-lg font-bold text-slate-900">{headerTitle}</h1>
       <p className="text-xs text-slate-500 mt-1">
         Completa tus datos. Esto ayuda a empresas/particulares a confiar y contratar.
       </p>
 
-      {/* FOTOS: SELFIE + DOCUMENTO */}
-      <div className="mt-5 bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-        <h2 className="text-sm font-bold text-slate-900">Fotos</h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Sube selfie y documento. Se usarán para tu avatar y verificación.
-        </p>
-
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PhotoUploader
-            userId={userId!}
-            label="Selfie (avatar)"
-            field="selfie_photo_url"
-            currentUrl={form.selfie_photo_url}
-            onUploaded={(url) => setForm((prev) => ({ ...prev, selfie_photo_url: url }))}
-          />
-
-          <PhotoUploader
-            userId={userId!}
-            label="Documento (foto)"
-            field="document_photo_url"
-            currentUrl={form.document_photo_url}
-            onUploaded={(url) => setForm((prev) => ({ ...prev, document_photo_url: url }))}
-          />
-        </div>
-
-        <div className="mt-4">
-          <Button onClick={onSaveProfile} disabled={saving}>
-            {saving ? "Guardando..." : "Guardar cambios"}
-          </Button>
-        </div>
-      </div>
-
       {/* VERIFICACION */}
       <div className="mt-4 space-y-3">
-        <VerificationUploader defaultVerificationType="helper" showTypeSelector={false} />
+        <VerificationUploader defaultVerificationType={isCompanyRole ? "company" : "helper"} showTypeSelector={false} />
         <AvatarFromSelfieCard />
         <VerificationStatusCard auth={auth} />
       </div>
@@ -198,7 +231,7 @@ export default function WorkerProfilePage({ auth }: Props) {
       <div className="mt-4 bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
         <h2 className="text-sm font-bold text-slate-900 mb-3">Datos personales</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
             label="Nombre completo"
             type="text"
@@ -206,9 +239,9 @@ export default function WorkerProfilePage({ auth }: Props) {
             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
             required
           />
-          <Input
-            label="Teléfono"
-            type="text"
+            <Input
+              label="Teléfono"
+              type="text"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             placeholder="Ej: 600123123"
@@ -275,6 +308,95 @@ export default function WorkerProfilePage({ auth }: Props) {
         </div>
       </div>
 
+      {isCompanyRole && (
+        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-gray-200 p-4 space-y-4">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 mb-1">Datos empresariales</h2>
+            <p className="text-xs text-slate-500">Completa la información fiscal y de contacto para facturación.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Input
+              label="Nombre comercial / razón social"
+              type="text"
+              value={form.company_name}
+              onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+              placeholder="Nombre de tu empresa"
+            />
+            <Input
+              label="CIF / NIF empresa"
+              type="text"
+              value={form.cif ?? ""}
+              onChange={(e) => setForm({ ...form, cif: e.target.value })}
+              placeholder="B12345678"
+            />
+            <Input
+              label="Sector de actividad"
+              type="text"
+              value={form.company_sector ?? ""}
+              onChange={(e) => setForm({ ...form, company_sector: e.target.value })}
+              placeholder="Hostelería, logística, servicios..."
+            />
+            <Input
+              label="Distrito principal"
+              type="text"
+              value={form.primary_district ?? ""}
+              onChange={(e) => setForm({ ...form, primary_district: e.target.value })}
+              placeholder="Madrid Centro"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Input
+              label="Barrio principal"
+              type="text"
+              value={form.primary_neighborhood ?? ""}
+              onChange={(e) => setForm({ ...form, primary_neighborhood: e.target.value })}
+              placeholder="Sol"
+            />
+            <Input
+              label="Distritos adyacentes (coma separados)"
+              type="text"
+              value={form.adjacent_districts}
+              onChange={(e) => setForm({ ...form, adjacent_districts: e.target.value })}
+              placeholder="Chamberí, Retiro"
+            />
+            <Input
+              label="Barrios adyacentes"
+              type="text"
+              value={form.adjacent_neighborhoods}
+              onChange={(e) => setForm({ ...form, adjacent_neighborhoods: e.target.value })}
+              placeholder="Chueca, Lavapiés"
+            />
+            <Input
+              label="Horario de disponibilidad (desde)"
+              type="text"
+              value={form.availability_time_from}
+              onChange={(e) => setForm({ ...form, availability_time_from: e.target.value })}
+              placeholder="17:00"
+            />
+            <Input
+              label="Horario de disponibilidad (hasta)"
+              type="text"
+              value={form.availability_time_to}
+              onChange={(e) => setForm({ ...form, availability_time_to: e.target.value })}
+              placeholder="20:00"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-2">Logo / imagen corporativa</label>
+            <PhotoUploader
+              userId={userId ?? ""}
+              label="Logo"
+              field="company_logo_url"
+              currentUrl={form.company_logo_url}
+              onUploaded={(url) => setForm({ ...form, company_logo_url: url })}
+            />
+          </div>
+        </div>
+      )}
+
       {/* IDENTIFICACIÓN */}
       <div className="mt-4 bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
         <h2 className="text-sm font-bold text-slate-900 mb-3">Identificación</h2>
@@ -300,6 +422,22 @@ export default function WorkerProfilePage({ auth }: Props) {
           <Button onClick={onSaveProfile} disabled={saving}>
             {saving ? "Guardando..." : "Guardar identificación"}
           </Button>
+        </div>
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <PhotoUploader
+            userId={userId ?? ""}
+            label="Documento (DNI/CIF / PDF)"
+            field="document_photo_url"
+            currentUrl={form.document_photo_url}
+            onUploaded={(url) => setForm({ ...form, document_photo_url: url })}
+          />
+          <PhotoUploader
+            userId={userId ?? ""}
+            label={isCompanyRole ? "Selfie / Imagen corporativa" : "Selfie"}
+            field="selfie_photo_url"
+            currentUrl={form.selfie_photo_url}
+            onUploaded={(url) => setForm({ ...form, selfie_photo_url: url })}
+          />
         </div>
       </div>
 
@@ -353,6 +491,18 @@ export default function WorkerProfilePage({ auth }: Props) {
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="mt-4 bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
+        <h2 className="text-sm font-bold text-slate-900 mb-3">Disponibilidad</h2>
+        <p className="text-xs text-slate-500 mb-3">
+          Indica los días y franjas horarias en formato JSON (ej. {"{\"mon\":true,\"tue\":true}"}).
+        </p>
+        <textarea
+          value={form.availability_days}
+          onChange={(e) => setForm({ ...form, availability_days: e.target.value })}
+          className="w-full min-h-[120px] border border-gray-200 rounded-lg p-3 text-sm font-mono text-slate-600"
+        />
       </div>
 
       {/* DATOS ECONÓMICOS (placeholder) */}

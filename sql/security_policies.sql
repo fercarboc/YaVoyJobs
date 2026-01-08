@@ -82,6 +82,45 @@ CREATE POLICY voymsgs_participant
   );
 
 -----------------------------
+-- Chats de trabajos y aplicaciones
+-----------------------------
+ALTER TABLE public."VoyJobChats" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY voyjobchats_participant_select
+  ON public."VoyJobChats" FOR SELECT TO authenticated
+  USING (
+    auth.jwt()->>'role' = 'admin'
+    OR client_user_id = auth.uid()
+    OR helper_user_id = auth.uid()
+  );
+
+CREATE POLICY voyjobchats_participant_insert
+  ON public."VoyJobChats" FOR INSERT TO authenticated
+  USING (
+    auth.jwt()->>'role' = 'admin'
+    OR client_user_id = auth.uid()
+    OR helper_user_id = auth.uid()
+  )
+  WITH CHECK (
+    auth.jwt()->>'role' = 'admin'
+    OR client_user_id = auth.uid()
+    OR helper_user_id = auth.uid()
+  );
+
+CREATE POLICY voyjobchats_participant_update
+  ON public."VoyJobChats" FOR UPDATE TO authenticated
+  USING (
+    auth.jwt()->>'role' = 'admin'
+    OR client_user_id = auth.uid()
+    OR helper_user_id = auth.uid()
+  )
+  WITH CHECK (
+    auth.jwt()->>'role' = 'admin'
+    OR client_user_id = auth.uid()
+    OR helper_user_id = auth.uid()
+  );
+
+-----------------------------
 -- Jobs / Aplicaciones / Asignaciones
 -- Supuestos: VoyJobs(creator_user_id), VoyJobApplications(job_id, helper_user_id),
 -- VoyJobAssignments(job_id, helper_user_id, requester_user_id)
@@ -95,6 +134,14 @@ CREATE POLICY voyjobs_owner_or_assignee
   USING (
     auth.jwt()->>'role' = 'admin'
     OR creator_user_id = auth.uid()
+  );
+
+CREATE POLICY voyjobs_open_for_helpers
+  ON public."VoyJobs" FOR SELECT TO authenticated
+  USING (
+    auth.jwt()->>'role' = 'helper'
+    AND status = 'OPEN'
+    AND creator_user_id <> auth.uid()
   );
 
 CREATE POLICY voyjobs_insert_employer

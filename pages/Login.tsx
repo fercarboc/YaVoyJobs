@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import type { AuthState } from "@/types";
-import { UserRole } from "@/types";
 import { supabase } from "@/services/supabase";
 
 type LoginProps = {
@@ -16,19 +15,7 @@ const Login: React.FC<LoginProps> = ({ auth, onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   // ✅ destino según rol (memo para no recalcular)
-  const redirectTo = useMemo(() => {
-    if (!auth.user) return null;
-    switch (auth.user.role) {
-      case UserRole.ADMIN:
-        return "/admin";
-      case UserRole.HELPER:
-        return "/worker";
-      case UserRole.AGENCY:
-        return "/agency";
-      default:
-        return "/panel";
-    }
-  }, [auth.user]);
+  const redirectTo = "/perfil";
 
   /* =====================================================
      🔁 SI YA ESTÁ LOGADO → REDIRIGIR AL DASHBOARD

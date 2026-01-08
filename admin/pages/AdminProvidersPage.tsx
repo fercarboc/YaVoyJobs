@@ -1,34 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  AdminAgency,
+  listAdminAgencies,
   ProviderProfile,
   ProviderType,
   createProviderInvite,
   findUserByEmail,
-  listProviders,
   upsertProviderProfile,
 } from "@/services/adminApi";
 
-type FormState = {
-  email: string;
-  display_name: string;
-  phone?: string;
-  contact_person?: string;
-  address?: string;
-  city?: string;
-  district?: string;
-  neighborhood?: string;
-  postal_code?: string;
-  province?: string;
-  country?: string;
-  website?: string;
-};
-
-const providerTabs: { id: ProviderType; label: string }[] = [
-  { id: "HOUSING_AGENCY", label: "Agencias" },
-  { id: "MARKET_VENDOR", label: "Vendors" },
-];
-
-const initialForm: FormState = {
+const pageSize = 20;
+const initialForm: Omit<ProviderProfile, "id" | "created_at" | "updated_at" | "user"> = {
   email: "",
   display_name: "",
   phone: "",
@@ -44,38 +26,55 @@ const initialForm: FormState = {
 };
 
 const AdminProvidersPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ProviderType>("HOUSING_AGENCY");
-  const [providers, setProviders] = useState<ProviderProfile[]>([]);
+  const [agencies, setAgencies] = useState<AdminAgency[]>([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [formType, setFormType] = useState<ProviderType>("HOUSING_AGENCY");
+  const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
   const [inviteLink, setInviteLink] = useState<string | null>(null);
-
-  const filtered = useMemo(() => providers.filter((p) => p.provider_type === activeTab), [providers, activeTab]);
 
   const load = async () => {
     setLoading(true);
     setError(null);
-    try {
-      const res = await listProviders();
-      setProviders(res);
-    } catch (err: any) {
-      setError(err?.message || "No se pudieron cargar los proveedores");
-    } finally {
-      setLoading(false);
+    const result = await listAdminAgencies({ q: search || undefined, page, pageSize });
+    if (result.error) {
+      const message = result.error.message.includes("RLS")
+        ? "Sin permisos por RLS para listar agencias"
+        : result.error.message || "No se pudieron cargar las agencias";
+      setError(message);
+      setAgencies([]);
+      setCount(0);
+    } else {
+      setAgencies(result.data);
+      setCount(result.count);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     load();
+  }, [search, page]);
+
+  useEffect(() => {
+    const handleOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ type?: ProviderType }>).detail;
+      const type = detail?.type || "HOUSING_AGENCY";
+      openForm(type);
+    };
+
+    window.addEventListener("admin:open-agency-form", handleOpen as EventListener);
+    return () => window.removeEventListener("admin:open-agency-form", handleOpen as EventListener);
   }, []);
 
   const openForm = (type: ProviderType) => {
-    setInviteLink(null);
-    setActiveTab(type);
+    setFormType(type);
     setForm({ ...initialForm });
+    setInviteLink(null);
     setFormOpen(true);
   };
 
@@ -88,7 +87,7 @@ const AdminProvidersPage: React.FC = () => {
       if (existingUser) {
         await upsertProviderProfile({
           provider_user_id: existingUser.id,
-          provider_type: activeTab,
+          provider_type: formType,
           display_name: form.display_name,
           phone: form.phone,
           email: form.email,
@@ -102,11 +101,11 @@ const AdminProvidersPage: React.FC = () => {
           contact_person: form.contact_person,
           website: form.website,
         });
-        alert("Proveedor creado/actualizado correctamente");
+        alert("Agencia creada/actualizada correctamente");
       } else {
         const expires = new Date();
         expires.setDate(expires.getDate() + 7);
-        const invite = await createProviderInvite(form.email, activeTab, expires.toISOString());
+        const invite = await createProviderInvite(form.email, formType, expires.toISOString());
         const link = `/#/register?invite=${invite.token}`;
         setInviteLink(link);
         alert("Usuario no existe. Invitación generada.");
@@ -114,53 +113,63 @@ const AdminProvidersPage: React.FC = () => {
       setFormOpen(false);
       load();
     } catch (err: any) {
-      alert(err?.message || "No se pudo guardar el proveedor");
+      alert(err?.message || "No se pudo guardar la agencia");
     } finally {
       setSaving(false);
     }
   };
 
+  const startIndex = useMemo(() => (count === 0 ? 0 : (page - 1) * pageSize + 1), [count, page]);
+  const endIndex = useMemo(() => Math.min(count, page * pageSize), [count, page]);
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Proveedores</h1>
-          <p className="text-sm text-gray-600">Agencias inmobiliarias y vendors del marketplace.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Agencias</h1>
+          <p className="text-sm text-gray-600">Captación y gestión de agencias inmobiliarias.</p>
         </div>
-        <div className="flex gap-2">
+        <button
+          onClick={() => openForm("HOUSING_AGENCY")}
+          className="px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Alta Agencia
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Buscar agencias"
+            className="px-3 py-2 border rounded-xl text-sm"
+          />
           <button
-            onClick={() => openForm("HOUSING_AGENCY")}
-            className="px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => {
+              setSearch("");
+              setPage(1);
+            }}
+            className="text-xs text-blue-600 hover:underline"
           >
-            Alta Agencia
+            Limpiar
           </button>
-          <button
-            onClick={() => openForm("MARKET_VENDOR")}
-            className="px-3 py-2 rounded-xl text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700"
-          >
-            Alta Vendor
-          </button>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          Mostrando {startIndex}–{endIndex} de {count}
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {providerTabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-2 rounded-full text-sm font-semibold ${
-              activeTab === tab.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {error && <div className="p-3 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">{error}</div>}
+      {error && (
+        <div className="p-3 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">{error}</div>
+      )}
 
       {loading ? (
-        <div className="p-4 text-sm text-gray-500">Cargando proveedores...</div>
+        <div className="p-4 text-sm text-gray-500">Cargando agencias...</div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-auto">
           <table className="min-w-full text-sm">
@@ -175,14 +184,18 @@ const AdminProvidersPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((p) => (
+              {agencies.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">{p.display_name || "—"}</td>
-                  <td className="px-4 py-3 text-gray-700">{p.email || p.user?.email || "—"}</td>
-                  <td className="px-4 py-3 text-gray-700">{p.phone || "—"}</td>
-                  <td className="px-4 py-3 text-gray-700">{p.city || "—"}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-900">{p.display_name || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{p.email || p.user?.email || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{p.phone || "-"}</td>
+                  <td className="px-4 py-3 text-gray-700">{p.city || "-"}</td>
                   <td className="px-4 py-3 text-gray-600">
-                    {p.created_at ? new Date(p.created_at).toLocaleDateString() : p.user?.created_at ? new Date(p.user.created_at).toLocaleDateString() : "—"}
+                    {p.created_at
+                      ? new Date(p.created_at).toLocaleDateString()
+                      : p.user?.created_at
+                      ? new Date(p.user.created_at).toLocaleDateString()
+                      : "-"}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -200,13 +213,30 @@ const AdminProvidersPage: React.FC = () => {
         </div>
       )}
 
+      <div className="flex gap-2 text-xs">
+        <button
+          disabled={page <= 1 || loading}
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          className="px-3 py-1 rounded-xl border text-xs disabled:opacity-50"
+        >
+          Anterior
+        </button>
+        <button
+          disabled={page >= totalPages || loading}
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-3 py-1 rounded-xl border text-xs disabled:opacity-50"
+        >
+          Siguiente
+        </button>
+      </div>
+
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  {activeTab === "HOUSING_AGENCY" ? "Alta Agencia" : "Alta Vendor"}
+                  {formType === "HOUSING_AGENCY" ? "Alta Agencia" : "Alta Vendor"}
                 </h3>
                 <p className="text-sm text-gray-600">
                   Si el email existe se convierte a PROVIDER; si no, generamos invitación.

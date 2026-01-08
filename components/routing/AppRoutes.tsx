@@ -10,6 +10,7 @@ import Landing from "@/pages/Landing";
 import SectorsPage from "@/pages/SectorsPage";
 import DownloadPage from "@/pages/DownloadPage";
 import ParticularesInfoPage from "@/pages/informacion/particulares";
+import InmobiliariasInfo from "@/pages/informacion/inmobiliarias";
 import InfoMarketplace from "@/pages/informacion/infomarketplace";
 import Seguro from "@/pages/informacion/seguro";
 import InfoEmpresas from "@/pages/informacion/empresas";
@@ -39,9 +40,12 @@ import ClientJobs from "@/pages/client/ClientJobs";
 import ClientJobNew from "@/pages/client/ClientJobNew";
 import ClientJobDetail from "@/pages/client/ClientJobDetail";
 import ClientDashboardShell from "@/components/client/ClientDashboardShell";
+import CrearEmpleoPuntualPage from "@/pages/CrearEmpleoPuntualPage";
 
 // Admin / Worker
 import AdminLayout from "@/admin/layout/AdminLayout";
+//import { AdminLayout } from "@/admin/layout/AdminLayout";
+
 import AdminHomePage from "@/admin/pages/AdminHomePage";
 import AdminUsersPage from "@/admin/pages/AdminUsersPage";
 import AdminProvidersPage from "@/admin/pages/AdminProvidersPage";
@@ -52,12 +56,14 @@ import AdminPaymentsPage from "@/admin/pages/AdminPaymentsPage";
 import AdminMetricsPage from "@/admin/pages/AdminMetricsPage";
 import AdminFinancePage from "@/admin/pages/AdminFinancePage";
 import AdminLogsPage from "@/admin/pages/AdminLogsPage";
+import MarketplaceSection from "@/admin/sections/MarketplaceSection";
 import WorkerDashboard from "@/pages/worker/WorkerDashboard";
 import WorkerProfilePage from "@/pages/worker/WorkerProfilePage";
 import DashboardPerfiles from "@/dashboardperfiles/DashboardPerfiles";
 import WorkerJobs from "@/pages/worker/WorkerJobs";
 import WorkerJobDetail from "@/pages/worker/WorkerJobDetail";
 import WorkerDashboardShell from "@/pages/worker/WorkerDashboardShell";
+import PerfilesPage from "@/pages/perfilesnew";
 
 
 
@@ -67,14 +73,9 @@ import WorkerDashboardShell from "@/pages/worker/WorkerDashboardShell";
 
 
 
-
-// Debug admin imports
-console.log("AdminLayout", AdminLayout);
-console.log("AdminHomePage", AdminHomePage);
-console.log("AdminUsersPage", AdminUsersPage);
 
 // Marketplace
-import Marketplace from "@/pages/marketplace";
+import MarketplaceRoutes from "../../pages/marketplace";
 
 // Agency
 import AgencyGuard from "@/agency/components/AgencyGuard";
@@ -91,6 +92,7 @@ import AgencyPlansPage from "@/agency/pages/AgencyPlansPage";
 // Chat
 import ChatListPage from "@/pages/chat/ChatListPage";
 import ChatRoomPage from "@/pages/chat/ChatRoomPage";
+import ChatPlaceholderPage from "@/pages/chat/ChatPlaceholderPage";
 
 // Alquileres
 
@@ -109,6 +111,7 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       <Route path="/" element={<Landing />} />
       <Route path="/sectores" element={<SectorsPage />} />
       <Route path="/informacion/particulares" element={<ParticularesInfoPage />} />
+      <Route path="/informacion/inmobiliarias" element={<InmobiliariasInfo />} />
       <Route path="/informacion/infomarketplace" element={<InfoMarketplace />} />
       <Route path="/informacion/infoempresas" element={<InfoEmpresas />} />
       <Route path="/informacion/Empleo" element={<EmpleoInfo />} />
@@ -135,18 +138,54 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
       */}
 
       {/* Marketplace (público) */}
-      <Route path="/marketplace" element={<Marketplace />} />
+      <Route path="/marketplace/*" element={<MarketplaceRoutes auth={auth} />} />
 
       {/* Auth */}
       <Route path="/login" element={<Login auth={auth} />} />
 
       <Route path="/register" element={<Register />} />
 
+      <Route
+        path="/perfil"
+        element={
+          <ProtectedRoute
+            auth={auth}
+            roles={[
+              UserRole.ADMIN,
+              UserRole.HELPER,
+              UserRole.PARTICULAR,
+              UserRole.COMPANY,
+              UserRole.AGENCY,
+              UserRole.PROVIDER,
+            ]}
+          >
+            <PerfilesPage auth={auth} />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Legal */}
       <Route path="/aviso-legal" element={<AvisoLegalPage />} />
       <Route path="/privacidad" element={<PrivacidadPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/terminos" element={<TerminosPage />} />
+
+      <Route
+        path="/jobs/oneoff/new"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY, UserRole.AGENCY]}>
+            <CrearEmpleoPuntualPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/jobs/oneoff/:jobId/edit"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY, UserRole.AGENCY]}>
+            <CrearEmpleoPuntualPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Admin */}
       <Route
@@ -167,6 +206,7 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
         <Route path="metrics" element={<AdminMetricsPage />} />
         <Route path="finance" element={<AdminFinancePage />} />
         <Route path="logs" element={<AdminLogsPage />} />
+        <Route path="marketplace" element={<MarketplaceSection />} />
       </Route>
 
       {/* Agency */}
@@ -232,10 +272,36 @@ const AppRoutes: React.FC<Props> = ({ auth }) => {
         <Route path="perfil" element={<WorkerProfilePage auth={auth} />} />
         <Route path="trabajos" element={<WorkerDashboard auth={auth} />} />
         <Route path="jobs" element={<WorkerJobs />} />
+        <Route path="solicitudes" element={<WorkerJobs initialTab="applications" />} />
         <Route path="jobs/:id" element={<WorkerJobDetail />} />
         <Route path="pagos" element={<div className="p-4 text-sm">Pagos (pendiente)</div>} />
         <Route path="seguridad" element={<div className="p-4 text-sm">Seguridad (pendiente)</div>} />
       </Route>
+
+      <Route
+        path="/worker/chat"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.HELPER]}>
+            <ChatPlaceholderPage
+              title="Chat trabajador"
+              subtitle="El chat estará disponible cuando una solicitud sea aceptada."
+              basePath="/worker/jobs"
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/client/chat"
+        element={
+          <ProtectedRoute auth={auth} roles={[UserRole.PARTICULAR, UserRole.COMPANY]}>
+            <ChatPlaceholderPage
+              title="Chat cliente"
+              subtitle="Consulta las conversaciones de candidaturas aceptadas."
+              basePath="/client/jobs"
+            />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Chat */}
       <Route element={<ProtectedRoute auth={auth} roles={[UserRole.HELPER, UserRole.PARTICULAR, UserRole.COMPANY]} />}>

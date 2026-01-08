@@ -95,5 +95,24 @@ export const paymentService = {
 
     if (error) throw error;
     return data || [];
-  }
+  },
+  async recordJobPayment(params: {
+    userId: string;
+    jobId: string;
+    applicationId: string;
+    amount: number;
+    currency?: string;
+    status?: 'pending' | 'completed' | 'failed';
+  }): Promise<void> {
+    const { error } = await supabase.from('VoyPayments').insert({
+      user_id: params.userId,
+      job_id: params.jobId,
+      application_id: params.applicationId,
+      amount: params.amount,
+      currency: params.currency ?? 'EUR',
+      status: params.status ?? 'pending',
+    });
+
+    if (error) throw error;
+  },
 };

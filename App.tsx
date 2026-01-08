@@ -1,11 +1,12 @@
 // App.tsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { HashRouter } from "react-router-dom";
 import { supabase } from "./services/supabase";
 import { Layout } from "./components/Layout";
 import AppRoutes from "./components/routing/AppRoutes";
 import type { AuthState } from "./types";
 import { mapLegacyRoleToBase, UserRole } from "./types";
+import { CartProvider } from "./marketplace/context/CartContext";
 
 const INITIAL_AUTH: AuthState = {
   isAuthenticated: false,
@@ -16,11 +17,13 @@ const INITIAL_AUTH: AuthState = {
 export default function App() {
   const [auth, setAuth] = useState<AuthState>(INITIAL_AUTH);
 
-  const fetchProfile = async (authUserId: string) => {
+  const fetchProfile = useCallback(async (authUserId: string) => {
     try {
       const { data, error } = await supabase
         .from("VoyUsers")
-        .select("id, auth_user_id, full_name, role, email, city, district, company_sector")
+        .select(
+          "id, auth_user_id, full_name, role, email, city, district, company_sector, avatar_url, selfie_photo_url, verification_status"
+        )
         .eq("auth_user_id", authUserId)
         .single();
 
@@ -42,6 +45,9 @@ export default function App() {
             city: data.city,
             district: data.district,
             company_sector: data.company_sector,
+            avatar_url: data.avatar_url,
+            selfie_photo_url: data.selfie_photo_url,
+            verification_status: data.verification_status,
           } as any,
         });
       } else {
@@ -51,7 +57,7 @@ export default function App() {
       console.error("Error fetching profile:", error);
       setAuth({ ...INITIAL_AUTH, loading: false });
     }
-  };
+  }, []);
 
   useEffect(() => {
     console.log("[APP BOOT]");
@@ -79,7 +85,22 @@ export default function App() {
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchProfile]);
+
+  useEffect(() => {
+    const refreshProfile = async () => {
+      const { data } = await supabase.auth.getSession();
+      const authUserId = data.session?.user?.id;
+      if (authUserId) {
+        fetchProfile(authUserId);
+      }
+    };
+
+    window.addEventListener("voy:user-updated", refreshProfile);
+    return () => {
+      window.removeEventListener("voy:user-updated", refreshProfile);
+    };
+  }, [fetchProfile]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -87,10 +108,12 @@ export default function App() {
   };
 
   return (
-    <HashRouter>
-      <Layout auth={auth} onLogout={handleLogout}>
-        <AppRoutes auth={auth} />
-      </Layout>
-    </HashRouter>
+    <CartProvider>
+      <HashRouter>
+        <Layout auth={auth} onLogout={handleLogout}>
+          <AppRoutes auth={auth} />
+        </Layout>
+      </HashRouter>
+    </CartProvider>
   );
 }
